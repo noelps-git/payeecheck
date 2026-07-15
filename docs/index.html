@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PayeeCheck — UPI Payee Verification API</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ─────────────────────────────────────────────────────── */
+:root {
+  --void:     #050508;
+  --dark:     #0D0D14;
+  --surface:  #14141E;
+  --edge:     #22222E;
+  --edge2:    #2E2E3E;
+  --white:    #FFFFFF;
+  --offwhite: #F4F4F7;
+  --muted:    #7878A0;
+  --muted2:   #A0A0BE;
+  --cobalt:   #1444FF;
+  --cobalt-d: rgba(20,68,255,0.12);
+  --cobalt-b: rgba(20,68,255,0.06);
+  --pass:     #BEFF00;
+  --pass-d:   rgba(190,255,0,0.10);
+  --warn:     #FF9500;
+  --warn-d:   rgba(255,149,0,0.12);
+  --block:    #FF3B30;
+  --block-d:  rgba(255,59,48,0.12);
+  --sig-ok:   #30D158;
+  --text:     #0A0A12;
+  --text2:    #48485A;
+  --font-d:   'Space Grotesk', system-ui, sans-serif;
+  --font-b:   'Inter', system-ui, sans-serif;
+  --font-m:   'JetBrains Mono', 'SF Mono', monospace;
+  --r-sm: 6px; --r-md: 12px; --r-lg: 20px;
+  --max: 1100px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-b);background:var(--void);color:var(--white);overflow-x:hidden;line-height:1.6}
+
+/* ── NAV ─────────────────────────────────────────────────────────── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(5,5,8,0.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--edge)}
+.nav-logo{display:flex;align-items:center;gap:9px;font-family:var(--font-d);font-size:15px;font-weight:600;letter-spacing:-.02em;text-decoration:none;color:var(--white)}
+.nav-mark{width:26px;height:26px;background:var(--cobalt);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.nav-links{display:flex;align-items:center;gap:28px;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;transition:color .15s}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{background:var(--cobalt)!important;color:white!important;padding:7px 18px;border-radius:7px;font-weight:600!important;font-size:13px!important}
+.nav-cta:hover{opacity:.88}
+
+/* ── LAYOUT ──────────────────────────────────────────────────────── */
+.wrap{max-width:var(--max);margin:0 auto;padding:0 40px}
+section{padding:96px 0}
+.eyebrow{font-family:var(--font-m);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--cobalt);display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.eyebrow::before{content:'';width:20px;height:1px;background:var(--cobalt)}
+.eyebrow.on-light{color:var(--cobalt)}
+
+/* ── HERO ────────────────────────────────────────────────────────── */
+#hero{min-height:100vh;background:var(--void);display:flex;align-items:center;padding:120px 0 80px;position:relative;overflow:hidden}
+#hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--edge) 1px,transparent 1px),linear-gradient(90deg,var(--edge) 1px,transparent 1px);background-size:64px 64px;opacity:.25;pointer-events:none}
+#hero::after{content:'';position:absolute;top:-240px;left:-80px;width:700px;height:700px;background:radial-gradient(circle,rgba(20,68,255,.13) 0%,transparent 68%);pointer-events:none}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;position:relative;z-index:1}
+.hero-eye{font-family:var(--font-m);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--cobalt);display:flex;align-items:center;gap:10px;margin-bottom:22px}
+.hero-eye::before{content:'';width:20px;height:1px;background:var(--cobalt)}
+h1.hh{font-family:var(--font-d);font-size:clamp(30px,3.8vw,50px);font-weight:700;line-height:1.07;letter-spacing:-.03em;margin-bottom:20px}
+h1.hh .hl{color:var(--cobalt)}
+.hero-sub{font-size:15.5px;color:var(--muted2);line-height:1.7;margin-bottom:32px;max-width:460px}
+.hero-ctas{display:flex;gap:10px;flex-wrap:wrap}
+.btn-p{background:var(--cobalt);color:white;border:none;padding:11px 22px;border-radius:8px;font-family:var(--font-b);font-size:13.5px;font-weight:600;cursor:pointer;transition:transform .15s,box-shadow .15s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-p:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(20,68,255,.38)}
+.btn-s{background:transparent;color:var(--muted2);border:1px solid var(--edge2);padding:11px 22px;border-radius:8px;font-family:var(--font-b);font-size:13.5px;font-weight:500;cursor:pointer;transition:all .15s;text-decoration:none}
+.btn-s:hover{border-color:var(--muted);color:var(--white)}
+
+/* ── HERO TERMINAL ───────────────────────────────────────────────── */
+.h-term{background:var(--surface);border:1px solid var(--edge2);border-radius:var(--r-lg);overflow:hidden;font-family:var(--font-m);font-size:11.5px}
+.h-term-bar{background:var(--dark);padding:10px 16px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--edge)}
+.tdot{width:10px;height:10px;border-radius:50%}
+.td-r{background:#FF5F57}.td-y{background:#FEBC2E}.td-g{background:#28C840}
+.h-term-label{font-size:10.5px;color:var(--muted);margin-left:6px;letter-spacing:.04em}
+.h-term-body{padding:20px;min-height:270px}
+.tl{display:flex;gap:10px;margin-bottom:9px;align-items:flex-start;opacity:0;transform:translateY(5px);transition:opacity .3s,transform .3s}
+.tl.vis{opacity:1;transform:translateY(0)}
+.tl-t{color:var(--muted);flex-shrink:0;width:68px;font-size:11px}
+.tl-m{color:#9090BE;flex-shrink:0;width:195px}
+.tl-r{display:flex;align-items:center;gap:8px}
+.tl-ok{color:var(--sig-ok)}.tl-bad{color:var(--block)}.tl-wrn{color:var(--warn)}.tl-neu{color:var(--muted)}
+.tl-v{color:var(--muted);font-size:10.5px}
+.t-verd{margin-top:16px;padding-top:14px;border-top:1px solid var(--edge);display:flex;align-items:center;gap:14px;opacity:0;transition:opacity .4s}
+.t-verd.vis{opacity:1}
+.vb{font-family:var(--font-d);font-size:12.5px;font-weight:700;letter-spacing:.07em;padding:5px 14px;border-radius:6px}
+.vb-w{background:rgba(255,149,0,.15);color:var(--warn)}
+.vb-b{background:rgba(255,59,48,.15);color:var(--block)}
+.vb-p{background:rgba(190,255,0,.12);color:var(--pass)}
+.t-rs{color:var(--muted);font-size:11px}
+
+/* ── GAP ─────────────────────────────────────────────────────────── */
+#gap{background:var(--offwhite);color:var(--text)}
+#gap .eyebrow{color:var(--cobalt)}
+#gap .eyebrow::before{background:var(--cobalt)}
+#gap h2{font-family:var(--font-d);font-size:clamp(22px,2.8vw,36px);font-weight:700;letter-spacing:-.025em;line-height:1.18;margin-bottom:14px;color:var(--text);max-width:580px}
+.gap-sub{font-size:15px;color:var(--text2);max-width:560px;margin-bottom:52px;line-height:1.65}
+.gap-grid{display:grid;grid-template-columns:1fr 48px 1fr;gap:0;align-items:center}
+.gc{background:white;border-radius:var(--r-md);padding:30px;border:1px solid #E4E4EC}
+.gc.uk{border-top:3px solid var(--sig-ok)}.gc.in{border-top:3px solid var(--cobalt)}
+.gc-lbl{font-family:var(--font-m);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:10px}
+.gc h3{font-family:var(--font-d);font-size:17px;font-weight:600;margin-bottom:16px;color:var(--text)}
+.gc-pts{list-style:none}
+.gc-pts li{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--text2);margin-bottom:11px;line-height:1.55}
+.gd{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.gd-g{background:var(--sig-ok)}.gd-c{background:var(--cobalt)}.gd-r{background:var(--block)}
+.gap-vs{display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:11px;font-weight:700;color:var(--cobalt);letter-spacing:.08em}
+
+/* ── STATS ───────────────────────────────────────────────────────── */
+#stats{background:var(--void)}
+#stats h2{font-family:var(--font-d);font-size:clamp(22px,2.6vw,34px);font-weight:700;letter-spacing:-.025em;margin-bottom:44px;max-width:540px}
+.bento{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.bc{background:var(--surface);border:1px solid var(--edge);border-radius:var(--r-md);padding:26px;position:relative;overflow:hidden}
+.bc::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(20,68,255,.04) 0%,transparent 55%);pointer-events:none}
+.bc-n{font-family:var(--font-d);font-size:40px;font-weight:700;letter-spacing:-.03em;line-height:1;margin-bottom:8px}
+.bc-n.pass-c{color:var(--pass)}.bc-n.cob{color:var(--cobalt)}
+.bc-lbl{font-size:13px;font-weight:600;margin-bottom:4px}
+.bc-sub{font-size:12px;color:var(--muted);line-height:1.55}
+.bc-tag{position:absolute;top:18px;right:18px;font-family:var(--font-m);font-size:9.5px;padding:3px 8px;border-radius:4px;background:var(--cobalt-d);color:var(--cobalt);letter-spacing:.06em}
+
+/* ── SIGNALS ─────────────────────────────────────────────────────── */
+#signals{background:var(--offwhite);color:var(--text)}
+#signals .eyebrow{color:var(--cobalt)}
+#signals .eyebrow::before{background:var(--cobalt)}
+#signals h2{font-family:var(--font-d);font-size:clamp(22px,2.6vw,34px);font-weight:700;letter-spacing:-.025em;margin-bottom:8px;color:var(--text)}
+.sig-sub{font-size:15px;color:var(--text2);margin-bottom:40px;max-width:600px}
+.sig-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.sc{background:white;border:1px solid #E4E4EC;border-radius:var(--r-md);padding:22px;transition:border-color .2s,transform .2s}
+.sc:hover{border-color:var(--cobalt);transform:translateY(-2px)}
+.sc.proposed{background:transparent;border-style:dashed;border-color:#C0C0D8;opacity:.55}
+.sc-num{font-family:var(--font-m);font-size:10px;color:#BBBBD0;margin-bottom:10px;letter-spacing:.06em}
+.sc-icon{width:34px;height:34px;border-radius:8px;background:var(--cobalt-d);display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:15px}
+.sc-title{font-family:var(--font-d);font-size:14.5px;font-weight:600;color:var(--text);margin-bottom:6px}
+.sc-depth{font-family:var(--font-m);font-size:9.5px;color:var(--cobalt);background:var(--cobalt-d);padding:2px 8px;border-radius:4px;display:inline-block;margin-bottom:9px;letter-spacing:.06em}
+.sc-desc{font-size:12.5px;color:var(--text2);line-height:1.55}
+
+/* ── SANDBOX ─────────────────────────────────────────────────────── */
+#sandbox{background:var(--void);padding:96px 0}
+.sb-hdr{margin-bottom:44px}
+.sb-hdr h2{font-family:var(--font-d);font-size:clamp(24px,3vw,40px);font-weight:700;letter-spacing:-.03em;margin-bottom:10px}
+.sb-hdr p{font-size:14.5px;color:var(--muted);max-width:500px;line-height:1.65}
+.pills{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:32px}
+.pill{font-family:var(--font-b);font-size:12px;font-weight:500;padding:6px 14px;border-radius:20px;border:1px solid var(--edge2);color:var(--muted);background:transparent;cursor:pointer;transition:all .15s;white-space:nowrap}
+.pill:hover{border-color:var(--muted);color:var(--white)}
+.pill.active-pass{background:rgba(190,255,0,.12);border-color:rgba(190,255,0,.4);color:var(--pass)}
+.pill.active-warn{background:var(--warn-d);border-color:rgba(255,149,0,.4);color:var(--warn)}
+.pill.active-block{background:var(--block-d);border-color:rgba(255,59,48,.4);color:var(--block)}
+.prod-panel{background:var(--dark);border:1px solid var(--edge2);border-radius:var(--r-lg);overflow:hidden}
+.pp-top{background:var(--surface);padding:13px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--edge)}
+.pp-title{font-family:var(--font-m);font-size:10.5px;color:var(--muted);letter-spacing:.09em;text-transform:uppercase}
+.pp-env{font-family:var(--font-m);font-size:9.5px;color:var(--cobalt);background:var(--cobalt-d);padding:3px 10px;border-radius:4px;letter-spacing:.07em}
+.pp-body{display:grid;grid-template-columns:1fr 290px;min-height:420px}
+/* log */
+.slog{padding:22px;border-right:1px solid var(--edge)}
+.slog-hdr{font-family:var(--font-m);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:18px;padding-bottom:11px;border-bottom:1px solid var(--edge);display:flex;justify-content:space-between}
+.le{display:grid;grid-template-columns:70px 1fr auto;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(34,34,46,.5);font-family:var(--font-m);font-size:11.5px;opacity:0;transform:translateX(-6px);transition:opacity .22s,transform .22s}
+.le.vis{opacity:1;transform:translateX(0)}
+.le-t{color:var(--muted);font-size:10.5px}
+.le-m{color:#9494BC;font-size:11px}
+.le-s{display:flex;align-items:center;gap:6px;font-size:11px}
+.ls-ok{color:var(--sig-ok)}.ls-fail{color:var(--block)}.ls-warn{color:var(--warn)}.ls-neu{color:var(--muted)}
+.le-v{color:var(--muted);font-size:10px;font-style:italic}
+/* verdict */
+.vp{padding:22px;display:flex;flex-direction:column;gap:0}
+.vp-lbl{font-family:var(--font-m);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px}
+.v-main{opacity:0;transition:opacity .35s;flex:1}
+.v-main.vis{opacity:1}
+.vbig{font-family:var(--font-d);font-size:26px;font-weight:700;letter-spacing:.05em;padding:15px 22px;border-radius:var(--r-md);text-align:center;margin-bottom:12px}
+.vbig-b{background:var(--block-d);color:var(--block);border:1px solid rgba(255,59,48,.22)}
+.vbig-w{background:var(--warn-d);color:var(--warn);border:1px solid rgba(255,149,0,.22)}
+.vbig-p{background:var(--pass-d);color:var(--pass);border:1px solid rgba(190,255,0,.2)}
+.v-score-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.v-score-lbl{font-size:11.5px;color:var(--muted);font-family:var(--font-m)}
+.v-score-val{font-family:var(--font-d);font-size:20px;font-weight:700}
+.v-bar-bg{height:5px;background:var(--edge);border-radius:3px;overflow:hidden;margin-bottom:14px}
+.v-bar{height:100%;border-radius:3px;transition:width .9s cubic-bezier(.22,1,.36,1);width:0}
+.vbar-b{background:var(--block)}.vbar-w{background:var(--warn)}.vbar-p{background:var(--pass)}
+.v-desc{font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:18px}
+.v-vpa{font-family:var(--font-m);font-size:10px;padding:8px 10px;background:var(--surface);border:1px solid var(--edge);border-radius:6px;margin-bottom:18px;color:var(--muted2);line-height:1.6}
+.v-vpa span{color:var(--cobalt)}
+/* attribution */
+.attr{margin-top:auto;padding-top:16px;border-top:1px solid var(--edge)}
+.attr-hdr{font-family:var(--font-m);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+.attr-layer{margin-bottom:10px}
+.attr-lbl{font-family:var(--font-m);font-size:9.5px;color:var(--cobalt);margin-bottom:4px;letter-spacing:.06em}
+.attr-body{font-size:11px;color:#7878A0;line-height:1.55;padding-left:8px;border-left:2px solid var(--edge2)}
+
+/* ── TECH ────────────────────────────────────────────────────────── */
+#tech{background:var(--offwhite);color:var(--text)}
+#tech .eyebrow{color:var(--cobalt)}
+#tech .eyebrow::before{background:var(--cobalt)}
+#tech h2{font-family:var(--font-d);font-size:clamp(22px,2.6vw,34px);font-weight:700;letter-spacing:-.025em;margin-bottom:36px;color:var(--text)}
+.tech-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.tc{background:white;border:1px solid #E4E4EC;border-radius:var(--r-md);padding:26px}
+.tc h3{font-family:var(--font-d);font-size:15.5px;font-weight:600;margin-bottom:10px;color:var(--text)}
+.tc p,.tc li{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:7px}
+.tc ul{list-style:none}
+.tc li{padding-left:14px;position:relative}
+.tc li::before{content:'—';position:absolute;left:0;color:var(--cobalt)}
+.tc code{background:#F0F0F8;padding:1px 5px;border-radius:3px;font-family:var(--font-m);font-size:11px}
+.tc pre{background:#F5F5FA;padding:12px;border-radius:7px;font-family:var(--font-m);font-size:11px;color:var(--text2);overflow-x:auto;margin:10px 0;line-height:1.6}
+.honest{background:#FFFBF0;border:1px solid #FFE0A0;border-radius:var(--r-md);padding:22px 26px}
+.honest-lbl{font-family:var(--font-m);font-size:10px;color:#A07000;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.honest p{font-size:13px;color:#7A5800;line-height:1.65}
+.honest em{font-style:italic}
+
+/* ── REGULATORY ──────────────────────────────────────────────────── */
+#reg{background:var(--void)}
+#reg h2{font-family:var(--font-d);font-size:clamp(22px,2.6vw,34px);font-weight:700;letter-spacing:-.025em;margin-bottom:44px;max-width:540px}
+.reg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.rc{background:var(--surface);border:1px solid var(--edge2);border-radius:var(--r-md);padding:26px}
+.rc-flag{font-size:26px;margin-bottom:10px}
+.rc-country{font-family:var(--font-d);font-size:15px;font-weight:600;margin-bottom:6px}
+.rc-status{font-family:var(--font-m);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:4px;display:inline-block;margin-bottom:16px}
+.rs-live{background:rgba(48,209,88,.12);color:#30D158}
+.rs-prop{background:var(--cobalt-d);color:var(--cobalt)}
+.rs-man{background:var(--warn-d);color:var(--warn)}
+.rc-pts{list-style:none}
+.rc-pts li{font-size:12.5px;color:var(--muted);line-height:1.55;margin-bottom:10px;padding-left:12px;position:relative}
+.rc-pts li::before{content:'·';position:absolute;left:0;color:var(--cobalt)}
+
+/* ── CTA ─────────────────────────────────────────────────────────── */
+#cta{background:var(--void);border-top:1px solid var(--edge);text-align:center;padding:80px 40px}
+#cta h2{font-family:var(--font-d);font-size:clamp(24px,3vw,42px);font-weight:700;letter-spacing:-.03em;margin-bottom:12px;max-width:540px;margin-left:auto;margin-right:auto}
+#cta p{font-size:14.5px;color:var(--muted);margin-bottom:32px;max-width:400px;margin-left:auto;margin-right:auto;line-height:1.65}
+.cta-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+
+/* ── FOOTER ──────────────────────────────────────────────────────── */
+footer{background:var(--dark);border-top:1px solid var(--edge);padding:28px 40px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted)}
+.f-logo{font-family:var(--font-d);font-weight:600;color:var(--white);font-size:13px}
+.f-links{display:flex;gap:22px}
+.f-links a{color:var(--muted);text-decoration:none;font-size:12px}
+.f-links a:hover{color:var(--white)}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────── */
+@media(max-width:960px){
+  .hero-grid{grid-template-columns:1fr;gap:40px}
+  .bento{grid-template-columns:repeat(2,1fr)}
+  .sig-cards{grid-template-columns:repeat(2,1fr)}
+  .pp-body{grid-template-columns:1fr}
+  .vp{border-top:1px solid var(--edge)}
+  .gap-grid{grid-template-columns:1fr}
+  .gap-vs{display:none}
+  .tech-grid{grid-template-columns:1fr}
+  .reg-grid{grid-template-columns:1fr}
+  .wrap{padding:0 24px}
+  section{padding:64px 0}
+  nav{padding:0 24px}
+  #cta{padding:60px 24px}
+  footer{padding:24px;flex-direction:column;gap:12px;text-align:center}
+  .f-links{flex-wrap:wrap;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo"><div class="nav-mark">PC</div>PayeeCheck</a>
+  <ul class="nav-links">
+    <li><a href="#gap">The Problem</a></li>
+    <li><a href="#signals">Architecture</a></li>
+    <li><a href="#tech">Technical Depth</a></li>
+    <li><a href="#sandbox" class="nav-cta">Run a check →</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ──────────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eye">PayeeCheck — UPI Payee Verification API</div>
+        <h1 class="hh">India processes <span class="hl">₹17B</span> UPI transactions monthly.<br>None verify the payee's name.</h1>
+        <p class="hero-sub">PayeeCheck is a fraud-detection API built for Indian BFSI — seven signal modules, a trained edge-feature GAT ring detector, and a three-layer attribution record designed for the regulatory era ahead.</p>
+        <div class="hero-ctas">
+          <a href="#sandbox" class="btn-p">Run a live check →</a>
+          <a href="#tech" class="btn-s">Read the architecture</a>
+        </div>
+      </div>
+      <div class="h-term">
+        <div class="h-term-bar">
+          <div class="tdot td-r"></div><div class="tdot td-y"></div><div class="tdot td-g"></div>
+          <span class="h-term-label">POST /v1/payee-checks — clipboard_scam scenario</span>
+        </div>
+        <div class="h-term-body">
+          <div class="tl" id="ht1"><span class="tl-t">0.312ms</span><span class="tl-m">Name Matching L3</span><span class="tl-r tl-wrn">⚠ 0.38 <span class="tl-v">abbreviation mismatch</span></span></div>
+          <div class="tl" id="ht2"><span class="tl-t">0.521ms</span><span class="tl-m">Lookalike VPA L3</span><span class="tl-r tl-bad">✗ BLOCK <span class="tl-v">hdfc brand + @paytrn not registered</span></span></div>
+          <div class="tl" id="ht3"><span class="tl-t">0.890ms</span><span class="tl-m">Mule Database L1</span><span class="tl-r tl-neu">○ clear <span class="tl-v">no consortium flags</span></span></div>
+          <div class="tl" id="ht4"><span class="tl-t">1.203ms</span><span class="tl-m">Behavioural SDK</span><span class="tl-r tl-wrn">⚠ paste <span class="tl-v">ms_since_bg: 4,200</span></span></div>
+          <div class="tl" id="ht5"><span class="tl-t">1.567ms</span><span class="tl-m">VPA Velocity L2</span><span class="tl-r tl-bad">✗ BLOCK <span class="tl-v">11 days · 43 unique senders/7d</span></span></div>
+          <div class="tl" id="ht6"><span class="tl-t">1.890ms</span><span class="tl-m">Sanctions Screen</span><span class="tl-r tl-ok">✓ clear <span class="tl-v">no PEP match</span></span></div>
+          <div class="tl" id="ht7"><span class="tl-t">2.145ms</span><span class="tl-m">GAT Ring Score</span><span class="tl-r tl-neu">○ 0.18 <span class="tl-v">below ring threshold</span></span></div>
+          <div class="t-verd" id="htv">
+            <span class="vb vb-w">WARN</span>
+            <span class="t-rs">risk_score: 62/100 · 2.145ms total</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── GAP ───────────────────────────────────────────────────────── -->
+<section id="gap">
+  <div class="wrap">
+    <div class="eyebrow on-light">The Structural Gap</div>
+    <h2>The UK mandated payee name verification in 2020. India hasn't yet.</h2>
+    <p class="gap-sub">UPI routes money via account number and VPA — the name you see is a display label only. There's no mandatory cross-check that the name the payer typed matches the account holder on file. PayeeCheck addresses this gap.</p>
+    <div class="gap-grid">
+      <div class="gc uk">
+        <div class="gc-lbl">🇬🇧 United Kingdom</div>
+        <h3>Confirmation of Payee (CoP)</h3>
+        <ul class="gc-pts">
+          <li><span class="gd gd-g"></span>Mandated by PSR in 2020 for all major UK banks</li>
+          <li><span class="gd gd-g"></span>Real-time name verification at point of payment — mandatory</li>
+          <li><span class="gd gd-g"></span>PSR evaluation report (2022): ~17% reduction in APP fraud in year one</li>
+          <li><span class="gd gd-g"></span>MAST (Mule Account Sharing Tool) — consortium cross-bank mule flagging</li>
+        </ul>
+      </div>
+      <div class="gap-vs">VS</div>
+      <div class="gc in">
+        <div class="gc-lbl">🇮🇳 India — UPI / NPCI</div>
+        <h3>No Mandatory Payee Name Verification</h3>
+        <ul class="gc-pts">
+          <li><span class="gd gd-r"></span>17B+ transactions/month — zero structural payee name check</li>
+          <li><span class="gd gd-r"></span>VPA name is a display string only — routing is by account number</li>
+          <li><span class="gd gd-r"></span>An attacker can register any display name on any VPA</li>
+          <li><span class="gd gd-c"></span>RBI has proposed a CoP-equivalent — implementation timeline pending</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STATS ─────────────────────────────────────────────────────── -->
+<section id="stats">
+  <div class="wrap">
+    <div class="eyebrow">Benchmark — Synthetic Dataset</div>
+    <h2>The numbers. Real benchmark, honest framing.</h2>
+    <div class="bento">
+      <div class="bc"><div class="bc-tag">PIPELINE</div><div class="bc-n pass-c">1.00</div><div class="bc-lbl">Precision</div><div class="bc-sub">Zero false positives across 700 clean transactions in the synthetic benchmark</div></div>
+      <div class="bc"><div class="bc-tag">PIPELINE</div><div class="bc-n cob">82.6%</div><div class="bc-lbl">Recall</div><div class="bc-sub">Improved from 47% after fixing a real dataset generator bug — documented in CHANGELOG</div></div>
+      <div class="bc"><div class="bc-tag">THROUGHPUT</div><div class="bc-n">2.2ms</div><div class="bc-lbl">Per Transaction</div><div class="bc-sub">Full 7-signal pipeline on CPU. Sub-millisecond for L1–L3 layers alone</div></div>
+      <div class="bc"><div class="bc-tag">ARCHITECTURE</div><div class="bc-n cob">7</div><div class="bc-lbl">Signal Modules</div><div class="bc-sub">Name Matching · Lookalike VPA · Mule DB · Behavioural SDK · Velocity · Sanctions · GAT Ring</div></div>
+      <div class="bc"><div class="bc-tag">GAT ABLATION</div><div class="bc-n">6.7pp</div><div class="bc-lbl">Edge Feature Lift</div><div class="bc-sub">Full GAT 95.6% precision vs NoEdge ablation 88.9% — confirmed edge-feature contribution</div></div>
+      <div class="bc"><div class="bc-tag">SANDBOX</div><div class="bc-n cob">13</div><div class="bc-lbl">Deterministic Scenarios</div><div class="bc-sub">Clean, mule, consortium block, brand impersonation, clipboard scam, ring, sanctions, and more</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SIGNAL STACK ───────────────────────────────────────────────── -->
+<section id="signals">
+  <div class="wrap">
+    <div class="eyebrow on-light">Signal Architecture</div>
+    <h2>Seven signal modules. Each with progressive depth.</h2>
+    <p class="sig-sub">Each module outputs a grounded assertion with a specific numerical value and threshold. Every verdict is fully traceable through a three-layer attribution record — designed to meet RBI Model Risk Management interpretability requirements.</p>
+    <div class="sig-cards">
+      <div class="sc"><div class="sc-num">01</div><div class="sc-icon">🔤</div><div class="sc-title">Name Matching</div><div class="sc-depth">L1 → L6</div><div class="sc-desc">Jaro-Winkler → phonetic → TF-IDF char n-grams → sentence embeddings → Siamese fine-tune → graph entity resolution. Handles Indian transliteration, abbreviations, and entity type mismatch.</div></div>
+      <div class="sc"><div class="sc-num">02</div><div class="sc-icon">🎭</div><div class="sc-title">Look-alike VPA</div><div class="sc-depth">L1 → L5</div><div class="sc-desc">Protected Brand Token Registry (NPCI-style, zero ML) catches the 'paytm.support@axl' pattern that string distance cannot. Highest leverage per engineering cost.</div></div>
+      <div class="sc"><div class="sc-num">03</div><div class="sc-icon">🕳️</div><div class="sc-title">Mule Database</div><div class="sc-depth">L1 → L4</div><div class="sc-desc">Static flag lookup → velocity scoring (fan-in, pass-through speed, balance volatility) → consortium shared DB (MAST-modelled) → graph-based ring propagation.</div></div>
+      <div class="sc"><div class="sc-num">04</div><div class="sc-icon">📱</div><div class="sc-title">Behavioural SDK</div><div class="sc-depth">L1 → L4</div><div class="sc-desc">Client-side: paste vs type, app-switch timing chain (cross-app copy from SMS), device fingerprint, per-user z-score baseline. Fires before any server-side check.</div></div>
+      <div class="sc"><div class="sc-num">05</div><div class="sc-icon">⚡</div><div class="sc-title">VPA Velocity Engine</div><div class="sc-depth">L1 → L4</div><div class="sc-desc">Rolling window velocity (24h/7d/30d), amount-ratio scoring, salary-cycle-aware seasonal z-score, linear trend early-warning forecast. Detects mules before any report is filed.</div></div>
+      <div class="sc"><div class="sc-num">06</div><div class="sc-icon">🚫</div><div class="sc-title">Sanctions Screen</div><div class="sc-depth">Fuzzy Match</div><div class="sc-desc">PEP and sanctions list fuzzy matching on payee name. Hard block at threshold — overrides all other signals. Illustrative seed lists in sandbox; production requires OFAC/UN/domestic integration.</div></div>
+      <div class="sc"><div class="sc-num">07</div><div class="sc-icon">🕸️</div><div class="sc-title">GAT Ring Detector</div><div class="sc-depth">PyTorch Geometric</div><div class="sc-desc">Edge-feature Graph Attention Network (GATConv, edge_dim). Trained on 636-node synthetic graph. Catches fraud rings via shared mobile/device attribute propagation, not just individual flags.</div></div>
+      <div class="sc proposed"><div class="sc-num">08</div><div class="sc-icon">🔄</div><div class="sc-title">Transaction Graph GNN</div><div class="sc-depth">PROPOSED</div><div class="sc-desc">Money-flow edges (who paid whom, amount, frequency). LineMVGNN-inspired pass-through score. Next in the development queue — not yet built.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SANDBOX ────────────────────────────────────────────────────── -->
+<section id="sandbox">
+  <div class="wrap">
+    <div class="sb-hdr">
+      <div class="eyebrow">Live Sandbox — Deterministic Responses</div>
+      <h2>Run a live check. Real signals, synthetic data.</h2>
+      <p>Select any of the 13 scenarios to see the full 7-signal pipeline animate with realistic timing, attribution record, and verdict. No API key required.</p>
+    </div>
+    <div class="pills" id="pillsContainer"></div>
+    <div class="prod-panel">
+      <div class="pp-top">
+        <span class="pp-title">POST /sandbox/v1/payee-checks</span>
+        <span class="pp-env">SANDBOX — deterministic</span>
+      </div>
+      <div class="pp-body">
+        <div class="slog">
+          <div class="slog-hdr"><span>Signal Pipeline</span><span id="logTimer" style="color:var(--cobalt)">—</span></div>
+          <div id="logBody"></div>
+        </div>
+        <div class="vp">
+          <div class="vp-lbl">Risk Assessment</div>
+          <div class="v-main" id="vMain">
+            <div class="vbig" id="vBig">—</div>
+            <div class="v-vpa" id="vVpa"><span>payee_vpa</span> — <br><span>entered_name</span> → <span>actual_name</span></div>
+            <div class="v-score-row">
+              <span class="v-score-lbl">risk_score</span>
+              <span class="v-score-val" id="vScoreVal">0</span>
+            </div>
+            <div class="v-bar-bg"><div class="v-bar" id="vBar"></div></div>
+            <div class="v-desc" id="vDesc">Select a scenario above to run a check.</div>
+          </div>
+          <div class="attr">
+            <div class="attr-hdr">Attribution Record</div>
+            <div class="attr-layer"><div class="attr-lbl">Layer 1 — Transaction</div><div class="attr-body" id="aL1">—</div></div>
+            <div class="attr-layer"><div class="attr-lbl">Layer 2 — Payee Network</div><div class="attr-body" id="aL2">—</div></div>
+            <div class="attr-layer"><div class="attr-lbl">Layer 3 — Temporal</div><div class="attr-body" id="aL3">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TECH ──────────────────────────────────────────────────────── -->
+<section id="tech">
+  <div class="wrap">
+    <div class="eyebrow on-light">Technical Underpinnings</div>
+    <h2>The architecture, cited honestly.</h2>
+    <div class="tech-grid">
+      <div class="tc">
+        <h3>Edge-Feature Graph Attention Network</h3>
+        <p>The GAT ring detector uses PyTorch Geometric's <code>GATConv(edge_dim=…)</code> — edge features concatenated directly into the attention coefficient computation:</p>
+        <pre>α_vu = softmax(LeakyReLU(aᵀ[Wh_v ‖ Wh_u ‖ e_vu]))</pre>
+        <p>Directly informed by SCAFDS (Uddin, 2026) Stage 3 architecture — the fraud co-occurrence edge-feature formulation applied to mule ring detection rather than interbank forensics. Ablation result: 95.6% vs 88.9% precision, confirming edge features carry real signal.</p>
+      </div>
+      <div class="tc">
+        <h3>Three-Layer Attribution Record</h3>
+        <ul>
+          <li><strong>Layer 1 — Transaction:</strong> How was this initiated? Paste vs type, timing, device fingerprint, first-time payee flag.</li>
+          <li><strong>Layer 2 — Payee Network:</strong> What do we know about the destination? VPA age, velocity, mule flags, name score, lookalike signals, GAT ring score.</li>
+          <li><strong>Layer 3 — Temporal:</strong> How does this compare to the payer's own history? Amount vs average, time-of-day, SIM change proximity.</li>
+        </ul>
+        <p>Every signal fires a grounded assertion with a specific numerical value and threshold — designed to meet RBI Draft Model Risk Management Guidelines (2023) interpretability requirements.</p>
+      </div>
+      <div class="tc">
+        <h3>Five Signal Playbooks — 121 Pages</h3>
+        <ul>
+          <li>Name Matching: L1–L6, 47 pages. Jaro-Winkler through graph entity resolution.</li>
+          <li>Look-alike VPA Detection: L1–L5, 21 pages. NPCI-style Brand Token Registry.</li>
+          <li>Mule Account Database: L1–L4, 18 pages. MAST-modelled consortium architecture.</li>
+          <li>Behavioural Signal SDK: L1–L4, 18 pages. Client-side JS + Android Kotlin code.</li>
+          <li>VPA Age + Velocity Engine: L1–L4, 17 pages. Salary-cycle-aware anomaly detection.</li>
+        </ul>
+      </div>
+      <div class="tc">
+        <h3>Real Bugs Found and Fixed</h3>
+        <ul>
+          <li><strong>Dataset inconsistency:</strong> <code>mule_flagged</code> set independently from <code>mule_flag_count</code> — capped recall at 47%. Fixed: <code>mule_flagged = mule_flag_count > 0</code>. Recall jumped to 82.6%.</li>
+          <li><strong>Vacuous GAT ablation:</strong> Non-overlapping fraud/clean feature ranges made the ablation meaningless. Fixed by overlapping ranges — produced a real 6.7pp edge-feature contribution.</li>
+          <li><strong>Idempotency bug:</strong> FastAPI static decorator silently overrode dynamic status codes. Fixed via explicit <code>JSONResponse</code>.</li>
+          <li><strong>IP whitelist bypass:</strong> <code>testclient</code> exemption defeated the security control entirely. Removed and verified.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="honest">
+      <div class="honest-lbl">⚠ Honest Framing</div>
+      <p>All benchmark numbers (Precision 1.00, Recall 82.6%, AUPRC ~0.996) are from rule-generated synthetic data on 1,000 transactions. They measure whether the pipeline correctly recovers patterns <em>deliberately encoded in the generator</em> — not real-world accuracy on live bank data. This framing mirrors how SCAFDS (Uddin, 2026) itself frames its synthetic Track B evaluation. Real-world calibration requires labelled outcomes from a production bank deployment.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── REGULATORY ─────────────────────────────────────────────────── -->
+<section id="reg">
+  <div class="wrap">
+    <div class="eyebrow">Regulatory Context</div>
+    <h2>The global direction is clear. India is next.</h2>
+    <div class="reg-grid">
+      <div class="rc">
+        <div class="rc-flag">🇬🇧</div>
+        <div class="rc-country">United Kingdom</div>
+        <span class="rc-status rs-live">Live since 2020</span>
+        <ul class="rc-pts">
+          <li>Confirmation of Payee mandated by PSR for all major UK banks</li>
+          <li>PSR evaluation (2022): ~17% reduction in APP fraud in year one</li>
+          <li>MAST — Mule Account Sharing Tool, consortium cross-bank flagging operated by Stop Scams UK</li>
+          <li>Extended to all UK PSPs by 2024, not just the original six</li>
+        </ul>
+      </div>
+      <div class="rc">
+        <div class="rc-flag">🇮🇳</div>
+        <div class="rc-country">India — UPI / NPCI</div>
+        <span class="rc-status rs-prop">Proposed</span>
+        <ul class="rc-pts">
+          <li>RBI has proposed a CoP-equivalent for UPI — implementation timeline pending</li>
+          <li>RBI Draft Model Risk Management Guidelines (2023) require interpretable, auditable AI in BFSI</li>
+          <li>17B+ UPI transactions/month — zero mandatory name verification today</li>
+          <li>PayeeCheck is a working proof-of-concept of what this regulation will require</li>
+        </ul>
+      </div>
+      <div class="rc">
+        <div class="rc-flag">🇪🇺</div>
+        <div class="rc-country">European Union</div>
+        <span class="rc-status rs-man">Mandated Oct 2025</span>
+        <ul class="rc-pts">
+          <li>Verification of Payee (VoP) entered into force October 2025 for all SEPA Credit Transfer participants</li>
+          <li>Requires real-time payee name-to-IBAN verification before any transfer is processed</li>
+          <li>EU follows UK's lead — both validate the CoP model at regulatory scale</li>
+          <li>Sets global precedent: name verification is a baseline expectation, not a premium feature</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ────────────────────────────────────────────────────────── -->
+<section id="cta">
+  <h2>For fraud teams, risk leads, and integration engineers.</h2>
+  <p>An independent research project exploring what a working CoP implementation for UPI would look like — not a commercial product.</p>
+  <div class="cta-row">
+    <a href="#sandbox" class="btn-p">Run the sandbox →</a>
+    <a href="https://github.com/noelps-git" target="_blank" class="btn-s">GitHub ↗</a>
+    <a href="https://linkedin.com/in/noel-rajakumar" target="_blank" class="btn-s">Built by Noel ↗</a>
+  </div>
+</section>
+
+<footer>
+  <div class="f-logo">PayeeCheck</div>
+  <div>Independent research · Not affiliated with NPCI or RBI</div>
+  <div class="f-links">
+    <a href="#sandbox">Sandbox</a>
+    <a href="#signals">Architecture</a>
+    <a href="#reg">Regulatory</a>
+    <a href="#tech">Technical Depth</a>
+  </div>
+</footer>
+
+<script>
+// ── SCENARIO DATA ─────────────────────────────────────────────────
+const S = {
+  clean:{label:"✓ Clean Payment",v:"PASS",risk:3,vpa:"amazon.pay@apl",en:"Amazon Pay",an:"Amazon Pay",
+    desc:"All checks passed. Verified merchant, 5+ year VPA, zero flags across all 7 signal modules.",
+    sig:[
+      {t:"0.312ms",m:"Name Matching L3",st:"ok",i:"✓",l:"0.97",d:"exact match"},
+      {t:"0.521ms",m:"Lookalike VPA L3",st:"ok",i:"✓",l:"clean",d:"registered VPA"},
+      {t:"0.890ms",m:"Mule Database L1",st:"ok",i:"✓",l:"0 flags",d:"no consortium flags"},
+      {t:"1.203ms",m:"Behavioural SDK",st:"neu",i:"○",l:"typed",d:"normal input pattern"},
+      {t:"1.567ms",m:"VPA Velocity L2",st:"ok",i:"✓",l:"5yr+ VPA",d:"established history"},
+      {t:"1.890ms",m:"Sanctions Screen",st:"ok",i:"✓",l:"clear",d:"no PEP match"},
+      {t:"2.145ms",m:"GAT Ring Score",st:"ok",i:"✓",l:"0.02",d:"below ring threshold"},
+    ],
+    a1:"No behavioural anomalies. VPA typed from memory. Normal flow duration.",
+    a2:"Name match: 0.97. Registered VPA (5+ years). Zero velocity anomaly. No mule flags. GAT: 0.02.",
+    a3:"First payment to this merchant from this payer. No temporal anomaly."},
+
+  mule:{label:"⛔ Mule Account",v:"BLOCK",risk:88,vpa:"ramesh.001@ybl",en:"Krishna Enterprises",an:"Ramesh Kumar",
+    desc:"Flagged as mule by 1 bank. Entity type mismatch (business name entered, individual account). High inbound velocity pattern.",
+    sig:[
+      {t:"0.312ms",m:"Name Matching L3",st:"fail",i:"✗",l:"0.41",d:"individual vs business"},
+      {t:"0.521ms",m:"Lookalike VPA L3",st:"ok",i:"✓",l:"clean",d:"no brand match"},
+      {t:"0.890ms",m:"Mule Database L1",st:"fail",i:"✗",l:"1 bank flag",d:"ref TXN8823 — Axis Bank"},
+      {t:"1.203ms",m:"Behavioural SDK",st:"neu",i:"○",l:"typed",d:"normal input"},
+      {t:"1.567ms",m:"VPA Velocity L2",st:"warn",i:"⚠",l:"score: 35",d:"8 unique senders/7d"},
+      {t:"1.890ms",m:"Sanctions Screen",st:"ok",i:"✓",l:"clear",d:"no PEP match"},
+      {t:"2.145ms",m:"GAT Ring Score",st:"ok",i:"✓",l:"0.22",d:"isolated node"},
+    ],
+    a1:"No behavioural anomalies in transaction initiation.",
+    a2:"Name mismatch: 0.41 (entity type: business entered vs individual account). Mule flag: 1 bank (flag_count: 1). Velocity score: 35 (8 unique senders in 7 days).",
+    a3:"First payment to this VPA. Amount 2.1x payer's 30-day average."},
+
+  mule_consortium:{label:"🔴 Consortium Block",v:"BLOCK",risk:95,vpa:"pooja.455@okaxis",en:"Quick Transfer Services",an:"Pooja Pillai",
+    desc:"Hard override: 3 independent banks flagged this account as a confirmed mule. Consortium consensus triggers automatic block regardless of other signals.",
+    sig:[
+      {t:"0.312ms",m:"Name Matching L3",st:"fail",i:"✗",l:"0.28",d:"complete mismatch"},
+      {t:"0.521ms",m:"Lookalike VPA L3",st:"ok",i:"✓",l:"clean",d:"no impersonation"},
+      {t:"0.890ms",m:"Mule Database L3",st:"fail",i:"✗",l:"3 banks",d:"CONSORTIUM OVERRIDE"},
+      {t:"1.203ms",m:"Behavioural SDK",st:"neu",i:"○",l:"typed",d:"normal input"},
+      {t:"1.567ms",m:"VPA Velocity L2",st:"fail",i:"✗",l:"score: 75",d:"pass-through 94th pct"},
+      {t:"1.890ms",m:"Sanctions Screen",st:"ok",i:"✓",l:"clear",d:"no PEP match"},
+      {t:"2.145ms",m:"GAT Ring Score",st:"warn",i:"⚠",l:"0.58",d:"elevated ring proximity"},
+    ],
+    a1:"Normal transaction initiation. No behavioural anomalies.",
+    a2:"CONSORTIUM OVERRIDE: 3 institutions flagged (Axis Bank, ICICI Bank, SBI). Name mismatch: 0.28. Velocity score: 75 (pass-through pattern). GAT ring proximity: 0.58.",
+    a3:"First payment from this payer. Amount 4.8x payer average. 14:03 local time."},
+
+  lookalike:{label:"🎭 Brand Impersonation",v:"BLOCK",risk:91,vpa:"paytm.verify@axl",en:"Paytm Verify",an:"Vikram Nair",
+    desc:"Protected brand token 'paytm' in unregistered VPA handle with suspicious suffix 'verify'. @axl is not Paytm's PSP handle. High-confidence brand impersonation.",
+    sig:[
+      {t:"0.312ms",m:"Name Matching L3",st:"fail",i:"✗",l:"0.19",d:"Paytm Verify ≠ Vikram Nair"},
+      {t:"0.521ms",m:"Lookalike VPA L3",st:"fail",i:"✗",l:"IMPERSONATION",d:"paytm + verify + @axl"},
+      {t:"0.890ms",m:"Mule Database L1",st:"ok",i:"✓",l:"clear",d:"no flags (4 days old)"},
+      {t:"1.203ms",m:"Behavioural SDK",st:"neu",i:"○",l:"typed",d:"normal input"},
+      {t:"1.567ms",m:"VPA Velocity L2",st:"fail",i:"✗",l:"score: 60",d:"4 days · 0 prior txns"},
+      {t:"1.890ms",m:"Sanctions Screen",st:"ok",i:"✓",l:"clear",d:"no PEP match"},
+      {t:"2.145ms",m:"GAT Ring Score",st:"neu",i:"○",l:"0.11",d:"isolated VPA, new"},
+    ],
+    a1:"Normal transaction initiation. VPA typed (not pasted).",
+    a2:"Brand impersonation HIGH CONFIDENCE: protected brand 'paytm' + suspicious suffix {'verify'} in unregistered VPA. @axl ≠ Paytm's registered PSP handle. VPA age: 4 days, 0 prior transactions.",
+    a3:"First and only transaction to this VPA observed. Amount: ₹45,000."},
+
+  clipboard_scam:{label:"📋 Clipboard Scam",v:"WARN",risk:62,vpa:"hdfc.support@paytrn",en:"HDFC Support",an:"Mohammed Riaz",
+    desc:"VPA pasted from clipboard 4.2s after returning from another app (cross-app copy chain). HDFC brand token in unregistered handle. 11-day-old VPA with 43 unique senders.",
+    sig:[
+      {t:"0.312ms",m:"Name Matching L3",st:"warn",i:"⚠",l:"0.38",d:"abbreviation mismatch"},
+      {t:"0.521ms",m:"Lookalike VPA L3",st:"fail",i:"✗",l:"hdfc brand",d:"hdfc + @paytrn not registered"},
+      {t:"0.890ms",m:"Mule Database L1",st:"ok",i:"✓",l:"clear",d:"no flags yet"},
+      {t:"1.203ms",m:"Behavioural SDK",st:"warn",i:"⚠",l:"paste",d:"ms_since_bg: 4,200"},
+      {t:"1.567ms",m:"VPA Velocity L2",st:"fail",i:"✗",l:"score: 60",d:"11 days · 43 senders/7d"},
+      {t:"1.890ms",m:"Sanctions Screen",st:"ok",i:"✓",l:"clear",d:"no PEP match"},
+      {t:"2.145ms",m:"GAT Ring Score",st:"neu",i:"○",l:"0.09",d:"below threshold"},
+    ],
+    a1:"VPA pasted from clipboard. Returned from background app 4.2s before paste — cross-app copy chain pattern. Paste trust score: 0.08 (high risk).",
+    a2:"Lookalike: 'hdfc' brand token in unregistered VPA, @paytrn ≠ HDFC PSP handle. Name mismatch: 0.38. Velocity: 43 unique senders in 7 days on 11-day-old VPA.",
+    a3:"First payment to this payee. Amount: ₹38,000 (1.9x payer average). 22:41 local time."},
+
+  biz_individual_mismatch:{label:"🏢 Entity Mismatch",v:"WARN",risk:48,vpa:"suresh.kumar@hdfcbank",en:"Suresh Enterprises",an:"Suresh Kumar",
+    desc:"Close name match but entity type mismatch — business name entered, individual account on file. Established VPA, no other flags. Likely legitimate with friction prompt.",
+    sig:[
+      {t:"0.312ms",m:"Name Matching L3",st:"warn",i:"⚠",l:"0.61",d:"entity type: biz vs individual"},
+      {t:"0.521ms",m:"Lookalike VPA L3",st:"ok",i:"✓",l:"clean",d:"no impersonation"},
+      {t:"0.890ms",m:"Mule Database L1",st:"ok",i:"✓",l:"clear",d:"no flags"},
+      {t:"1.203ms",m:"Behavioural SDK",st:"neu",i:"○",l:"typed",d:"normal input"},
+      {t:"1.567ms",m:"VPA Velocity L2",st:"ok",i:"✓",l:"established",d:"3yr+ VPA, low velocity"},
+      {t:"1.890ms",m:"Sanctions Screen",st:"ok",i:"✓",l:"clear",d:"no PEP match"},
+      {t:"2.145ms",m:"GAT Ring Score",st:"ok",i:"✓",l:"0.05",d:"clean node"},
+    ],
+    a1:"Normal transaction. No behavioural anomalies.",
+    a2:"Name score: 0.61. Entity type mismatch: entered 'Suresh Enterprises' (business token detected), account name 'Suresh Kumar' (individual). Established VPA (3 years). No other flags.",
+    a3:"Recurring payee — 3 prior transactions in history. Amount within normal range."},
+
+  name_mismatch_abbr:{label:"🔤 Abbreviation Gap",v:"WARN",risk:35,vpa:"sbi.01@oksbi",en:"SBI",an:"State Bank of India",
+    desc:"Abbreviation vs full legal name. Jaro-Winkler scores near zero. TF-IDF char n-grams partially bridge the gap. Established institutional VPA offsets the signal.",
+    sig:[
+      {t:"0.312ms",m:"Name Matching L1",st:"fail",i:"✗",l:"0.18",d:"SBI vs State Bank of India"},
+      {t:"0.521ms",m:"Name Matching L3",st:"warn",i:"⚠",l:"0.52",d:"char n-gram partial match"},
+      {t:"0.890ms",m:"Lookalike VPA L3",st:"ok",i:"✓",l:"clean",d:"sbi brand, registered @oksbi"},
+      {t:"1.203ms",m:"Mule Database L1",st:"ok",i:"✓",l:"clear",d:"no flags"},
+      {t:"1.567ms",m:"VPA Velocity L2",st:"ok",i:"✓",l:"10yr+ VPA",d:"institutional, established"},
+      {t:"1.890ms",m:"Sanctions Screen",st:"ok",i:"✓",l:"clear",d:"no match"},
+      {t:"2.145ms",m:"GAT Ring Score",st:"ok",i:"✓",l:"0.01",d:"institutional node"},
+    ],
+    a1:"Normal transaction. No behavioural anomalies.",
+    a2:"Name match: 0.18 (L1 Jaro-Winkler) → 0.52 (L3 TF-IDF char n-gram). Note: L4 sentence embeddings would resolve 'SBI' = 'State Bank of India' at ~0.72. Long-established institutional VPA. No other flags.",
+    a3:"Recurring payee pattern. Amount consistent with prior history."},
+
+  fresh_vpa:{label:"🆕 Fresh VPA + High Amount",v:"WARN",risk:58,vpa:"newbiz.new@ybl",en:"Newbiz Solutions",an:"Newbiz Solutions",
+    desc:"Exact name match but VPA is 6 days old with zero prior transaction history receiving a ₹2.3L transfer. Name match reassures; age and amount profile do not.",
+    sig:[
+      {t:"0.312ms",m:"Name Matching L3",st:"ok",i:"✓",l:"0.94",d:"near-exact match"},
+      {t:"0.521ms",m:"Lookalike VPA L3",st:"ok",i:"✓",l:"clean",d:"no brand detected"},
+      {t:"0.890ms",m:"Mule Database L1",st:"ok",i:"✓",l:"clear",d:"no flags"},
+      {t:"1.203ms",m:"Behavioural SDK",st:"neu",i:"○",l:"typed",d:"normal input"},
+      {t:"1.567ms",m:"VPA Velocity L2",st:"fail",i:"✗",l:"score: 60",d:"6 days · 0 prior txns · ₹2.3L"},
+      {t:"1.890ms",m:"Sanctions Screen",st:"ok",i:"✓",l:"clear",d:"no PEP match"},
+      {t:"2.145ms",m:"GAT Ring Score",st:"neu",i:"○",l:"0.08",d:"new isolated node"},
+    ],
+    a1:"Normal transaction. VPA typed from memory. No anomalies.",
+    a2:"Name match: 0.94 (reassuring). Velocity: VPA is 6 days old, 0 prior transaction history. Incoming amount ₹2,30,000 is 5.4x the ratio threshold for this age bracket.",
+    a3:"First and only transaction to this VPA. Amount significantly above payer's 30-day average."},
+
+  ring_member:{label:"🕸 Ring Coordinator",v:"BLOCK",risk:87,vpa:"ananya.123@paytm",en:"Ananya Sharma",an:"Ananya Sharma",
+    desc:"Exact name match, but GAT identifies this account as coordinator of a detected fraud ring. Four accounts share this device fingerprint. Name match provides no protection.",
+    sig:[
+      {t:"0.312ms",m:"Name Matching L3",st:"ok",i:"✓",l:"0.96",d:"exact match"},
+      {t:"0.521ms",m:"Lookalike VPA L3",st:"ok",i:"✓",l:"clean",d:"no impersonation"},
+      {t:"0.890ms",m:"Mule Database L1",st:"fail",i:"✗",l:"2 banks",d:"SBI + Axis Bank"},
+      {t:"1.203ms",m:"Behavioural SDK",st:"neu",i:"○",l:"typed",d:"normal input"},
+      {t:"1.567ms",m:"VPA Velocity L2",st:"warn",i:"⚠",l:"score: 45",d:"elevated fan-in"},
+      {t:"1.890ms",m:"Sanctions Screen",st:"ok",i:"✓",l:"clear",d:"no PEP match"},
+      {t:"2.145ms",m:"GAT Ring Score",st:"fail",i:"✗",l:"0.88",d:"RING COORDINATOR"},
+    ],
+    a1:"Normal transaction initiation.",
+    a2:"Mule flags: 2 banks. GAT ring score: 0.88 — coordinator role confirmed. 4 accounts share device DEV_X. Fan-in velocity score: 45. Name match provides no protection when ring structure is visible.",
+    a3:"First payment from this payer. Amount: ₹75,000."},
+
+  ring_satellite:{label:"🔗 Ring Satellite",v:"WARN",risk:44,vpa:"rohan.456@okaxis",en:"Rohan Patel",an:"Rohan Patel",
+    desc:"Not individually flagged, but shares a mobile number with a confirmed mule ring coordinator. Second-degree ring proximity surfaced by the L4 graph propagation.",
+    sig:[
+      {t:"0.312ms",m:"Name Matching L3",st:"ok",i:"✓",l:"0.99",d:"exact match"},
+      {t:"0.521ms",m:"Lookalike VPA L3",st:"ok",i:"✓",l:"clean",d:"no impersonation"},
+      {t:"0.890ms",m:"Mule Database L1",st:"ok",i:"✓",l:"clear",d:"no individual flags"},
+      {t:"1.203ms",m:"Behavioural SDK",st:"neu",i:"○",l:"typed",d:"normal input"},
+      {t:"1.567ms",m:"VPA Velocity L2",st:"ok",i:"✓",l:"normal",d:"established velocity"},
+      {t:"1.890ms",m:"Sanctions Screen",st:"ok",i:"✓",l:"clear",d:"no PEP match"},
+      {t:"2.145ms",m:"GAT Ring Score",st:"warn",i:"⚠",l:"0.47",d:"2nd-degree ring proximity"},
+    ],
+    a1:"Normal transaction. No behavioural anomalies.",
+    a2:"No individual flags. GAT score: 0.47 — shared mobile with confirmed ring coordinator (ananya.123@paytm). Risk propagated via Mule L4 graph, not from direct bank reports.",
+    a3:"Regular payer. Amount within normal range. No temporal anomaly."},
+
+  sanction:{label:"🚫 Sanctions Hit",v:"BLOCK",risk:99,vpa:"gtfl.pay@apl",en:"Global Trade Finance Ltd",an:"Global Trade Finance Ltd",
+    desc:"Payee name matches a sanctioned entity above the fuzzy match threshold. Hard block — sanctions signal weight is 1.00 and overrides all other signals regardless of score.",
+    sig:[
+      {t:"0.312ms",m:"Name Matching L3",st:"ok",i:"✓",l:"0.94",d:"strong name match"},
+      {t:"0.521ms",m:"Lookalike VPA L3",st:"ok",i:"✓",l:"clean",d:"no impersonation"},
+      {t:"0.890ms",m:"Mule Database L1",st:"ok",i:"✓",l:"clear",d:"no mule flags"},
+      {t:"1.203ms",m:"Behavioural SDK",st:"neu",i:"○",l:"typed",d:"normal input"},
+      {t:"1.567ms",m:"VPA Velocity L2",st:"ok",i:"✓",l:"normal",d:"established VPA"},
+      {t:"1.890ms",m:"Sanctions Screen",st:"fail",i:"✗",l:"SANCTIONS HIT",d:"score: 0.91 ≥ 0.85 threshold"},
+      {t:"2.145ms",m:"GAT Ring Score",st:"neu",i:"○",l:"0.14",d:"below ring threshold"},
+    ],
+    a1:"Normal transaction initiation. No behavioural anomalies.",
+    a2:"SANCTIONS OVERRIDE: Name match against PEP/sanctions list score 0.91 (threshold: 0.85). Signal weight: 1.00 — hard block regardless of all other signals. Regulatory requirement.",
+    a3:"Transaction details irrelevant — sanctions hit triggers mandatory block under PMLA."},
+
+  seasonal_burst:{label:"📈 Seasonal Burst",v:"PASS",risk:8,vpa:"kavya.789@ybl",en:"Kavya Menon",an:"Kavya Menon",
+    desc:"High velocity flagged by rolling window engine but seasonal z-score model identifies this as a Diwali-period pattern (salary-cycle window). Long-established VPA. Clean overall.",
+    sig:[
+      {t:"0.312ms",m:"Name Matching L3",st:"ok",i:"✓",l:"0.98",d:"exact match"},
+      {t:"0.521ms",m:"Lookalike VPA L3",st:"ok",i:"✓",l:"clean",d:"no impersonation"},
+      {t:"0.890ms",m:"Mule Database L1",st:"ok",i:"✓",l:"clear",d:"no flags"},
+      {t:"1.203ms",m:"Behavioural SDK",st:"neu",i:"○",l:"typed",d:"normal input"},
+      {t:"1.567ms",m:"VPA Velocity L3",st:"warn",i:"⚠",l:"z: 2.8",d:"salary-cycle window — adjusted"},
+      {t:"1.890ms",m:"Sanctions Screen",st:"ok",i:"✓",l:"clear",d:"no PEP match"},
+      {t:"2.145ms",m:"GAT Ring Score",st:"ok",i:"✓",l:"0.05",d:"clean established node"},
+    ],
+    a1:"Normal transaction. Standard business hours.",
+    a2:"Velocity z-score: 2.8 (elevated). Adjusted: Diwali-period (Oct 27, salary-cycle window + festival season). Seasonal baseline model flags as expected elevated volume. Name match: 0.98. 4yr+ VPA.",
+    a3:"Recurring account. 12 prior transactions. Diwali burst consistent with prior-year pattern."},
+
+  session_anomaly:{label:"⚡ Session Anomaly",v:"WARN",risk:41,vpa:"meera.321@hdfcbank",en:"Meera Das",an:"Meera Das",
+    desc:"Clean payee — exact name match, established VPA, no fraud flags anywhere. But the payer's behavioural baseline shows this flow completed 3.2 standard deviations faster than their personal average. Possible coercion.",
+    sig:[
+      {t:"0.312ms",m:"Name Matching L3",st:"ok",i:"✓",l:"0.99",d:"exact match"},
+      {t:"0.521ms",m:"Lookalike VPA L3",st:"ok",i:"✓",l:"clean",d:"registered account"},
+      {t:"0.890ms",m:"Mule Database L1",st:"ok",i:"✓",l:"clear",d:"no flags"},
+      {t:"1.203ms",m:"Behavioural SDK L4",st:"warn",i:"⚠",l:"z: −3.2",d:"4,100ms vs 38,400ms avg"},
+      {t:"1.567ms",m:"VPA Velocity L2",st:"ok",i:"✓",l:"normal",d:"established account"},
+      {t:"1.890ms",m:"Sanctions Screen",st:"ok",i:"✓",l:"clear",d:"no PEP match"},
+      {t:"2.145ms",m:"GAT Ring Score",st:"ok",i:"✓",l:"0.03",d:"clean established node"},
+    ],
+    a1:"BEHAVIOURAL ANOMALY: Flow completed in 4,100ms. User's personal baseline: 38,400ms ± 8,200ms (47 prior sessions). Z-score: −3.2. Possible ATO or real-time social engineering.",
+    a2:"All payee signals clean. Established account, clean velocity, no mule flags.",
+    a3:"User has 47 prior payment sessions. This flow speed has never been observed for this specific user."},
+};
+
+// ── BUILD PILLS ─────────────────────────────────────────────────────
+const pillsCt = document.getElementById('pillsContainer');
+const logBody = document.getElementById('logBody');
+let runTimer = null;
+
+Object.entries(S).forEach(([id, s]) => {
+  const p = document.createElement('button');
+  p.className = 'pill';
+  p.textContent = s.label;
+  p.dataset.id = id;
+  p.onclick = () => run(id, p);
+  pillsCt.appendChild(p);
+});
+
+// ── RUN CHECK ────────────────────────────────────────────────────────
+function run(id, pillEl) {
+  if (runTimer) clearTimeout(runTimer);
+  const s = S[id];
+
+  // Pills
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active-pass','active-warn','active-block'));
+  const pc = s.v === 'PASS' ? 'active-pass' : s.v === 'WARN' ? 'active-warn' : 'active-block';
+  pillEl.classList.add(pc);
+
+  // Reset
+  logBody.innerHTML = '';
+  document.getElementById('vMain').classList.remove('vis');
+  document.getElementById('logTimer').textContent = '—';
+  document.getElementById('vScoreVal').textContent = '0';
+  document.getElementById('vBar').style.width = '0%';
+  document.getElementById('vBar').className = 'v-bar';
+  document.getElementById('vBig').textContent = '—';
+  document.getElementById('vBig').className = 'vbig';
+  document.getElementById('vDesc').textContent = '';
+  document.getElementById('vVpa').innerHTML = '<span>payee_vpa</span> — <br><span>entered_name</span> → <span>actual_name</span>';
+  document.getElementById('aL1').textContent = '—';
+  document.getElementById('aL2').textContent = '—';
+  document.getElementById('aL3').textContent = '—';
+
+  // Build log entries
+  s.sig.forEach((sg, i) => {
+    const el = document.createElement('div');
+    el.className = 'le';
+    el.id = 'le_'+i;
+    const sc = sg.st === 'ok' ? 'ls-ok' : sg.st === 'fail' ? 'ls-fail' : sg.st === 'warn' ? 'ls-warn' : 'ls-neu';
+    el.innerHTML = `<span class="le-t">${sg.t}</span><span class="le-m">${sg.m}</span><span class="le-s ${sc}"><span>${sg.i}</span><span>${sg.l}</span><span class="le-v">${sg.d}</span></span>`;
+    logBody.appendChild(el);
+  });
+
+  // Animate signals
+  s.sig.forEach((sg, i) => {
+    runTimer = setTimeout(() => {
+      const el = document.getElementById('le_'+i);
+      if (el) el.classList.add('vis');
+      document.getElementById('logTimer').textContent = sg.t;
+      if (i === s.sig.length - 1) setTimeout(() => showVerdict(s), 280);
+    }, i * 230 + 80);
+  });
+}
+
+function showVerdict(s) {
+  const vm = document.getElementById('vMain');
+  vm.classList.add('vis');
+
+  const big = document.getElementById('vBig');
+  big.textContent = s.v;
+  big.className = 'vbig ' + (s.v === 'BLOCK' ? 'vbig-b' : s.v === 'WARN' ? 'vbig-w' : 'vbig-p');
+
+  document.getElementById('vVpa').innerHTML =
+    `<span>payee_vpa</span> ${s.vpa}<br><span>entered</span> ${s.en} → <span>actual</span> ${s.an}`;
+
+  document.getElementById('vDesc').textContent = s.desc;
+
+  const bar = document.getElementById('vBar');
+  bar.className = 'v-bar ' + (s.v === 'BLOCK' ? 'vbar-b' : s.v === 'WARN' ? 'vbar-w' : 'vbar-p');
+
+  let cur = 0;
+  const tick = setInterval(() => {
+    cur = Math.min(cur + Math.ceil(s.risk / 28), s.risk);
+    document.getElementById('vScoreVal').textContent = cur;
+    bar.style.width = cur + '%';
+    if (cur >= s.risk) clearInterval(tick);
+  }, 22);
+
+  document.getElementById('aL1').textContent = s.a1;
+  document.getElementById('aL2').textContent = s.a2;
+  document.getElementById('aL3').textContent = s.a3;
+}
+
+// ── HERO TERMINAL ───────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  ['ht1','ht2','ht3','ht4','ht5','ht6','ht7'].forEach((id, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('vis');
+    }, 600 + i * 280);
+  });
+  setTimeout(() => {
+    const v = document.getElementById('htv');
+    if (v) v.classList.add('vis');
+  }, 600 + 7 * 280 + 280);
+
+  // Auto-run first sandbox scenario
+  setTimeout(() => {
+    const first = document.querySelector('.pill');
+    if (first) run('clean', first);
+  }, 400);
+});
+</script>
+</body>
+</html>

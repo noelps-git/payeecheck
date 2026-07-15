@@ -1,0 +1,326 @@
+tx_id,entered_name,actual_name,payee_vpa,amount,input_method,vpa_age_days,prior_tx_count,unique_senders_7d,mule_flagged,mule_flag_count,is_lookalike,name_score,fraud_ring_id,bank_flags,seasonal_burst,session_anomaly,vpa_is_new,sanction_match,label
+142,Hdfc Service,Lakshmi Kumar,hdfc.service@0kaxis,10254.42,paste,4,0,19,False,0,True,0.18,,0,False,False,False,False,lookalike
+155,Hdfc Service,Divya Reddy,hdfc.kyc@hdfcb,21258.23,paste,6,4,16,True,1,True,0.18,,0,False,False,False,False,lookalike
+298,Crescent Capital Group,Crescent Capital Group,divya.866@ybl,924428.34,type,269,41,3,False,0,False,1.0,,0,False,False,False,True,sanction
+19,Paytm,Paytm,paytm@paytm,4374.11,type,1295,885,2,False,0,False,1.0,,0,False,False,False,False,clean
+67,BookMyShow,BookMyShow,bookmyshow@hdfcbank,20847.13,type,723,902,7,False,0,False,0.93,,0,False,False,False,False,clean
+300,Pacific Rim Associates,Pacific Rim Associates,rohan.48@oksbi,1855902.61,type,450,22,3,False,0,False,0.99,,0,False,False,False,True,sanction
+215,Pooja Associates,Ananya Shah,ananya.444@okaxis,103058.44,type,313,51,3,False,0,False,0.59,,0,False,False,False,False,biz_individual_mismatch
+162,Amazon Help,Ananya Verma,amazon.support@axl,6760.23,paste,6,0,5,True,1,True,0.3,,0,False,False,False,False,lookalike
+2,Suresh Sharma,Suresh Sharma,arjun.518@okaxis,30140.73,type,1449,253,9,False,0,False,0.93,,0,False,False,False,False,clean
+316,Karthik Iyer,Karthik Iyer,amit.205@ybl,18174.58,paste,758,76,3,False,0,False,0.96,,0,False,True,False,False,session_anomaly
+18,Manoj Shah,Manoj Shah,sneha.332@ybl,24481.42,type,529,421,5,False,0,False,0.91,,0,False,False,False,False,clean
+88,Lakshmi Singh,Lakshmi Singh,pooja.339@apl,56012.53,type,44,24,44,True,1,False,0.95,,1,False,False,False,False,mule
+32,Swiggy,Swiggy,swiggy@ybl,2952.55,type,1496,538,9,False,0,False,0.99,,0,False,False,False,False,clean
+190,ICICI Support,Suresh Iyer,icici.support@yba,46887.17,paste,11,1,18,False,0,True,0.11,,0,False,True,False,False,clipboard_scam
+302,Karthik Shah,Karthik Shah,kavya.167@ybl,49477.07,type,1161,1586,76,False,0,False,0.99,,0,True,False,False,False,seasonal_burst
+258,Deepa Patel,Deepa Patel,deepa.new@icici,435265.93,type,4,0,1,False,0,False,0.98,,0,False,False,True,False,fresh_vpa
+91,Priya Pillai,Priya Pillai,kavya.233@okaxis,57327.76,type,11,39,34,True,1,False,0.95,,1,False,False,False,False,mule
+177,Kotak Support,Kavya Nair,kotak.support@paytrn,37568.01,paste,20,1,31,False,0,True,0.12,,0,False,True,False,False,clipboard_scam
+117,Sanjay Shah,Sanjay Shah,manoj.274@hdfcbank,165904.4,type,43,19,38,True,3,False,0.95,,3,False,False,False,False,mule_consortium
+185,BOB Support,Deepa Iyer,bob.support@paytrn,35523.81,paste,19,3,39,False,0,True,0.25,,0,False,True,False,False,clipboard_scam
+150,Amazon Kyc,Manoj Nair,amazon.service@0kaxis,11616.03,paste,10,3,8,True,1,True,0.39,,0,False,False,False,False,lookalike
+78,Arjun Sharma,Arjun Sharma,kavya.871@apl,34244.53,type,1949,173,10,False,0,False,0.97,,0,False,False,False,False,clean
+202,Divya Solutions,Vikram Gupta,manoj.274@hdfcbank,161223.88,type,1069,40,3,False,0,False,0.57,,0,False,False,False,False,biz_individual_mismatch
+76,Vikram Menon,Vikram Menon,priya.797@icici,40983.13,type,937,160,10,False,0,False,0.88,,0,False,False,False,False,clean
+249,Deepa Verma,Deepa Verma,deepa.new@paytm,194525.47,type,6,0,1,False,0,False,0.91,,0,False,False,True,False,fresh_vpa
+40,Pooja Patel,Pooja Patel,kavya.620@paytm,10610.42,type,1002,258,5,False,0,False,0.94,,0,False,False,False,False,clean
+278,Kavya Reddy,Amit Iyer,sneha.792@icici,73802.55,type,49,100,35,True,2,False,0.95,ring_02,1,False,False,False,False,ring_member
+98,Sneha Joshi,Sneha Joshi,deepa.641@ybl,35598.65,type,20,15,57,True,1,False,0.95,,1,False,False,False,False,mule
+296,Global Trade Finance Ltd,Global Trade Finance Ltd,mohammed.670@hdfcbank,1984181.94,type,432,7,3,False,0,False,0.91,,0,False,False,False,True,sanction
+70,Karthik Iyer,Karthik Iyer,karthik.742@apl,8335.73,type,1257,991,3,False,0,False,1.0,,0,False,False,False,False,clean
+175,PNB Support,Sneha Patel,pnb.support@hdfcb,21375.41,paste,10,3,36,False,0,True,0.25,,0,False,True,False,False,clipboard_scam
+204,Rajesh Solutions,Meera Patel,ramesh.745@oksbi,174657.25,type,922,177,3,False,0,False,0.72,,0,False,False,False,False,biz_individual_mismatch
+65,Flipkart,Flipkart,flipkart@icici,11801.23,type,987,377,9,False,0,False,0.89,,0,False,False,False,False,clean
+124,Divya Pillai,Divya Pillai,ramesh.633@icici,22999.94,type,41,8,60,True,3,False,0.95,,3,False,False,False,False,mule_consortium
+187,ICICI Support,Divya Pillai,icici.support@axl,21704.54,paste,4,0,28,False,0,True,0.12,,0,False,True,False,False,clipboard_scam
+136,Phonepe Help,Arjun Pillai,phonepe.support@paytrn,17069.93,paste,11,3,30,False,0,True,0.32,,0,False,False,False,False,lookalike
+112,Divya Das,Divya Das,ramesh.209@oksbi,60740.69,type,41,15,28,True,4,False,0.95,,4,False,False,False,False,mule_consortium
+134,Paytm Help,Mohammed Shah,paytm.support@hdfcb,7730.21,paste,12,3,10,True,1,True,0.21,,0,False,False,False,False,lookalike
+97,Karthik Gupta,Karthik Gupta,kavya.881@oksbi,90336.15,type,49,8,42,True,1,False,0.95,,1,False,False,False,False,mule
+5,Ramesh Joshi,Ramesh Joshi,pooja.128@oksbi,48658.48,type,1075,130,9,False,0,False,0.92,,0,False,False,False,False,clean
+165,Hdfc Help,Sneha Gupta,hdfc.refund@axl,20884.63,paste,15,2,7,False,0,True,0.28,,0,False,False,False,False,lookalike
+318,Mohammed Pillai,Mohammed Pillai,meera.690@hdfcbank,15479.79,paste,510,91,3,False,0,False,0.91,,0,False,True,False,False,session_anomaly
+239,BOB,Bank of Baroda,karthik.322@icici,95711.86,type,1441,372,3,False,0,False,0.3,,0,False,False,False,False,name_mismatch_abbr
+80,Divya Sharma,Divya Sharma,lakshmi.651@oksbi,44589.59,type,1241,774,3,False,0,False,0.93,,0,False,False,False,False,clean
+256,Sanjay Patel,Sanjay Patel,sanjay.new@apl,256511.51,type,3,0,1,False,0,False,0.97,,0,False,False,True,False,fresh_vpa
+133,Sbi Service,Ananya Das,sbi.service@yba,2880.52,paste,11,5,6,False,0,True,0.24,,0,False,False,False,False,lookalike
+223,Ramesh Solutions,Ananya Sharma,sneha.429@oksbi,53412.7,type,527,103,3,False,0,False,0.7,,0,False,False,False,False,biz_individual_mismatch
+292,Suresh Reddy,Manoj Gupta,ramesh.633@paytm,33697.79,type,57,100,23,False,0,False,0.92,ring_04,0,False,False,False,False,ring_satellite
+221,Deepa Solutions,Divya Gupta,ananya.321@icici,172989.59,type,853,108,3,False,0,False,0.71,,0,False,False,False,False,biz_individual_mismatch
+238,BOB,Bank of Baroda,ramesh.723@hdfcbank,14670.17,type,924,387,3,False,0,False,0.29,,0,False,False,False,False,name_mismatch_abbr
+255,Ananya Pillai,Ananya Pillai,ananya.new@icici,260609.35,type,2,0,1,False,0,False,0.98,,0,False,False,True,False,fresh_vpa
+20,Ananya Patel,Ananya Patel,divya.970@apl,27535.2,type,842,590,10,False,0,False,0.93,,0,False,False,False,False,clean
+41,Amazon Pay,Amazon Pay,amazon.pay@apl,4705.69,type,1167,899,5,False,0,False,0.89,,0,False,False,False,False,clean
+115,Kavya Rao,Kavya Rao,rohan.426@apl,168597.55,type,36,15,50,True,3,False,0.95,,3,False,False,False,False,mule_consortium
+4,Swiggy,Swiggy,swiggy@ybl,5200.29,type,1078,149,6,False,0,False,0.98,,0,False,False,False,False,clean
+180,Kotak Support,Manoj Iyer,kotak.support@paytrn,5820.37,paste,10,1,23,False,0,True,0.17,,0,False,True,False,False,clipboard_scam
+279,Manoj Reddy,Meera Nair,ramesh.571@paytm,47683.41,type,55,100,13,False,0,False,0.95,ring_02,0,False,False,False,False,ring_satellite
+158,Paytm Support,Mohammed Joshi,paytm.support@yba,13496.83,paste,7,3,19,False,0,True,0.25,,0,False,False,False,False,lookalike
+62,Paytm,Paytm,paytm@paytm,22877.45,type,1941,525,9,False,0,False,1.0,,0,False,False,False,False,clean
+79,Zomato,Zomato,zomato@paytm,33109.91,type,441,568,6,False,0,False,0.88,,0,False,False,False,False,clean
+169,Phonepe Kyc,Amit Gupta,phonepe.service@paytrn,17187.77,paste,15,4,25,False,0,True,0.34,,0,False,False,False,False,lookalike
+24,Sanjay Sharma,Sanjay Sharma,arjun.286@icici,33481.99,type,738,602,3,False,0,False,0.97,,0,False,False,False,False,clean
+120,Sanjay Joshi,Sanjay Joshi,karthik.396@oksbi,197798.66,type,88,5,70,True,2,False,0.95,,2,False,False,False,False,mule_consortium
+104,Rajesh Joshi,Rajesh Joshi,karthik.966@paytm,44475.7,type,73,33,49,True,1,False,0.95,,1,False,False,False,False,mule
+207,Sneha Trading,Amit Kumar,rajesh.972@apl,77338.08,type,1109,39,3,False,0,False,0.6,,0,False,False,False,False,biz_individual_mismatch
+308,Kavya Gupta,Kavya Gupta,rohan.105@paytm,19275.49,type,1247,1119,51,False,0,False,0.96,,0,True,False,False,False,seasonal_burst
+39,Manoj Kumar,Manoj Kumar,pooja.307@apl,46594.63,type,512,949,3,False,0,False,0.91,,0,False,False,False,False,clean
+84,Deepa Iyer,Deepa Iyer,rohan.349@hdfcbank,45550.48,type,99,22,53,True,1,False,0.95,,1,False,False,False,False,mule
+26,Ramesh Das,Ramesh Das,priya.63@apl,20190.8,type,994,869,2,False,0,False,0.91,,0,False,False,False,False,clean
+93,Priya Pillai,Priya Pillai,amit.292@ybl,73062.56,type,53,16,43,True,1,False,0.95,,1,False,False,False,False,mule
+218,Vikram Associates,Amit Patel,sneha.346@apl,169293.35,type,1354,30,3,False,0,False,0.67,,0,False,False,False,False,biz_individual_mismatch
+172,BOB Support,Sneha Menon,bob.support@axl,27818.05,paste,15,0,38,False,0,True,0.28,,0,False,True,False,False,clipboard_scam
+288,Pooja Shah,Amit Menon,meera.303@apl,11858.51,type,29,100,18,False,0,False,0.91,ring_03,0,False,False,False,False,ring_satellite
+21,IRCTC,IRCTC,irctc@sbi,37787.73,type,1712,255,5,False,0,False,0.93,,0,False,False,False,False,clean
+266,Sneha Iyer,Meera Joshi,divya.776@icici,63001.42,type,78,100,33,True,3,False,0.95,ring_00,1,False,False,False,False,ring_member
+224,Vikram Services,Sanjay Reddy,rajesh.511@icici,176419.75,type,1218,25,3,False,0,False,0.47,,0,False,False,False,False,biz_individual_mismatch
+121,Ramesh Patel,Ramesh Patel,amit.340@icici,175243.06,type,61,4,75,True,3,False,0.95,,3,False,False,False,False,mule_consortium
+13,Paytm,Paytm,paytm@paytm,7726.78,type,627,861,7,False,0,False,0.95,,0,False,False,False,False,clean
+6,Lakshmi Menon,Lakshmi Menon,mohammed.47@okaxis,33097.04,type,1883,346,2,False,0,False,0.98,,0,False,False,False,False,clean
+7,Karthik Nair,Karthik Nair,lakshmi.167@oksbi,18572.03,type,729,736,5,False,0,False,0.96,,0,False,False,False,False,clean
+87,Karthik Joshi,Karthik Joshi,kavya.680@okaxis,89325.56,type,80,38,45,True,1,False,0.95,,1,False,False,False,False,mule
+226,BOB,Bank of Baroda,pooja.9@paytm,84870.06,type,1382,168,3,False,0,False,0.42,,0,False,False,False,False,name_mismatch_abbr
+73,Meera Nair,Meera Nair,mohammed.482@hdfcbank,1067.23,type,1404,103,6,False,0,False,0.91,,0,False,False,False,False,clean
+17,IRCTC,IRCTC,irctc@sbi,30487.61,type,613,432,3,False,0,False,0.94,,0,False,False,False,False,clean
+194,Axis Support,Pooja Kumar,axis.support@hdfcb,33437.97,paste,19,1,19,False,0,True,0.16,,0,False,True,False,False,clipboard_scam
+149,Paytm Support,Sanjay Menon,paytm.service@paytrn,4134.18,paste,3,2,24,True,1,True,0.34,,0,False,False,False,False,lookalike
+246,Manoj Reddy,Manoj Reddy,manoj.new@apl,154776.45,type,1,0,1,False,0,False,0.94,,0,False,False,True,False,fresh_vpa
+129,Pooja Patel,Pooja Patel,rajesh.968@ybl,75657.47,type,43,14,57,True,4,False,0.95,,4,False,False,False,False,mule_consortium
+211,Lakshmi Enterprises,Sanjay Das,pooja.298@icici,178809.68,type,522,199,3,False,0,False,0.62,,0,False,False,False,False,biz_individual_mismatch
+189,ICICI Support,Meera Kumar,icici.support@axl,22840.43,paste,12,1,34,False,0,True,0.3,,0,False,True,False,False,clipboard_scam
+306,Amit Das,Amit Das,mohammed.791@oksbi,53303.11,type,869,1660,91,False,0,False,0.91,,0,True,False,False,False,seasonal_burst
+103,Vikram Verma,Vikram Verma,sneha.767@paytm,124514.84,type,66,12,33,True,1,False,0.95,,1,False,False,False,False,mule
+55,PhonePe,PhonePe,phonepe@ybl,9672.82,type,1661,438,3,False,0,False,0.95,,0,False,False,False,False,clean
+28,Rajesh Verma,Rajesh Verma,pooja.101@hdfcbank,2624.36,type,1407,906,1,False,0,False,1.0,,0,False,False,False,False,clean
+51,Lakshmi Joshi,Lakshmi Joshi,sanjay.447@hdfcbank,30349.82,type,1347,168,7,False,0,False,0.99,,0,False,False,False,False,clean
+128,Ananya Reddy,Ananya Reddy,rohan.471@oksbi,58512.07,type,64,10,20,True,4,False,0.95,,4,False,False,False,False,mule_consortium
+171,PNB Support,Kavya Gupta,pnb.support@axl,25336.12,paste,2,2,28,False,0,True,0.12,,0,False,True,False,False,clipboard_scam
+46,Sneha Joshi,Sneha Joshi,arjun.886@okaxis,8208.84,type,1938,880,3,False,0,False,0.99,,0,False,False,False,False,clean
+152,Flipkart Service,Rohan Iyer,flipkart.support@0kaxis,23863.02,paste,11,3,7,False,0,True,0.18,,0,False,False,False,False,lookalike
+86,Arjun Joshi,Arjun Joshi,divya.459@oksbi,119975.27,type,47,19,20,True,1,False,0.95,,1,False,False,False,False,mule
+122,Rajesh Kumar,Rajesh Kumar,ananya.420@apl,175477.26,type,14,16,29,True,4,False,0.95,,4,False,False,False,False,mule_consortium
+111,Suresh Das,Suresh Das,pooja.474@hdfcbank,88517.04,type,71,12,32,True,4,False,0.95,,4,False,False,False,False,mule_consortium
+212,Arjun Enterprises,Lakshmi Rao,ananya.243@okaxis,159122.75,type,253,112,3,False,0,False,0.6,,0,False,False,False,False,biz_individual_mismatch
+192,SBI Support,Pooja Joshi,sbi.support@yba,32399.6,paste,14,0,28,False,0,True,0.15,,0,False,True,False,False,clipboard_scam
+297,Eastern Star Holdings,Eastern Star Holdings,karthik.566@oksbi,1004409.69,type,426,5,3,False,0,False,0.97,,0,False,False,False,True,sanction
+250,Mohammed Das,Mohammed Das,mohammed.new@icici,154499.09,type,6,0,1,False,0,False,0.97,,0,False,False,True,False,fresh_vpa
+1,Suresh Joshi,Suresh Joshi,arjun.229@paytm,7062.94,type,509,742,9,False,0,False,0.89,,0,False,False,False,False,clean
+191,BOB Support,Ananya Verma,bob.support@paytrn,36749.13,paste,15,0,15,False,0,True,0.1,,0,False,True,False,False,clipboard_scam
+42,PhonePe,PhonePe,phonepe@ybl,31891.96,type,836,215,8,False,0,False,0.95,,0,False,False,False,False,clean
+63,Rajesh Menon,Rajesh Menon,manoj.437@hdfcbank,41545.4,type,1422,506,3,False,0,False,0.97,,0,False,False,False,False,clean
+268,Manoj Reddy,Amit Rao,vikram.336@okaxis,43451.87,type,22,100,22,False,0,False,0.95,ring_00,0,False,False,False,False,ring_satellite
+230,HDFC,HDFC Bank,sneha.522@okaxis,40737.32,type,582,123,3,False,0,False,0.23,,0,False,False,False,False,name_mismatch_abbr
+264,Kavya Joshi,Kavya Joshi,kavya.new@ybl,337420.1,type,3,0,1,False,0,False,0.94,,0,False,False,True,False,fresh_vpa
+160,Flipkart Refund,Divya Menon,flipkart.support@0kaxis,11330.08,paste,5,1,29,False,0,True,0.3,,0,False,False,False,False,lookalike
+254,Sanjay Nair,Sanjay Nair,sanjay.new@oksbi,495094.76,type,5,0,1,False,0,False,0.95,,0,False,False,True,False,fresh_vpa
+66,Zomato,Zomato,zomato@paytm,34728.1,type,1746,269,2,False,0,False,0.93,,0,False,False,False,False,clean
+52,Amazon Pay,Amazon Pay,amazon.pay@apl,35468.39,type,303,582,9,False,0,False,0.96,,0,False,False,False,False,clean
+311,Karthik Patel,Karthik Patel,rohan.309@okaxis,28788.48,type,494,542,49,False,0,False,0.94,,0,True,False,False,False,seasonal_burst
+217,Pooja Solutions,Rohan Reddy,kavya.630@okaxis,109028.22,type,1229,184,3,False,0,False,0.5,,0,False,False,False,False,biz_individual_mismatch
+299,Northern Light Enterprises,Northern Light Enterprises,manoj.942@ybl,180848.34,type,208,49,3,False,0,False,0.99,,0,False,False,False,True,sanction
+291,Mohammed Pillai,Ramesh Verma,meera.141@ybl,42914.51,type,19,100,15,False,0,False,0.96,ring_04,0,False,False,False,False,ring_satellite
+303,Sanjay Singh,Sanjay Singh,ananya.810@hdfcbank,79193.46,type,525,1225,86,False,0,False,0.97,,0,True,False,False,False,seasonal_burst
+10,Mohammed Reddy,Mohammed Reddy,sanjay.218@icici,32806.39,type,1110,955,8,False,0,False,0.9,,0,False,False,False,False,clean
+196,Pooja Associates,Mohammed Rao,manoj.568@hdfcbank,8965.19,type,1162,31,3,False,0,False,0.62,,0,False,False,False,False,biz_individual_mismatch
+49,Arjun Reddy,Arjun Reddy,deepa.409@ybl,16480.27,type,442,841,5,False,0,False,0.92,,0,False,False,False,False,clean
+241,HDFC,HDFC Bank,kavya.722@paytm,21520.5,type,1943,350,3,False,0,False,0.29,,0,False,False,False,False,name_mismatch_abbr
+229,SBI,State Bank of India,priya.404@okaxis,37946.64,type,1194,385,3,False,0,False,0.44,,0,False,False,False,False,name_mismatch_abbr
+228,PNB,Punjab National Bank,kavya.76@icici,39248.53,type,1422,491,3,False,0,False,0.35,,0,False,False,False,False,name_mismatch_abbr
+252,Ramesh Pillai,Ramesh Pillai,ramesh.new@oksbi,404582.28,type,2,0,1,False,0,False,0.99,,0,False,False,True,False,fresh_vpa
+206,Rajesh Enterprises,Sneha Das,mohammed.242@okaxis,156810.5,type,950,112,3,False,0,False,0.55,,0,False,False,False,False,biz_individual_mismatch
+277,Ramesh Reddy,Ramesh Singh,arjun.553@oksbi,14777.11,type,23,100,9,False,0,False,0.93,ring_01,0,False,False,False,False,ring_satellite
+274,Arjun Pillai,Suresh Verma,kavya.475@ybl,35307.49,type,42,100,25,False,0,False,0.93,ring_01,0,False,False,False,False,ring_satellite
+186,BOB Support,Manoj Rao,bob.support@paytrn,23839.74,paste,6,1,48,False,0,True,0.13,,0,False,True,False,False,clipboard_scam
+38,PhonePe,PhonePe,phonepe@ybl,21965.41,type,1412,770,5,False,0,False,0.95,,0,False,False,False,False,clean
+173,PNB Support,Sanjay Menon,pnb.support@yba,26403.31,paste,5,0,38,False,0,True,0.12,,0,False,True,False,False,clipboard_scam
+34,Amit Reddy,Amit Reddy,sneha.41@icici,31007.14,type,1158,723,10,False,0,False,0.95,,0,False,False,False,False,clean
+304,Lakshmi Kumar,Lakshmi Kumar,meera.238@ybl,68707.23,type,1177,1784,61,False,0,False,0.93,,0,True,False,False,False,seasonal_burst
+197,Suresh Solutions,Lakshmi Nair,mohammed.354@hdfcbank,52019.56,type,1486,46,3,False,0,False,0.66,,0,False,False,False,False,biz_individual_mismatch
+314,Rajesh Iyer,Rajesh Iyer,sneha.140@oksbi,31030.47,type,776,1181,78,False,0,False,0.93,,0,True,False,False,False,seasonal_burst
+285,Priya Joshi,Divya Shah,sneha.721@okaxis,14203.09,type,50,100,15,False,0,False,0.9,ring_03,0,False,False,False,False,ring_satellite
+289,Arjun Gupta,Pooja Das,sanjay.264@apl,39351.23,type,56,100,23,False,0,False,0.96,ring_03,0,False,False,False,False,ring_satellite
+25,Amit Gupta,Amit Gupta,divya.827@okaxis,20412.29,type,493,149,7,False,0,False,0.92,,0,False,False,False,False,clean
+132,Phonepe Service,Divya Pillai,phonepe.service@axl,22651.8,paste,5,1,24,False,0,True,0.39,,0,False,False,False,False,lookalike
+184,ICICI Support,Rajesh Menon,icici.support@yba,17821.76,paste,15,1,44,False,0,True,0.15,,0,False,True,False,False,clipboard_scam
+322,Amit Das,Amit Das,karthik.991@apl,22827.8,paste,640,57,3,False,0,False,0.88,,0,False,True,False,False,session_anomaly
+270,Amit Kumar,Pooja Gupta,kavya.741@apl,5979.67,type,15,100,16,False,0,False,0.96,ring_00,0,False,False,False,False,ring_satellite
+83,Rajesh Menon,Rajesh Menon,karthik.345@icici,9161.5,type,33,36,35,True,1,False,0.95,,1,False,False,False,False,mule
+193,HDFC Support,Arjun Singh,hdfc.support@axl,33752.83,paste,20,3,14,False,0,True,0.12,,0,False,True,False,False,clipboard_scam
+269,Amit Gupta,Mohammed Shah,rajesh.829@icici,7503.61,type,47,100,12,False,0,False,0.91,ring_00,0,False,False,False,False,ring_satellite
+72,Swiggy,Swiggy,swiggy@ybl,10661.85,type,969,395,7,False,0,False,0.91,,0,False,False,False,False,clean
+137,Hdfc Kyc,Priya Gupta,hdfc.secure@paytrn,9530.35,paste,12,5,13,True,1,True,0.33,,0,False,False,False,False,lookalike
+260,Ananya Gupta,Ananya Gupta,ananya.new@paytm,471121.42,type,1,0,1,False,0,False,0.93,,0,False,False,True,False,fresh_vpa
+146,Sbi Verify,Ramesh Patel,sbi.kyc@0kaxis,18672.09,paste,9,0,28,True,1,True,0.17,,0,False,False,False,False,lookalike
+16,Rajesh Kumar,Rajesh Kumar,rohan.996@apl,25079.25,type,665,569,2,False,0,False,0.98,,0,False,False,False,False,clean
+156,Icici Secure,Pooja Verma,icici.kyc@yba,20551.46,paste,10,5,25,False,0,True,0.32,,0,False,False,False,False,lookalike
+282,Pooja Singh,Meera Rao,ananya.398@icici,15928.63,type,36,100,14,False,0,False,0.95,ring_02,0,False,False,False,False,ring_satellite
+290,Rajesh Patel,Lakshmi Patel,pooja.501@okaxis,34723.82,type,63,100,23,True,3,False,0.95,ring_04,1,False,False,False,False,ring_member
+205,Ramesh Enterprises,Rohan Das,karthik.373@apl,105051.77,type,527,27,3,False,0,False,0.49,,0,False,False,False,False,biz_individual_mismatch
+286,Kavya Singh,Rajesh Rao,lakshmi.316@apl,16770.27,type,46,100,24,False,0,False,0.92,ring_03,0,False,False,False,False,ring_satellite
+257,Suresh Joshi,Suresh Joshi,suresh.new@paytm,405845.45,type,5,0,1,False,0,False,0.97,,0,False,False,True,False,fresh_vpa
+174,BOB Support,Mohammed Rao,bob.support@0kaxis,34075.72,paste,2,1,38,False,0,True,0.3,,0,False,True,False,False,clipboard_scam
+151,Hdfc Help,Meera Gupta,hdfc.secure@hdfcb,22258.23,paste,7,2,19,False,0,True,0.27,,0,False,False,False,False,lookalike
+54,Flipkart,Flipkart,flipkart@icici,25405.41,type,1665,468,6,False,0,False,0.93,,0,False,False,False,False,clean
+259,Manoj Iyer,Manoj Iyer,manoj.new@ybl,230374.96,type,1,0,1,False,0,False,0.92,,0,False,False,True,False,fresh_vpa
+31,Pooja Das,Pooja Das,divya.159@apl,9575.9,type,745,109,10,False,0,False,0.97,,0,False,False,False,False,clean
+323,Rohan Reddy,Rohan Reddy,manoj.572@icici,17835.03,paste,789,86,3,False,0,False,0.93,,0,False,True,False,False,session_anomaly
+313,Rajesh Sharma,Rajesh Sharma,kavya.7@okaxis,76417.64,type,1143,1846,61,False,0,False,0.99,,0,True,False,False,False,seasonal_burst
+305,Rohan Verma,Rohan Verma,divya.234@oksbi,34906.78,type,1133,1084,100,False,0,False,0.92,,0,True,False,False,False,seasonal_burst
+68,Suresh Pillai,Suresh Pillai,amit.390@hdfcbank,23901.29,type,1020,355,7,False,0,False,0.98,,0,False,False,False,False,clean
+227,PNB,Punjab National Bank,karthik.375@hdfcbank,5479.0,type,604,391,3,False,0,False,0.35,,0,False,False,False,False,name_mismatch_abbr
+198,Ramesh Solutions,Sanjay Patel,sanjay.834@icici,130345.15,type,1151,198,3,False,0,False,0.58,,0,False,False,False,False,biz_individual_mismatch
+77,Zomato,Zomato,zomato@paytm,19893.06,type,1764,253,2,False,0,False,0.95,,0,False,False,False,False,clean
+64,Rohan Verma,Rohan Verma,rohan.785@okaxis,38905.97,type,1292,691,4,False,0,False,0.91,,0,False,False,False,False,clean
+214,Amit Enterprises,Meera Pillai,sanjay.658@okaxis,19462.18,type,1154,194,3,False,0,False,0.59,,0,False,False,False,False,biz_individual_mismatch
+27,BookMyShow,BookMyShow,bookmyshow@hdfcbank,7095.1,type,675,335,8,False,0,False,0.91,,0,False,False,False,False,clean
+320,Manoj Shah,Manoj Shah,meera.557@hdfcbank,2066.19,paste,568,167,3,False,0,False,0.95,,0,False,True,False,False,session_anomaly
+309,Manoj Singh,Manoj Singh,suresh.92@ybl,34774.0,type,1029,1968,45,False,0,False,0.94,,0,True,False,False,False,seasonal_burst
+183,PNB Support,Sneha Singh,pnb.support@yba,11941.37,paste,6,1,38,False,0,True,0.11,,0,False,True,False,False,clipboard_scam
+113,Divya Sharma,Divya Sharma,sneha.819@ybl,55466.52,type,44,18,30,True,4,False,0.95,,4,False,False,False,False,mule_consortium
+11,IRCTC,IRCTC,irctc@sbi,26994.97,type,1829,648,7,False,0,False,0.99,,0,False,False,False,False,clean
+139,Hdfc Verify,Meera Sharma,hdfc.service@paytrn,3924.54,paste,1,2,20,False,0,True,0.18,,0,False,False,False,False,lookalike
+94,Ramesh Nair,Ramesh Nair,divya.117@hdfcbank,124206.77,type,72,9,40,True,1,False,0.95,,1,False,False,False,False,mule
+140,Sbi Verify,Pooja Singh,sbi.kyc@yba,14889.84,paste,12,1,18,True,1,True,0.35,,0,False,False,False,False,lookalike
+261,Arjun Gupta,Arjun Gupta,arjun.new@hdfcbank,170147.45,type,3,0,1,False,0,False,0.93,,0,False,False,True,False,fresh_vpa
+30,Zomato,Zomato,zomato@paytm,13333.63,type,1905,853,8,False,0,False,0.91,,0,False,False,False,False,clean
+147,Paytm Support,Rajesh Rao,paytm.secure@0kaxis,5927.97,paste,10,0,28,False,0,True,0.38,,0,False,False,False,False,lookalike
+29,Arjun Patel,Arjun Patel,divya.493@oksbi,10765.99,type,1121,974,1,False,0,False,0.9,,0,False,False,False,False,clean
+273,Karthik Sharma,Pooja Patel,lakshmi.122@apl,13031.31,type,40,100,25,False,0,False,0.93,ring_01,0,False,False,False,False,ring_satellite
+141,Phonepe Verify,Ramesh Joshi,phonepe.refund@hdfcb,9577.98,paste,8,3,12,False,0,True,0.41,,0,False,False,False,False,lookalike
+213,Pooja Trading,Lakshmi Gupta,mohammed.68@icici,65311.69,type,1180,154,3,False,0,False,0.56,,0,False,False,False,False,biz_individual_mismatch
+293,Suresh Rao,Pooja Singh,suresh.543@ybl,37498.67,type,33,100,25,False,0,False,0.85,ring_04,0,False,False,False,False,ring_satellite
+118,Divya Pillai,Divya Pillai,rajesh.552@okaxis,102024.86,type,75,18,41,True,4,False,0.95,,4,False,False,False,False,mule_consortium
+262,Amit Kumar,Amit Kumar,amit.new@paytm,344157.52,type,6,0,1,False,0,False,0.92,,0,False,False,True,False,fresh_vpa
+317,Pooja Kumar,Pooja Kumar,rajesh.966@apl,21542.64,paste,648,104,3,False,0,False,0.98,,0,False,True,False,False,session_anomaly
+240,PNB,Punjab National Bank,rohan.625@apl,48933.83,type,1004,242,3,False,0,False,0.35,,0,False,False,False,False,name_mismatch_abbr
+58,Swiggy,Swiggy,swiggy@ybl,4760.02,type,1838,290,5,False,0,False,0.91,,0,False,False,False,False,clean
+71,Karthik Menon,Karthik Menon,suresh.86@icici,32173.21,type,577,937,8,False,0,False,0.9,,0,False,False,False,False,clean
+9,Pooja Reddy,Pooja Reddy,sanjay.864@apl,38438.85,type,414,284,1,False,0,False,0.98,,0,False,False,False,False,clean
+75,BookMyShow,BookMyShow,bookmyshow@hdfcbank,33506.0,type,1455,273,8,False,0,False,0.96,,0,False,False,False,False,clean
+57,Sanjay Gupta,Sanjay Gupta,rajesh.692@oksbi,10763.7,type,1269,862,3,False,0,False,0.96,,0,False,False,False,False,clean
+195,HDFC Support,Lakshmi Reddy,hdfc.support@hdfcb,30679.87,paste,6,0,43,False,0,True,0.29,,0,False,True,False,False,clipboard_scam
+8,Mohammed Menon,Mohammed Menon,vikram.547@apl,36483.43,type,634,523,7,False,0,False,0.91,,0,False,False,False,False,clean
+145,Sbi Help,Priya Das,sbi.help@hdfcb,21727.97,paste,3,0,16,True,1,True,0.39,,0,False,False,False,False,lookalike
+22,Lakshmi Gupta,Lakshmi Gupta,rajesh.124@icici,12470.49,type,431,396,1,False,0,False,0.95,,0,False,False,False,False,clean
+325,Kavya Singh,Kavya Singh,priya.852@ybl,28279.61,paste,345,119,3,False,0,False,0.92,,0,False,True,False,False,session_anomaly
+210,Priya Trading,Divya Reddy,mohammed.463@hdfcbank,38667.99,type,1111,42,3,False,0,False,0.67,,0,False,False,False,False,biz_individual_mismatch
+114,Pooja Singh,Pooja Singh,arjun.862@ybl,183456.68,type,20,5,49,True,2,False,0.95,,2,False,False,False,False,mule_consortium
+182,HDFC Support,Pooja Pillai,hdfc.support@hdfcb,38238.98,paste,17,0,31,False,0,True,0.28,,0,False,True,False,False,clipboard_scam
+107,Amit Kumar,Amit Kumar,vikram.482@hdfcbank,80249.76,type,45,16,43,True,1,False,0.95,,1,False,False,False,False,mule
+233,BOB,Bank of Baroda,amit.307@apl,48014.37,type,534,288,3,False,0,False,0.3,,0,False,False,False,False,name_mismatch_abbr
+310,Kavya Singh,Kavya Singh,mohammed.743@oksbi,73079.52,type,862,1371,97,False,0,False,0.95,,0,True,False,False,False,seasonal_burst
+105,Mohammed Menon,Mohammed Menon,meera.753@ybl,51736.63,type,13,10,31,True,1,False,0.95,,1,False,False,False,False,mule
+127,Vikram Patel,Vikram Patel,mohammed.625@okaxis,175459.52,type,35,16,59,True,4,False,0.95,,4,False,False,False,False,mule_consortium
+168,Flipkart Help,Rohan Reddy,flipkart.secure@yba,4750.73,paste,3,5,7,True,1,True,0.2,,0,False,False,False,False,lookalike
+130,Rohan Gupta,Rohan Gupta,kavya.204@hdfcbank,199880.98,type,66,4,74,True,4,False,0.95,,4,False,False,False,False,mule_consortium
+144,Phonepe Secure,Arjun Iyer,phonepe.kyc@yba,19472.03,paste,13,4,5,False,0,True,0.23,,0,False,False,False,False,lookalike
+245,PNB,Punjab National Bank,rohan.141@icici,11813.43,type,1701,222,3,False,0,False,0.28,,0,False,False,False,False,name_mismatch_abbr
+209,Pooja Enterprises,Karthik Shah,rohan.721@paytm,92023.26,type,1453,93,3,False,0,False,0.64,,0,False,False,False,False,biz_individual_mismatch
+319,Ananya Joshi,Ananya Joshi,karthik.76@oksbi,14022.93,paste,690,179,3,False,0,False,0.93,,0,False,True,False,False,session_anomaly
+315,Karthik Iyer,Karthik Iyer,divya.991@paytm,50311.55,type,1032,970,55,False,0,False,0.93,,0,True,False,False,False,seasonal_burst
+242,PNB,Punjab National Bank,rohan.295@icici,13065.54,type,1885,378,3,False,0,False,0.31,,0,False,False,False,False,name_mismatch_abbr
+301,Amit Das,Amit Das,vikram.952@ybl,69529.93,type,789,1402,41,False,0,False,0.91,,0,True,False,False,False,seasonal_burst
+92,Ananya Nair,Ananya Nair,ramesh.567@ybl,47359.81,type,91,36,23,True,1,False,0.95,,1,False,False,False,False,mule
+294,Meera Verma,Vikram Sharma,manoj.153@ybl,15843.6,type,31,100,24,False,0,False,0.97,ring_04,0,False,False,False,False,ring_satellite
+14,BookMyShow,BookMyShow,bookmyshow@hdfcbank,26502.81,type,1433,931,1,False,0,False,0.96,,0,False,False,False,False,clean
+159,Icici Kyc,Sneha Sharma,icici.verify@0kaxis,22141.88,paste,3,1,29,False,0,True,0.34,,0,False,False,False,False,lookalike
+116,Ananya Singh,Ananya Singh,sneha.521@okaxis,151795.58,type,13,9,28,True,4,False,0.95,,4,False,False,False,False,mule_consortium
+216,Vikram Solutions,Kavya Patel,arjun.355@apl,189759.21,type,1262,92,3,False,0,False,0.68,,0,False,False,False,False,biz_individual_mismatch
+81,Manoj Das,Manoj Das,sneha.828@paytm,138344.56,type,69,32,45,True,1,False,0.95,,1,False,False,False,False,mule
+243,BOB,Bank of Baroda,lakshmi.978@hdfcbank,77533.37,type,799,248,3,False,0,False,0.23,,0,False,False,False,False,name_mismatch_abbr
+247,Divya Sharma,Divya Sharma,divya.new@apl,396844.73,type,1,0,1,False,0,False,1.0,,0,False,False,True,False,fresh_vpa
+74,Amazon Pay,Amazon Pay,amazon.pay@apl,37736.24,type,806,254,1,False,0,False,0.95,,0,False,False,False,False,clean
+126,Ramesh Nair,Ramesh Nair,lakshmi.442@paytm,37658.26,type,57,19,53,True,3,False,0.95,,3,False,False,False,False,mule_consortium
+43,Suresh Sharma,Suresh Sharma,ananya.559@ybl,1897.8,type,1056,646,9,False,0,False,0.9,,0,False,False,False,False,clean
+284,Amit Joshi,Pooja Reddy,deepa.891@oksbi,92562.63,type,43,100,20,True,2,False,0.95,ring_03,1,False,False,False,False,ring_member
+45,Google Pay,Google Pay,googlepay@okaxis,33379.98,type,1024,848,9,False,0,False,0.99,,0,False,False,False,False,clean
+166,Hdfc Kyc,Mohammed Singh,hdfc.help@paytrn,21827.85,paste,12,2,12,False,0,True,0.25,,0,False,False,False,False,lookalike
+236,BOB,Bank of Baroda,arjun.33@okaxis,57684.46,type,1934,156,3,False,0,False,0.26,,0,False,False,False,False,name_mismatch_abbr
+253,Kavya Shah,Kavya Shah,kavya.new@ybl,54170.23,type,5,0,1,False,0,False,0.96,,0,False,False,True,False,fresh_vpa
+138,Phonepe Help,Divya Kumar,phonepe.service@0kaxis,15678.9,paste,9,2,24,True,1,True,0.22,,0,False,False,False,False,lookalike
+163,Paytm Service,Arjun Rao,paytm.help@yba,14188.73,paste,11,2,7,True,1,True,0.27,,0,False,False,False,False,lookalike
+307,Rohan Patel,Rohan Patel,ananya.758@oksbi,37273.54,type,583,387,63,False,0,False,0.9,,0,True,False,False,False,seasonal_burst
+48,Priya Singh,Priya Singh,ramesh.880@hdfcbank,23587.43,type,708,886,8,False,0,False,0.92,,0,False,False,False,False,clean
+109,Sanjay Das,Sanjay Das,vikram.338@ybl,64688.54,type,46,30,46,True,1,False,0.95,,1,False,False,False,False,mule
+99,Arjun Patel,Arjun Patel,mohammed.161@icici,5387.98,type,98,35,43,True,1,False,0.95,,1,False,False,False,False,mule
+148,Phonepe Service,Suresh Kumar,phonepe.service@hdfcb,24965.38,paste,14,3,18,True,1,True,0.36,,0,False,False,False,False,lookalike
+36,Flipkart,Flipkart,flipkart@icici,22915.51,type,1839,124,1,False,0,False,0.93,,0,False,False,False,False,clean
+263,Priya Gupta,Priya Gupta,priya.new@paytm,121872.57,type,6,0,1,False,0,False,0.95,,0,False,False,True,False,fresh_vpa
+108,Amit Singh,Amit Singh,divya.993@apl,18230.15,type,62,26,37,True,1,False,0.95,,1,False,False,False,False,mule
+100,Kavya Kumar,Kavya Kumar,kavya.724@okaxis,45994.16,type,19,19,44,True,1,False,0.95,,1,False,False,False,False,mule
+131,Sbi Verify,Kavya Kumar,sbi.refund@hdfcb,24459.64,paste,11,3,13,True,1,True,0.15,,0,False,False,False,False,lookalike
+37,Priya Sharma,Priya Sharma,deepa.519@icici,13333.5,type,1014,952,2,False,0,False,0.99,,0,False,False,False,False,clean
+178,Kotak Support,Lakshmi Nair,kotak.support@yba,48546.34,paste,13,1,48,False,0,True,0.24,,0,False,True,False,False,clipboard_scam
+280,Pooja Gupta,Ramesh Iyer,karthik.805@apl,28600.84,type,41,100,21,False,0,False,0.87,ring_02,0,False,False,False,False,ring_satellite
+47,Swiggy,Swiggy,swiggy@ybl,39141.09,type,1143,871,4,False,0,False,0.91,,0,False,False,False,False,clean
+60,Amit Reddy,Amit Reddy,karthik.507@apl,20042.68,type,602,721,1,False,0,False,0.99,,0,False,False,False,False,clean
+157,Amazon Verify,Kavya Shah,amazon.service@0kaxis,8825.7,paste,1,1,9,True,1,True,0.32,,0,False,False,False,False,lookalike
+123,Sanjay Menon,Sanjay Menon,karthik.666@apl,25259.91,type,73,13,41,True,3,False,0.95,,3,False,False,False,False,mule_consortium
+61,Priya Verma,Priya Verma,arjun.181@oksbi,40225.08,type,1725,580,8,False,0,False,0.89,,0,False,False,False,False,clean
+272,Meera Patel,Ananya Verma,meera.384@apl,99428.53,type,85,100,48,True,2,False,0.95,ring_01,2,False,False,False,False,ring_member
+69,Meera Rao,Meera Rao,pooja.820@apl,30202.3,type,751,549,4,False,0,False,0.91,,0,False,False,False,False,clean
+44,Flipkart,Flipkart,flipkart@icici,18296.11,type,1930,931,1,False,0,False,0.99,,0,False,False,False,False,clean
+153,Hdfc Service,Lakshmi Verma,hdfc.support@paytrn,3687.83,paste,1,4,22,True,1,True,0.32,,0,False,False,False,False,lookalike
+89,Rohan Reddy,Rohan Reddy,deepa.324@ybl,22335.44,type,107,16,49,True,1,False,0.95,,1,False,False,False,False,mule
+276,Meera Menon,Suresh Reddy,mohammed.104@okaxis,31727.49,type,53,100,22,False,0,False,0.95,ring_01,0,False,False,False,False,ring_satellite
+181,BOB Support,Deepa Reddy,bob.support@paytrn,49998.95,paste,5,0,28,False,0,True,0.27,,0,False,True,False,False,clipboard_scam
+321,Mohammed Sharma,Mohammed Sharma,arjun.674@hdfcbank,20276.12,paste,370,195,3,False,0,False,0.95,,0,False,True,False,False,session_anomaly
+281,Karthik Patel,Pooja Gupta,arjun.308@okaxis,43589.36,type,44,100,12,False,0,False,0.99,ring_02,0,False,False,False,False,ring_satellite
+201,Sanjay Solutions,Ramesh Pillai,lakshmi.448@ybl,178449.87,type,1100,118,3,False,0,False,0.54,,0,False,False,False,False,biz_individual_mismatch
+199,Ananya Enterprises,Vikram Verma,rajesh.38@apl,62221.3,type,289,71,3,False,0,False,0.69,,0,False,False,False,False,biz_individual_mismatch
+161,Icici Service,Amit Gupta,icici.refund@axl,13409.89,paste,5,0,12,True,1,True,0.27,,0,False,False,False,False,lookalike
+271,Amit Sharma,Ramesh Singh,mohammed.555@paytm,49735.56,type,45,100,10,False,0,False,0.85,ring_00,0,False,False,False,False,ring_satellite
+251,Ramesh Shah,Ramesh Shah,ramesh.new@okaxis,238048.24,type,7,0,1,False,0,False,0.92,,0,False,False,True,False,fresh_vpa
+135,Phonepe Verify,Vikram Nair,phonepe.kyc@0kaxis,22894.2,paste,8,2,28,False,0,True,0.41,,0,False,False,False,False,lookalike
+312,Meera Nair,Meera Nair,mohammed.370@oksbi,27618.98,type,1380,1416,55,False,0,False,0.96,,0,True,False,False,False,seasonal_burst
+235,BOB,Bank of Baroda,amit.592@paytm,23526.78,type,605,398,3,False,0,False,0.33,,0,False,False,False,False,name_mismatch_abbr
+101,Rohan Verma,Rohan Verma,amit.678@hdfcbank,121566.32,type,64,12,27,True,1,False,0.95,,1,False,False,False,False,mule
+167,Sbi Kyc,Manoj Reddy,sbi.support@hdfcb,22695.11,paste,6,2,28,False,0,True,0.44,,0,False,False,False,False,lookalike
+188,SBI Support,Rajesh Shah,sbi.support@0kaxis,28100.87,paste,14,0,24,False,0,True,0.26,,0,False,True,False,False,clipboard_scam
+295,Rohan Verma,Karthik Sharma,karthik.471@paytm,30425.1,type,34,100,15,False,0,False,0.95,ring_04,0,False,False,False,False,ring_satellite
+275,Arjun Reddy,Rajesh Iyer,rohan.194@okaxis,47183.47,type,17,100,11,False,0,False,0.97,ring_01,0,False,False,False,False,ring_satellite
+53,Deepa Iyer,Deepa Iyer,mohammed.972@oksbi,33245.46,type,976,688,6,False,0,False,0.96,,0,False,False,False,False,clean
+33,Ramesh Rao,Ramesh Rao,vikram.71@ybl,29792.25,type,1682,932,4,False,0,False,0.93,,0,False,False,False,False,clean
+143,Sbi Support,Sanjay Reddy,sbi.service@hdfcb,24726.11,paste,13,4,11,False,0,True,0.17,,0,False,False,False,False,lookalike
+324,Karthik Gupta,Karthik Gupta,amit.708@hdfcbank,15513.51,paste,553,36,3,False,0,False,0.94,,0,False,True,False,False,session_anomaly
+110,Pooja Kumar,Pooja Kumar,mohammed.323@oksbi,41597.83,type,108,30,22,True,1,False,0.95,,1,False,False,False,False,mule
+3,Rohan Verma,Rohan Verma,suresh.778@hdfcbank,40310.38,type,1729,482,6,False,0,False,0.91,,0,False,False,False,False,clean
+200,Kavya Associates,Sanjay Shah,pooja.485@oksbi,54396.18,type,591,93,3,False,0,False,0.55,,0,False,False,False,False,biz_individual_mismatch
+220,Kavya Services,Pooja Nair,karthik.305@okaxis,93441.11,type,322,60,3,False,0,False,0.57,,0,False,False,False,False,biz_individual_mismatch
+231,PNB,Punjab National Bank,divya.532@hdfcbank,46241.87,type,1741,363,3,False,0,False,0.25,,0,False,False,False,False,name_mismatch_abbr
+102,Pooja Reddy,Pooja Reddy,ananya.931@apl,43516.71,type,19,8,24,True,1,False,0.95,,1,False,False,False,False,mule
+15,IRCTC,IRCTC,irctc@sbi,37568.8,type,1874,706,6,False,0,False,0.89,,0,False,False,False,False,clean
+203,Kavya Solutions,Vikram Rao,mohammed.336@ybl,133879.25,type,827,134,3,False,0,False,0.61,,0,False,False,False,False,biz_individual_mismatch
+222,Lakshmi Associates,Ananya Verma,priya.327@icici,52138.88,type,450,88,3,False,0,False,0.57,,0,False,False,False,False,biz_individual_mismatch
+96,Arjun Sharma,Arjun Sharma,meera.621@icici,91438.39,type,38,38,54,True,1,False,0.95,,1,False,False,False,False,mule
+95,Amit Das,Amit Das,ramesh.156@apl,26633.65,type,48,10,51,True,1,False,0.95,,1,False,False,False,False,mule
+208,Karthik Solutions,Manoj Iyer,rohan.256@apl,192301.41,type,253,67,3,False,0,False,0.58,,0,False,False,False,False,biz_individual_mismatch
+119,Rajesh Shah,Rajesh Shah,deepa.715@paytm,55373.05,type,34,14,44,True,3,False,0.95,,3,False,False,False,False,mule_consortium
+237,BOB,Bank of Baroda,meera.156@paytm,41883.05,type,917,310,3,False,0,False,0.34,,0,False,False,False,False,name_mismatch_abbr
+219,Ramesh Associates,Suresh Sharma,deepa.786@paytm,116566.75,type,1465,183,3,False,0,False,0.46,,0,False,False,False,False,biz_individual_mismatch
+287,Divya Verma,Sanjay Shah,lakshmi.321@okaxis,23626.86,type,24,100,15,False,0,False,0.85,ring_03,0,False,False,False,False,ring_satellite
+170,Amazon Support,Divya Gupta,amazon.verify@0kaxis,15968.94,paste,13,2,23,True,1,True,0.17,,0,False,False,False,False,lookalike
+82,Amit Nair,Amit Nair,arjun.851@paytm,140520.17,type,67,20,32,True,1,False,0.95,,1,False,False,False,False,mule
+283,Rajesh Pillai,Lakshmi Sharma,deepa.53@icici,17080.77,type,19,100,9,False,0,False,0.88,ring_02,0,False,False,False,False,ring_satellite
+90,Deepa Reddy,Deepa Reddy,divya.284@apl,110064.83,type,86,23,48,True,1,False,0.95,,1,False,False,False,False,mule
+265,Arjun Reddy,Arjun Reddy,arjun.new@okaxis,265181.85,type,4,0,1,False,0,False,0.97,,0,False,False,True,False,fresh_vpa
+125,Mohammed Singh,Mohammed Singh,priya.455@ybl,41609.31,type,8,2,39,True,4,False,0.95,,4,False,False,False,False,mule_consortium
+85,Pooja Kumar,Pooja Kumar,deepa.88@icici,39996.63,type,72,40,41,True,1,False,0.95,,1,False,False,False,False,mule
+56,IRCTC,IRCTC,irctc@sbi,41702.89,type,922,343,4,False,0,False,0.93,,0,False,False,False,False,clean
+176,Kotak Support,Ramesh Verma,kotak.support@hdfcb,33389.9,paste,11,0,31,False,0,True,0.12,,0,False,True,False,False,clipboard_scam
+12,Google Pay,Google Pay,googlepay@okaxis,49866.56,type,583,571,8,False,0,False,0.89,,0,False,False,False,False,clean
+59,Amazon Pay,Amazon Pay,amazon.pay@apl,2406.06,type,1273,675,2,False,0,False,0.93,,0,False,False,False,False,clean
+23,Google Pay,Google Pay,googlepay@okaxis,458.82,type,1749,696,1,False,0,False,0.91,,0,False,False,False,False,clean
+154,Flipkart Service,Meera Pillai,flipkart.support@paytrn,22938.17,paste,1,2,24,True,1,True,0.24,,0,False,False,False,False,lookalike
+35,Flipkart,Flipkart,flipkart@icici,10292.53,type,1766,371,4,False,0,False,0.91,,0,False,False,False,False,clean
+164,Flipkart Support,Sanjay Menon,flipkart.support@paytrn,11017.47,paste,7,5,25,True,1,True,0.28,,0,False,False,False,False,lookalike
+232,PNB,Punjab National Bank,karthik.632@okaxis,74192.62,type,1112,403,3,False,0,False,0.3,,0,False,False,False,False,name_mismatch_abbr
+225,Rajesh Trading,Karthik Rao,amit.362@okaxis,14488.34,type,776,146,3,False,0,False,0.61,,0,False,False,False,False,biz_individual_mismatch
+50,Pooja Iyer,Pooja Iyer,priya.899@ybl,48522.99,type,665,644,5,False,0,False,0.88,,0,False,False,False,False,clean
+244,SBI,State Bank of India,rajesh.672@paytm,26387.95,type,1481,209,3,False,0,False,0.27,,0,False,False,False,False,name_mismatch_abbr
+179,HDFC Support,Pooja Singh,hdfc.support@0kaxis,33957.2,paste,11,1,43,False,0,True,0.12,,0,False,True,False,False,clipboard_scam
+248,Vikram Singh,Vikram Singh,vikram.new@apl,470764.44,type,4,0,1,False,0,False,0.95,,0,False,False,True,False,fresh_vpa
+267,Sneha Pillai,Mohammed Rao,manoj.721@oksbi,21280.32,type,18,100,11,False,0,False,0.97,ring_00,0,False,False,False,False,ring_satellite
+106,Arjun Das,Arjun Das,amit.602@hdfcbank,142864.01,type,115,22,58,True,1,False,0.95,,1,False,False,False,False,mule
+234,SBI,State Bank of India,amit.316@oksbi,79878.73,type,1985,452,3,False,0,False,0.36,,0,False,False,False,False,name_mismatch_abbr

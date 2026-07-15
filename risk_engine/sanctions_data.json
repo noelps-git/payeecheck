@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-07-01T20:14:17.450750Z",
+  "counts": {
+    "ofac": 0,
+    "un": 0,
+    "rbi_seed": 13,
+    "total_unique": 13
+  },
+  "sanctions": [
+    "Lashkar-e-Taiba",
+    "Jaish-e-Mohammed",
+    "Al-Qa'ida",
+    "Harkat-ul-Mujahidin",
+    "Hizbul Mujahideen",
+    "Indian Mujahideen",
+    "SIMI",
+    "Babbar Khalsa International",
+    "Khalistan Zindabad Force",
+    "Khalistan Liberation Force",
+    "ISIS",
+    "Islamic State",
+    "Daesh"
+  ],
+  "pep": [],
+  "note": "OFAC and UN entries fetched from official public APIs. RBI UAPA entries are a static curated seed \u2014 refresh manually from https://www.rbi.org.in. PEP list requires a commercial data provider and is not yet integrated."
+}

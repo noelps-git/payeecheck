@@ -1,0 +1,23 @@
+{
+  "baseline_f1": 0.919,
+  "threshold": 30,
+  "precision": 0.927,
+  "recall": 0.912,
+  "recommended_weights": {
+    "mule_consortium": 1.0,
+    "sanctions_pep_match": 1.0,
+    "gat_ring_score": 0.75,
+    "velocity_pattern": 0.55,
+    "lookalike_vpa": 0.7,
+    "name_mismatch": 0.459,
+    "vpa_age": 0.357,
+    "clipboard_paste": 0.224,
+    "high_value": 0.165,
+    "first_time_payee": 0.112,
+    "unusual_amount": 0.224,
+    "rapid_cross_app_paste": 0.3,
+    "flow_speed_anomaly": 0.15,
+    "velocity_anomaly": 0.408
+  },
+  "honest_note": "Calibrated on synthetic data. Retrain on real labelled data."
+}

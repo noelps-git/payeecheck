@@ -1,0 +1,19 @@
+{
+  "total": 325,
+  "by_label": {
+    "lookalike": 40,
+    "sanction": 5,
+    "clean": 80,
+    "biz_individual_mismatch": 30,
+    "session_anomaly": 10,
+    "mule": 30,
+    "clipboard_scam": 25,
+    "seasonal_burst": 15,
+    "fresh_vpa": 20,
+    "mule_consortium": 20,
+    "ring_member": 5,
+    "name_mismatch_abbr": 20,
+    "ring_satellite": 25
+  },
+  "seed": 42
+}

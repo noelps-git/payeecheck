@@ -1,0 +1,105 @@
+{
+  "elapsed_seconds": 2.028972,
+  "metrics": {
+    "tp": 190,
+    "fp": 0,
+    "tn": 700,
+    "fn": 40,
+    "precision": 1.0,
+    "recall": 0.8261,
+    "f1": 0.9048,
+    "auprc_approx": 0.9957,
+    "n_binary_cases": 930
+  },
+  "category_breakdown": {
+    "clean": {
+      "total": 700,
+      "blocked": 0,
+      "warned": 0,
+      "passed": 700
+    },
+    "name_mismatch": {
+      "total": 70,
+      "blocked": 0,
+      "warned": 0,
+      "passed": 70
+    },
+    "lookalike": {
+      "total": 80,
+      "blocked": 29,
+      "warned": 42,
+      "passed": 9
+    },
+    "mule": {
+      "total": 150,
+      "blocked": 95,
+      "warned": 24,
+      "passed": 31
+    }
+  },
+  "signal_contribution": {
+    "velocity_anomaly": {
+      "total_fired": 308,
+      "by_label": {
+        "clean": 88,
+        "mule": 150,
+        "lookalike": 70
+      }
+    },
+    "name_mismatch": {
+      "total_fired": 299,
+      "by_label": {
+        "name_mismatch": 69,
+        "lookalike": 80,
+        "mule": 150
+      }
+    },
+    "clipboard_paste": {
+      "total_fired": 351,
+      "by_label": {
+        "lookalike": 80,
+        "clean": 194,
+        "mule": 77
+      }
+    },
+    "vpa_age": {
+      "total_fired": 230,
+      "by_label": {
+        "lookalike": 80,
+        "mule": 150
+      }
+    },
+    "lookalike_vpa": {
+      "total_fired": 55,
+      "by_label": {
+        "lookalike": 55
+      }
+    },
+    "unusual_amount": {
+      "total_fired": 108,
+      "by_label": {
+        "mule": 108
+      }
+    },
+    "mule_consortium": {
+      "total_fired": 183,
+      "by_label": {
+        "lookalike": 56,
+        "mule": 127
+      }
+    },
+    "high_value": {
+      "total_fired": 105,
+      "by_label": {
+        "mule": 105
+      }
+    },
+    "first_time_payee": {
+      "total_fired": 51,
+      "by_label": {
+        "mule": 40,
+        "lookalike": 11
+      }
+    }
+  }
+}

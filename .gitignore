@@ -1,0 +1,72 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+wheels/
+pip-wheel-metadata/
+.installed.cfg
+lib/
+lib64/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Models — large files, excluded from repo
+# Download instructions in gnn/README.md
+# *.pt  <-- kept: gat_mule_detector.pt is small (~500KB) and required to run
+*.pkl
+bilinear_model.pkl
+matchers/l5_model.pkl
+matchers/l5_lookalike_model.pkl
+risk_engine/bilinear_model.pkl
+
+# Databases — runtime artifacts
+*.db
+*.sqlite
+*.sqlite3
+mule_flags.db
+consortium_flags.db
+device_sessions.db
+behavioural_history.db
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+*.env
+
+# Test outputs
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# OS
+Thumbs.db

@@ -1,0 +1,9 @@
+{
+  "total": 1000,
+  "clean": 700,
+  "mule": 150,
+  "lookalike": 80,
+  "name_mismatch": 70,
+  "fraud_rings": 63,
+  "ring_accounts": 212
+}
