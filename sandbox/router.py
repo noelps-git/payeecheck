@@ -17,8 +17,8 @@ environment pointed to by the launch post.
 Any request without a scenario_id, or with an unrecognised one, returns
 the clean scenario by default.
 """
-from fastapi import APIRouter
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
 from typing import Optional
 import uuid
 from datetime import datetime
@@ -121,16 +121,18 @@ SCENARIOS = {
 }
 
 class SandboxRequest(BaseModel):
-    scenario_id: Optional[str] = "clean"
+    scenario_id: Optional[str] = Field(default="clean", max_length=64)
     # Any other fields accepted but ignored — makes it easy to send
     # a real PayeeCheck request body and just add scenario_id
-    entered_name: Optional[str] = None
-    actual_name: Optional[str] = None
-    payee_vpa: Optional[str] = None
-    amount: Optional[float] = None
+    entered_name: Optional[str] = Field(default=None, max_length=256)
+    actual_name: Optional[str] = Field(default=None, max_length=256)
+    payee_vpa: Optional[str] = Field(default=None, max_length=256)
+    amount: Optional[float] = Field(default=None, ge=0, le=1e12)
 
 def _build_response(scenario_id: str, req: SandboxRequest) -> dict:
-    s = SCENARIOS.get(scenario_id, SCENARIOS["clean"])
+    if scenario_id not in SCENARIOS:
+        scenario_id = "clean"
+    s = SCENARIOS[scenario_id]
     pchk_id = f"sandbox_pchk_{scenario_id}_{uuid.uuid4().hex[:8]}"
     rv_id   = f"sandbox_rv_{scenario_id}_{uuid.uuid4().hex[:8]}"
     now     = datetime.utcnow().isoformat() + "Z"
@@ -196,10 +198,7 @@ def sandbox_payee_check(req: SandboxRequest):
 @router.get("/payee-checks/{scenario_id}")
 def sandbox_get_scenario(scenario_id: str):
     """Retrieve the fixed response for a named scenario."""
-    class Req(BaseModel):
-        scenario_id: Optional[str] = None
-        entered_name: Optional[str] = None
-        actual_name: Optional[str] = None
-        payee_vpa: Optional[str] = None
-        amount: Optional[float] = None
-    return _build_response(scenario_id, Req())
+    if scenario_id not in SCENARIOS:
+        raise HTTPException(status_code=404,
+                            detail="Unknown scenario_id. See /sandbox/v1/scenarios.")
+    return _build_response(scenario_id, SandboxRequest(scenario_id=scenario_id))
