@@ -13,6 +13,9 @@ Real sources:
   RBI UAPA:  https://www.rbi.org.in (static seed in sanctions_loader.py)
 """
 import os, json
+import logging
+
+logger = logging.getLogger(__name__)
 
 _HERE = os.path.dirname(__file__)
 _DATA_FILE = os.path.join(_HERE, "sanctions_data.json")
@@ -30,17 +33,24 @@ _PEP_SEED = [
 
 def _load_lists():
     if os.path.exists(_DATA_FILE):
-        with open(_DATA_FILE) as f:
-            data = json.load(f)
-        sanctions = data.get("sanctions", [])
-        pep       = data.get("pep", [])
-        source    = f"sanctions_data.json ({data.get('counts',{}).get('total_unique',0)} entries, generated {data.get('generated_at','unknown')})"
-        is_real   = True
-    else:
-        sanctions = _SANCTIONS_SEED
-        pep       = _PEP_SEED
-        source    = "illustrative seed lists — run sanctions_loader.py to fetch real data"
-        is_real   = False
+        try:
+            with open(_DATA_FILE) as f:
+                data = json.load(f)
+            sanctions = data.get("sanctions", [])
+            pep       = data.get("pep", [])
+            source    = f"sanctions_data.json ({data.get('counts',{}).get('total_unique',0)} entries, generated {data.get('generated_at','unknown')})"
+            is_real   = True
+            return sanctions, pep, source, is_real
+        except (json.JSONDecodeError, OSError):
+            logger.warning(
+                "Failed to read %s — falling back to illustrative seed lists. "
+                "Re-run sanctions_loader.py to regenerate the data file.",
+                _DATA_FILE, exc_info=True,
+            )
+    sanctions = _SANCTIONS_SEED
+    pep       = _PEP_SEED
+    source    = "illustrative seed lists — run sanctions_loader.py to fetch real data"
+    is_real   = False
     return sanctions, pep, source, is_real
 
 _SANCTIONS, _PEP, _SOURCE, _IS_REAL = _load_lists()

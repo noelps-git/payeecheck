@@ -11,10 +11,13 @@ treats this as an additional weighted signal, not a hard override.
 HONEST NOTE: The model was trained on synthetic ring data. Retrain on
 real consortium data once a bank pilot is live.
 """
+import logging
 import os, sys, torch, numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 from common.datasets import RING_ACCOUNTS_CSV, read_rows, transactions_csv
+
+logger = logging.getLogger(__name__)
 
 _HERE   = os.path.dirname(__file__)
 _WEIGHTS = os.path.join(_HERE, "gat_mule_detector.pt")
@@ -46,12 +49,17 @@ def _load():
                 _vpa_idx[vpa.lower()] = i
 
         m = EdgeFeatureGAT()
-        m.load_state_dict(torch.load(_weights, map_location="cpu",
+        m.load_state_dict(torch.load(_WEIGHTS, map_location="cpu",
                                      weights_only=True))
         m.eval()
         _model = m
         return True
-    except Exception as e:
+    except Exception:
+        logger.warning(
+            "GAT model failed to load — falling back to neutral prior. "
+            "Run gnn/gat_mule_detector.py to (re)train the model.",
+            exc_info=True,
+        )
         return False
 
 
@@ -73,14 +81,21 @@ def score_vpa(vpa: str, fallback: float = 0.1) -> dict:
         return {"gat_score": 0.15, "is_available": True,
                 "note": "VPA not in entity graph — neutral prior returned"}
 
-    from gnn.gat_mule_detector import score_with_gat
-    probs = score_with_gat(_model, _graph)
-    idx   = _vpa_idx[vpa_lower]
-    if idx >= len(probs):
-        return {"gat_score": 0.15, "is_available": True,
-                "note": "Node index out of range — neutral prior returned"}
+    try:
+        from gnn.gat_mule_detector import score_with_gat
+        probs = score_with_gat(_model, _graph)
+        idx   = _vpa_idx[vpa_lower]
+        if idx >= len(probs):
+            return {"gat_score": 0.15, "is_available": True,
+                    "note": "Node index out of range — neutral prior returned"}
 
-    prob = float(probs[idx][0])
+        prob = float(probs[idx])
+    except Exception:
+        logger.warning("GAT inference failed for vpa=%r — returning fallback.",
+                       vpa, exc_info=True)
+        return {"gat_score": fallback, "is_available": False,
+                "note": "GAT inference failed — see logs"}
+
     return {
         "gat_score":     round(prob, 3),
         "is_available":  True,
