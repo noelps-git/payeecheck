@@ -15,8 +15,11 @@ Usage:
     db = ConsortiumDB.from_csv("data/synthetic_transactions_v2.csv")
     result = db.lookup("payee_vpa_here")
 """
-import csv, os, json
+import os, sys, json
 from collections import defaultdict
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from common.datasets import read_rows, transactions_csv
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -30,20 +33,19 @@ class ConsortiumDB:
     @classmethod
     def from_csv(cls, csv_path: str) -> "ConsortiumDB":
         db = cls()
-        with open(csv_path) as f:
-            for row in csv.DictReader(f):
-                vpa  = row.get("payee_vpa","")
-                bf   = int(row.get("bank_flags", 0) or 0)
-                ring = row.get("fraud_ring_id","")
-                mf   = row.get("mule_flagged","").lower() == "true"
-                if not vpa:
-                    continue
-                if mf and bf > 0:
-                    # Simulate each flag as from a different synthetic bank
-                    db.flags[vpa] = [f"SYNTH_BANK_{i+1}" for i in range(bf)]
-                if ring:
-                    db.rings[vpa] = ring
-                    db.ring_vpas[ring].append(vpa)
+        for row in read_rows(csv_path):
+            vpa  = row.get("payee_vpa","")
+            bf   = int(row.get("bank_flags", 0) or 0)
+            ring = row.get("fraud_ring_id","")
+            mf   = row.get("mule_flagged","").lower() == "true"
+            if not vpa:
+                continue
+            if mf and bf > 0:
+                # Simulate each flag as from a different synthetic bank
+                db.flags[vpa] = [f"SYNTH_BANK_{i+1}" for i in range(bf)]
+            if ring:
+                db.rings[vpa] = ring
+                db.ring_vpas[ring].append(vpa)
         return db
 
     def _propagate(self, vpa: str, decay: float = 0.5) -> float:
@@ -92,12 +94,7 @@ _db_cache = None
 def get_db(csv_path: str = None) -> ConsortiumDB:
     global _db_cache
     if _db_cache is None:
-        if csv_path is None:
-            csv_path = os.path.join(_HERE, "..", "data",
-                                    "synthetic_transactions_v2.csv")
-            if not os.path.exists(csv_path):
-                csv_path = csv_path.replace("_v2", "")
-        _db_cache = ConsortiumDB.from_csv(csv_path)
+        _db_cache = ConsortiumDB.from_csv(transactions_csv(csv_path))
     return _db_cache
 
 

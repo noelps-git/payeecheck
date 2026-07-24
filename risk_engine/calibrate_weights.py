@@ -13,13 +13,14 @@ Run:
     python risk_engine/calibrate_weights.py --csv data/synthetic_transactions_v2.csv
     # Prints recommended weight updates and optionally patches risk_scorer.py
 """
-import csv, os, sys, json, argparse, copy
+import os, sys, json, argparse, copy
 import logging
 import numpy as np
 
 logger = logging.getLogger(__name__)
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from common.datasets import read_rows, transactions_csv
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -33,8 +34,7 @@ CLEAN_LABELS = {"clean","seasonal_burst","session_anomaly",
 def load_scored_dataset(csv_path: str) -> list:
     from risk_engine.risk_scorer import score_transaction
     results = []
-    with open(csv_path) as f:
-        rows = list(csv.DictReader(f))
+    rows = read_rows(csv_path)
 
     print(f"Scoring {len(rows)} transactions...")
     skipped = 0
@@ -162,12 +162,9 @@ def calibrate(csv_path: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--csv", default=os.path.join(_HERE,"..","data",
-                                                       "synthetic_transactions_v2.csv"))
+    parser.add_argument("--csv", default=None)
     args = parser.parse_args()
-    if not os.path.exists(args.csv):
-        args.csv = args.csv.replace("_v2","")
-    result = calibrate(args.csv)
+    result = calibrate(transactions_csv(args.csv))
     print(f"\nSummary: F1={result['baseline_f1']} "
           f"at threshold={result['threshold']}")
     out = os.path.join(_HERE, "calibration_result.json")

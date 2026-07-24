@@ -10,7 +10,7 @@ Usage:
     python matchers/l5_lookalike.py        # train + test
     from matchers.l5_lookalike import classify_vpa
 """
-import os, sys, pickle, csv
+import os, sys, pickle
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -19,6 +19,7 @@ from sklearn.metrics import precision_score, recall_score
 _HERE  = os.path.dirname(os.path.abspath(__file__))
 _MODEL = os.path.join(_HERE, "l5_lookalike_model.pkl")
 sys.path.insert(0, os.path.join(_HERE, ".."))
+from common.datasets import read_rows, transactions_csv
 
 FAKE_PSPS    = {"axl","yba","0kaxis","paytrn","hdfcb"}
 SCAM_KW      = {"support","help","verify","refund","kyc","service","secure"}
@@ -48,10 +49,7 @@ def _vpa_features(vpa: str) -> list:
 
 
 def _generate_vpa_pairs(tx_csv: str):
-    rows = []
-    with open(tx_csv) as f:
-        for r in csv.DictReader(f):
-            rows.append(r)
+    rows = read_rows(tx_csv)
 
     X, y = [], []
     for r in rows:
@@ -67,10 +65,7 @@ def _generate_vpa_pairs(tx_csv: str):
 
 
 def train():
-    tx = os.path.join(_HERE,"..","data","synthetic_transactions_v2.csv")
-    if not os.path.exists(tx):
-        tx = tx.replace("_v2","")
-    X, y = _generate_vpa_pairs(tx)
+    X, y = _generate_vpa_pairs(transactions_csv())
     print(f"[l5_lookalike] {len(X)} samples, {y.sum()} fraud")
 
     clf = LogisticRegression(max_iter=500, C=1.0, class_weight="balanced")

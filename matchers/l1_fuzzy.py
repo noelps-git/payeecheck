@@ -5,36 +5,18 @@ Jaro-Winkler + Token Sort Ratio. Character-level comparison only.
 No understanding of meaning — fails on abbreviations and transliteration.
 See: PayeeCheck Engineering Playbook, Level 1.
 """
-from rapidfuzz import fuzz
-import re
+import os
+import sys
 
-BUSINESS_TOKENS = {
-    "pvt", "ltd", "limited", "llp", "inc", "corp",
-    "enterprises", "solutions", "services", "industries",
-    "holdings", "group", "ngo", "trust", "foundation"
-}
-
-
-def _normalise(name: str) -> str:
-    name = name.lower()
-    name = re.sub(r"[^\w\s]", " ", name)
-    return re.sub(r"\s+", " ", name).strip()
-
-
-def _is_business(name: str) -> bool:
-    return bool(set(_normalise(name).split()) & BUSINESS_TOKENS)
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from common.text import fuzzy_score, is_business, normalise
 
 
 def match(entered: str, actual: str) -> dict:
-    n_e = _normalise(entered)
-    n_a = _normalise(actual)
+    score = round(fuzzy_score(normalise(entered), normalise(actual)), 2)
 
-    jaro = fuzz.WRatio(n_e, n_a) / 100
-    token = fuzz.token_sort_ratio(n_e, n_a) / 100
-    score = round(max(jaro, token), 2)
-
-    entered_biz = _is_business(entered)
-    actual_biz = _is_business(actual)
+    entered_biz = is_business(entered)
+    actual_biz = is_business(actual)
     entity_mismatch = entered_biz != actual_biz
 
     if score >= 0.95:
