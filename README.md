@@ -189,6 +189,14 @@ curl -X POST http://localhost:8000/match/4 \
   -d '{"entered": "Mohammed Riaz", "actual": "Mohammad Riaz K"}'
 ```
 
+### Run the unit tests
+
+```bash
+pip install -r requirements-dev.txt
+pytest                                  # tests/unit — offline, no model downloads
+pytest --cov=. --cov-report=term-missing
+```
+
 ### Run benchmarks
 
 ```bash
@@ -264,8 +272,9 @@ payeecheck/
 │   └── README.md
 │
 ├── tests/
+│   ├── unit/                       # pytest suite — offline, no model downloads
 │   ├── test_cases.py               # Shared Indian FinCrime test set
-│   ├── test_l1.py → test_l6.py
+│   ├── test_l1.py → test_l6.py     # standalone level runners (not pytest)
 │   ├── benchmark.py
 │   └── benchmark_pipeline.py
 │
