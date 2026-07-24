@@ -24,10 +24,12 @@ Usage:
     bf = BilinearFusion.train("data/synthetic_transactions_v2.csv")
     score = bf.fuse(signal_vector)
 """
-import os, sys, pickle, csv
+import os, sys, pickle
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from common.datasets import read_rows, transactions_csv
+
 _HERE  = os.path.dirname(os.path.abspath(__file__))
 _MODEL = os.path.join(_HERE, "bilinear_model.pkl")
 
@@ -117,10 +119,9 @@ class BilinearFusion:
     @classmethod
     def train(cls, csv_path: str) -> "BilinearFusion":
         phis, labels = [], []
-        with open(csv_path) as f:
-            for row in csv.DictReader(f):
-                phis.append(_row_to_phi(row))
-                labels.append(1 if row.get("label","") in FRAUD_LABELS else 0)
+        for row in read_rows(csv_path):
+            phis.append(_row_to_phi(row))
+            labels.append(1 if row.get("label","") in FRAUD_LABELS else 0)
         phis   = np.stack(phis)
         labels = np.array(labels, dtype=np.float32)
         print(f"[bilinear] {len(phis)} samples, {labels.sum():.0f} fraud ({labels.mean():.1%})")
@@ -149,16 +150,12 @@ def get_fusion() -> BilinearFusion:
         if os.path.exists(_MODEL):
             _cache = BilinearFusion.load()
         else:
-            tx = os.path.join(_HERE,"..","data","synthetic_transactions_v2.csv")
-            if not os.path.exists(tx): tx = tx.replace("_v2","")
-            _cache = BilinearFusion.train(tx)
+            _cache = BilinearFusion.train(transactions_csv())
     return _cache
 
 
 if __name__ == "__main__":
-    tx = os.path.join(_HERE,"..","data","synthetic_transactions_v2.csv")
-    if not os.path.exists(tx): tx = tx.replace("_v2","")
-    bf = BilinearFusion.train(tx)
+    bf = BilinearFusion.train(transactions_csv())
 
     tests = [
         {"label":"mule_consortium","mule_flagged":"True","mule_flag_count":"3",

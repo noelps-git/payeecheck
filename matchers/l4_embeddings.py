@@ -10,9 +10,11 @@ This is the recommended production level for most PayeeCheck use cases.
 """
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-from rapidfuzz import fuzz
-from metaphone import doublemetaphone
-import re
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from common.text import entity_mismatch, fuzzy_score, normalise, phonetic_boost
 
 # Load once at import time — NOT inside match(). Reused across all calls.
 # 'all-MiniLM-L6-v2': 384-dim, fast, strong on short text like names.
@@ -21,44 +23,20 @@ print("[l4_embeddings] Loading sentence-transformer model (first run downloads ~
 _MODEL = SentenceTransformer("all-MiniLM-L6-v2")
 print("[l4_embeddings] Model loaded.")
 
-BUSINESS_TOKENS = {
-    "pvt", "ltd", "limited", "llp", "inc", "corp",
-    "enterprises", "solutions", "services", "holdings", "group"
-}
-
-
-def _normalise(name):
-    name = name.lower()
-    name = re.sub(r"[^\w\s]", " ", name)
-    return re.sub(r"\s+", " ", name).strip()
-
-
-def _is_business(name):
-    return bool(set(_normalise(name).split()) & BUSINESS_TOKENS)
-
 
 def _semantic(a, b):
     embs = _MODEL.encode([a, b], normalize_embeddings=True)
     return float(cosine_similarity([embs[0]], [embs[1]])[0][0])
 
 
-def _ph_boost(a, b):
-    ca = set(c for c in doublemetaphone(a) if c)
-    cb = set(c for c in doublemetaphone(b) if c)
-    return 0.08 if ca & cb else 0.0
-
-
 def match(entered: str, actual: str) -> dict:
-    n_e = _normalise(entered)
-    n_a = _normalise(actual)
-
     sem = _semantic(entered, actual)
-    fuz = max(fuzz.WRatio(n_e, n_a), fuzz.token_sort_ratio(n_e, n_a)) / 100
-    ph = _ph_boost(entered, actual)
+    fuz = fuzzy_score(normalise(entered), normalise(actual))
+    ph = phonetic_boost(entered, actual, 0.08)
 
     # Semantic anchors the decision, fuzzy validates, phonetic gives a small boost
     score = round(min(1.0, 0.65 * sem + 0.30 * fuz + ph), 2)
-    em = _is_business(entered) != _is_business(actual)
+    em = entity_mismatch(entered, actual)
     sigs = {"semantic": round(sem, 3), "fuzzy": round(fuz, 3), "phonetic_boost": ph}
 
     if score >= 0.88:

@@ -18,8 +18,11 @@ multiple times with consistent attributes).
 Usage:
     from risk_engine.velocity_advanced import VelocityAnalyser, BehaviouralProfiler
 """
-import csv, os, math
+import os, sys, math
 from collections import defaultdict
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from common.datasets import read_rows, transactions_csv
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -36,12 +39,11 @@ class VelocityAnalyser:
     @classmethod
     def from_csv(cls, csv_path: str) -> "VelocityAnalyser":
         va = cls()
-        with open(csv_path) as f:
-            for row in csv.DictReader(f):
-                vpa = row.get("payee_vpa","")
-                us7 = float(row.get("unique_senders_7d", 0) or 0)
-                if vpa and us7 > 0:
-                    va.history[vpa].append(us7)
+        for row in read_rows(csv_path):
+            vpa = row.get("payee_vpa","")
+            us7 = float(row.get("unique_senders_7d", 0) or 0)
+            if vpa and us7 > 0:
+                va.history[vpa].append(us7)
         return va
 
     def _rolling_median(self, values: list, window: int = 3) -> list:
@@ -121,13 +123,12 @@ class BehaviouralProfiler:
     def from_csv(cls, csv_path: str) -> "BehaviouralProfiler":
         bp = cls()
         raw = defaultdict(list)   # vpa -> [(paste, amount), ...]
-        with open(csv_path) as f:
-            for row in csv.DictReader(f):
-                vpa    = row.get("payee_vpa","")
-                method = row.get("input_method","type")
-                amt    = float(row.get("amount", 0) or 0)
-                if vpa:
-                    raw[vpa].append((1 if method=="paste" else 0, amt))
+        for row in read_rows(csv_path):
+            vpa    = row.get("payee_vpa","")
+            method = row.get("input_method","type")
+            amt    = float(row.get("amount", 0) or 0)
+            if vpa:
+                raw[vpa].append((1 if method=="paste" else 0, amt))
         for vpa, sessions in raw.items():
             if len(sessions) < 2:
                 continue
@@ -183,23 +184,13 @@ _bp = None
 def get_velocity_analyser(csv_path=None) -> VelocityAnalyser:
     global _va
     if _va is None:
-        if csv_path is None:
-            csv_path = os.path.join(_HERE,"..","data",
-                                    "synthetic_transactions_v2.csv")
-            if not os.path.exists(csv_path):
-                csv_path = csv_path.replace("_v2","")
-        _va = VelocityAnalyser.from_csv(csv_path)
+        _va = VelocityAnalyser.from_csv(transactions_csv(csv_path))
     return _va
 
 def get_behavioural_profiler(csv_path=None) -> BehaviouralProfiler:
     global _bp
     if _bp is None:
-        if csv_path is None:
-            csv_path = os.path.join(_HERE,"..","data",
-                                    "synthetic_transactions_v2.csv")
-            if not os.path.exists(csv_path):
-                csv_path = csv_path.replace("_v2","")
-        _bp = BehaviouralProfiler.from_csv(csv_path)
+        _bp = BehaviouralProfiler.from_csv(transactions_csv(csv_path))
     return _bp
 
 

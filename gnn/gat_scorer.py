@@ -11,7 +11,10 @@ treats this as an additional weighted signal, not a hard override.
 HONEST NOTE: The model was trained on synthetic ring data. Retrain on
 real consortium data once a bank pilot is live.
 """
-import os, torch, numpy as np
+import os, sys, torch, numpy as np
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+from common.datasets import RING_ACCOUNTS_CSV, read_rows, transactions_csv
 
 _HERE   = os.path.dirname(__file__)
 _WEIGHTS = os.path.join(_HERE, "gat_mule_detector.pt")
@@ -25,17 +28,11 @@ def _load():
     if _model is not None:
         return True
     try:
-        import sys
-        sys.path.insert(0, os.path.join(_HERE, ".."))
         from gnn.gat_mule_detector import EdgeFeatureGAT, build_graph_from_rings
         from torch_geometric.data import Data
 
-        tx_path   = os.path.join(_HERE, "..", "data", "synthetic_transactions_v2.csv")
-        ring_path = os.path.join(_HERE, "..", "data", "synthetic_ring_accounts.csv")
-
-        # Fall back to v1 dataset if v2 not present
-        if not os.path.exists(tx_path):
-            tx_path = os.path.join(_HERE, "..", "data", "synthetic_transactions.csv")
+        tx_path   = transactions_csv()
+        ring_path = RING_ACCOUNTS_CSV
 
         if not os.path.exists(ring_path) or not os.path.exists(tx_path):
             return False
@@ -43,13 +40,10 @@ def _load():
         _graph = build_graph_from_rings(ring_path, tx_path)
 
         # Read VPA index from ring CSV for lookup
-        import csv
-        with open(ring_path) as f:
-            reader = csv.DictReader(f)
-            for i, row in enumerate(reader):
-                vpa = row.get("payee_vpa", row.get("vpa", ""))
-                if vpa:
-                    _vpa_idx[vpa.lower()] = i
+        for i, row in enumerate(read_rows(ring_path)):
+            vpa = row.get("payee_vpa", row.get("vpa", ""))
+            if vpa:
+                _vpa_idx[vpa.lower()] = i
 
         m = EdgeFeatureGAT()
         m.load_state_dict(torch.load(_weights, map_location="cpu",

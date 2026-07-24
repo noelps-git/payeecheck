@@ -19,14 +19,12 @@ from sklearn.metrics.pairwise import cosine_similarity
 _HERE  = os.path.dirname(os.path.abspath(__file__))
 _MODEL = os.path.join(_HERE, "l5_model.pkl")
 sys.path.insert(0, os.path.join(_HERE, ".."))
+from common.datasets import read_rows, transactions_csv
 
 
 def _generate_pairs(tx_csv: str) -> list:
-    import csv, random
-    rows = []
-    with open(tx_csv) as f:
-        for r in csv.DictReader(f):
-            rows.append(r)
+    import random
+    rows = read_rows(tx_csv)
 
     pairs = []
     # Positives from dataset
@@ -134,10 +132,7 @@ def match(name_a: str, name_b: str) -> dict:
     return _cache.match(name_a, name_b)
 
 def train():
-    tx = os.path.join(_HERE,"..","data","synthetic_transactions_v2.csv")
-    if not os.path.exists(tx):
-        tx = tx.replace("_v2","")
-    pairs = _generate_pairs(tx)
+    pairs = _generate_pairs(transactions_csv())
     print(f"[l5] {len(pairs)} pairs, {sum(l for _,_,l in pairs)} positive")
     m = LightSiamese(dim=64); m.fit(pairs, epochs=30, lr=0.01)
     m.save(_MODEL); print(f"[l5] saved -> {_MODEL}")
