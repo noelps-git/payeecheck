@@ -14,7 +14,10 @@ Run:
     # Prints recommended weight updates and optionally patches risk_scorer.py
 """
 import csv, os, sys, json, argparse, copy
+import logging
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -34,6 +37,7 @@ def load_scored_dataset(csv_path: str) -> list:
         rows = list(csv.DictReader(f))
 
     print(f"Scoring {len(rows)} transactions...")
+    skipped = 0
     for i, row in enumerate(rows):
         if i % 50 == 0:
             print(f"  {i}/{len(rows)}")
@@ -42,8 +46,13 @@ def load_scored_dataset(csv_path: str) -> list:
             r  = score_transaction(tx)
             r["true_fraud"] = row.get("label","") in FRAUD_LABELS
             results.append(r)
-        except Exception as e:
-            pass
+        except Exception:
+            skipped += 1
+            logger.warning("Skipping row %d (tx_id=%r) — scoring failed.",
+                           i, row.get("tx_id"), exc_info=True)
+    if skipped:
+        logger.warning("Skipped %d/%d rows that failed to score.",
+                       skipped, len(rows))
     return results
 
 
@@ -55,11 +64,17 @@ def _coerce(k, v):
     if k in bool_keys:
         return str(v).lower() == "true"
     if k in int_keys:
-        try: return int(float(v or 0))
-        except: return 0
+        try:
+            return int(float(v or 0))
+        except (ValueError, TypeError):
+            logger.debug("Could not coerce %s=%r to int; defaulting to 0.", k, v)
+            return 0
     if k in float_keys:
-        try: return float(v or 0)
-        except: return 0.0
+        try:
+            return float(v or 0)
+        except (ValueError, TypeError):
+            logger.debug("Could not coerce %s=%r to float; defaulting to 0.0.", k, v)
+            return 0.0
     return v
 
 
