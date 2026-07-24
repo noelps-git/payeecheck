@@ -30,7 +30,10 @@ Usage:
 """
 
 import os, sys
+import logging
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
@@ -234,6 +237,8 @@ def score_tx_graph(model, graph_meta: dict,
         from gnn.gat_mule_detector import score_with_gat
         probs = score_with_gat(model, pyg_data)
     except Exception as e:
+        logger.warning("Transaction-graph GAT inference failed — returning empty scores.",
+                       exc_info=True)
         return {
             "scores": {},
             "high_risk_vpas": [],
@@ -243,7 +248,7 @@ def score_tx_graph(model, graph_meta: dict,
         }
 
     vpas    = graph_meta["vpas"]
-    scores  = {vpa: float(probs[i][0]) for i, vpa in enumerate(vpas)
+    scores  = {vpa: float(probs[i]) for i, vpa in enumerate(vpas)
                if i < len(probs)}
     high_risk = [v for v, s in scores.items() if s >= threshold]
 

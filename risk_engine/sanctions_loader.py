@@ -14,7 +14,10 @@ The output JSON is consumed by sanctions_screening.py at startup.
 Cached locally so the API does not fetch on every request.
 """
 import json, re, argparse, os
+import logging
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 try:
     import requests
@@ -40,8 +43,8 @@ def _fetch_ofac() -> list:
                 if raw and raw != "SDN_Name" and len(raw) > 3:
                     names.append(raw)
         return names[:5000]   # cap — full list is 10k+ rows
-    except Exception as e:
-        print(f"OFAC fetch failed: {e}")
+    except Exception:
+        logger.warning("OFAC fetch failed — returning empty list.", exc_info=True)
         return []
 
 def _fetch_un() -> list:
@@ -64,8 +67,8 @@ def _fetch_un() -> list:
             if full:
                 names.append(full)
         return names
-    except Exception as e:
-        print(f"UN fetch failed: {e}")
+    except Exception:
+        logger.warning("UN fetch failed — returning empty list.", exc_info=True)
         return []
 
 def _rbi_seed() -> list:
