@@ -47,6 +47,16 @@
   }
 }
 </script>
+<!-- PostHog Analytics — replace POSTHOG_API_KEY with your key from app.posthog.com -->
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+" (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('POSTHOG_API_KEY', {
+    api_host: 'https://us.i.posthog.com',
+    person_profiles: 'identified_only',
+    capture_pageview: true,
+    capture_pageleave: true,
+  });
+</script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1211,7 +1221,7 @@ r = requests.<span class="cm">post</span>(
         <div style="font-size:17px;font-weight:700;letter-spacing:-0.01em;margin-bottom:6px">Try the technical sandbox</div>
         <div style="font-size:13px;color:var(--fg-3)">Run name matchers, entity resolver, and fraud ring scanner live — no auth needed</div>
       </div>
-      <a href="/sandbox" style="display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:700;padding:12px 26px;border-radius:var(--r);text-decoration:none;transition:all 200ms;box-shadow:0 4px 16px rgba(249,115,22,0.3);white-space:nowrap;flex-shrink:0" onmouseover="this.style.background='#fb923c'" onmouseout="this.style.background='var(--accent)'">
+      <a href="/sandbox" style="display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:700;padding:12px 26px;border-radius:var(--r);text-decoration:none;transition:all 200ms;box-shadow:0 4px 16px rgba(249,115,22,0.3);white-space:nowrap;flex-shrink:0" onmouseover="this.style.background='#fb923c'" onmouseout="this.style.background='var(--accent)'" onclick="posthog.capture('sandbox_opened',{source:'api_section'})">
         Open Sandbox
         <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M3 7h8M7 3l4 4-4 4"/></svg>
       </a>
@@ -1474,7 +1484,7 @@ r = requests.<span class="cm">post</span>(
     <div class="prod-cta-card">
       <div class="prod-cta-h">Explore the full technical sandbox</div>
       <div class="prod-cta-sub">Run the L1–L5 name matchers, entity resolver, and fraud ring scanner — with live results</div>
-      <a class="prod-link" href="/sandbox">
+      <a class="prod-link" href="/sandbox" onclick="posthog.capture('sandbox_opened',{source:'prod_cta'})">
         Open PayeeCheck
         <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M3 7h8M7 3l4 4-4 4"/></svg>
       </a>
@@ -1521,6 +1531,7 @@ const MODULES_DEF = [
 
 // ─── Launch / close ───────────────────────────────────────
 function startDemo() {
+  posthog.capture('demo_started');
   document.getElementById('overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
   renderProgress();

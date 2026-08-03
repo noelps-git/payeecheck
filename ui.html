@@ -7,6 +7,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- PostHog Analytics — replace POSTHOG_API_KEY with your key from app.posthog.com -->
+<script>
+  !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+" (stub)"},o="capture identify alias people.set people.set_once set_config register register_once unregister opt_out_capturing has_opted_out_capturing opt_in_capturing reset isFeatureEnabled onFeatureFlags getFeatureFlag getFeatureFlagPayload reloadFeatureFlags group updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures getActiveMatchingSurveys getSurveys onSessionId".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+  posthog.init('POSTHOG_API_KEY', {
+    api_host: 'https://us.i.posthog.com',
+    person_profiles: 'identified_only',
+    capture_pageview: true,
+    capture_pageleave: true,
+  });
+</script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1074,6 +1084,7 @@ function switchTab(id, el) {
   document.getElementById('page-subtitle').textContent = PAGE_META[id].sub;
   if (id === 'behavioral') initBehavTab();
   if (id === 'muledb') loadMuleFilter('high');
+  posthog.capture('tab_viewed', { tab: id });
 }
 
 function fillCompare(entered, actual) {
@@ -1131,6 +1142,7 @@ async function runCompare() {
   const entered = document.getElementById('cmp-entered').value.trim();
   const actual  = document.getElementById('cmp-actual').value.trim();
   if (!entered || !actual) return;
+  posthog.capture('api_called', { endpoint: 'compare', entered_length: entered.length, actual_length: actual.length });
   const btn = document.getElementById('cmp-btn');
   const loading = document.getElementById('cmp-loading');
   const error   = document.getElementById('cmp-error');
@@ -1155,6 +1167,7 @@ async function runSingle(level) {
   const entered = document.getElementById('s-entered').value.trim();
   const actual  = document.getElementById('s-actual').value.trim();
   if (!entered || !actual) return;
+  posthog.capture('api_called', { endpoint: 'match', level });
   const loading = document.getElementById('s-loading');
   const error   = document.getElementById('s-error');
   const result  = document.getElementById('s-result');
@@ -1172,6 +1185,7 @@ async function runSingle(level) {
 }
 
 async function runResolve() {
+  posthog.capture('api_called', { endpoint: 'resolve' });
   const body = {
     name:    document.getElementById('r-name').value.trim()    || null,
     vpa:     document.getElementById('r-vpa').value.trim()     || null,
@@ -1193,6 +1207,7 @@ async function runResolve() {
 
 async function runRings() {
   const minSize = parseInt(document.getElementById('ring-min').value) || 2;
+  posthog.capture('api_called', { endpoint: 'rings', min_size: minSize });
   const loading = document.getElementById('ring-loading');
   const error   = document.getElementById('ring-error');
   const result  = document.getElementById('ring-result');
@@ -1207,6 +1222,7 @@ async function runRings() {
 }
 
 async function runAttribution() {
+  posthog.capture('api_called', { endpoint: 'attribution' });
   const body = {
     transaction: {
       input_method:      document.getElementById('a-input-method').value,
@@ -1356,6 +1372,7 @@ function muleTableHTML(records) {
 
 function searchMuleDB() {
   const q = document.getElementById('mule-search').value.trim().toLowerCase();
+  posthog.capture('api_called', { endpoint: 'muledb_search', query_length: q.length });
   const results = q ? MULE_DB.filter(r =>
     r.name.toLowerCase().includes(q) ||
     r.vpa.toLowerCase().includes(q) ||
@@ -1509,6 +1526,7 @@ function initBehavTab() {
 }
 
 function simulateBehav(type) {
+  posthog.capture('behavioral_simulated', { type });
   resetBehav();
   const inp = document.getElementById('behav-input');
   if (!inp) return;
@@ -1585,6 +1603,7 @@ function runVelocity() {
   const vpa = document.getElementById('vel-input').value.trim().toLowerCase();
   const container = document.getElementById('vel-result');
   if (!vpa) return;
+  posthog.capture('api_called', { endpoint: 'velocity' });
 
   // Find exact or fuzzy match
   let entry = VEL_DB[vpa];
@@ -1651,6 +1670,8 @@ function runVelocity() {
 function submitEmail() {
   const val = document.getElementById('sidebar-email').value.trim();
   if (!val) return;
+  posthog.capture('email_submitted', { $set: { email: val } });
+  posthog.identify(val);
   document.getElementById('sidebar-email').value = '';
   const msg = document.getElementById('email-sent-msg');
   msg.style.display = 'block';
@@ -1744,6 +1765,7 @@ function fillLookalike(vpa) {
 function runLookalike() {
   const vpa = document.getElementById('vpa-input').value.trim();
   if (!vpa) return;
+  posthog.capture('api_called', { endpoint: 'lookalike' });
   const container = document.getElementById('vpa-result');
   const r = lookalikeSynth(vpa);
 
@@ -1838,6 +1860,7 @@ function fillSanctions(name) {
 function runSanctions() {
   const query = document.getElementById('sanction-input').value.trim();
   if (!query) return;
+  posthog.capture('api_called', { endpoint: 'sanctions' });
   const container = document.getElementById('sanction-result');
   const hits = sanctionSynth(query);
 

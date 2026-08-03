@@ -24,7 +24,7 @@ Security (env):
 """
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 from typing import Literal, Optional
 from collections import defaultdict, deque
@@ -134,17 +134,27 @@ UI_FILE = os.path.join(os.path.dirname(__file__), "ui.html")
 LANDING_FILE = os.path.join(os.path.dirname(__file__), "landing.html")
 OG_IMAGE = os.path.join(os.path.dirname(__file__), "og-image.png")
 
+_POSTHOG_KEY = os.environ.get("POSTHOG_KEY", "").strip()
+
 _MAX_NAME = 256
+
+
+def _render_html(path: str) -> HTMLResponse:
+    with open(path, "r", encoding="utf-8") as f:
+        html = f.read()
+    if _POSTHOG_KEY:
+        html = html.replace("POSTHOG_API_KEY", _POSTHOG_KEY)
+    return HTMLResponse(content=html)
 
 
 @app.get("/", include_in_schema=False)
 def serve_landing():
-    return FileResponse(LANDING_FILE, media_type="text/html")
+    return _render_html(LANDING_FILE)
 
 
 @app.get("/sandbox", include_in_schema=False)
 def serve_ui():
-    return FileResponse(UI_FILE, media_type="text/html")
+    return _render_html(UI_FILE)
 
 
 @app.get("/og-image.png", include_in_schema=False)
