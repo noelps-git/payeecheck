@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PayeeCheck — Fraud Intelligence Sandbox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:           #09090b;
+    --surface:      #111113;
+    --surface-2:    #1c1c1f;
+    --surface-3:    #242428;
+    --border:       rgba(255,255,255,0.06);
+    --border-mid:   rgba(255,255,255,0.10);
+    --fg:           #fafafa;
+    --fg-2:         #a1a1aa;
+    --fg-3:         #52525b;
+    --accent:       #f97316;
+    --accent-2:     #fb923c;
+    --accent-dim:   rgba(249,115,22,0.12);
+    --accent-glow:  rgba(249,115,22,0.20);
+    --success:      #22c55e;
+    --success-dim:  rgba(34,197,94,0.10);
+    --warn:         #eab308;
+    --warn-dim:     rgba(234,179,8,0.10);
+    --danger:       #ef4444;
+    --danger-dim:   rgba(239,68,68,0.10);
+    --radius:       6px;
+    --radius-lg:    10px;
+    --mono:         'SF Mono', 'Fira Code', ui-monospace, monospace;
+    --sans:         'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  html, body { height: 100%; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--fg);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 228px;
+    min-width: 228px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+  }
+  .sidebar-brand {
+    padding: 18px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(249,115,22,0.06) 0%, transparent 60%);
+  }
+  .brand-row { display: flex; align-items: center; gap: 9px; }
+  .brand-icon {
+    width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0;
+    background: linear-gradient(135deg, #f97316, #fb923c);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 12px rgba(249,115,22,0.35);
+  }
+  .brand-name { font-size: 14px; font-weight: 700; letter-spacing: -0.03em; color: var(--fg); }
+  .brand-sub  { font-size: 10px; color: var(--fg-3); margin-top: 1px; font-family: var(--mono); letter-spacing: 0.02em; }
+
+  .nav-section-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.10em;
+    text-transform: uppercase; color: var(--fg-3); padding: 14px 20px 5px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 9px; padding: 7px 20px;
+    cursor: pointer; color: var(--fg-2); font-size: 12.5px; font-weight: 500;
+    transition: color 120ms, background 120ms; position: relative; user-select: none;
+    letter-spacing: -0.01em;
+  }
+  .nav-item:hover { color: var(--fg); background: rgba(255,255,255,0.03); }
+  .nav-item.active { color: var(--fg); }
+  .nav-item.active::before {
+    content: ''; position: absolute; left: 0; top: 5px; bottom: 5px;
+    width: 2px; background: var(--accent); border-radius: 0 2px 2px 0;
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+  .nav-icon { width: 15px; height: 15px; opacity: 0.6; flex-shrink: 0; transition: opacity 120ms; }
+  .nav-item.active .nav-icon,
+  .nav-item:hover .nav-icon { opacity: 1; }
+  .nav-badge {
+    margin-left: auto; font-size: 9.5px; font-family: var(--mono); font-weight: 600;
+    background: var(--accent-dim); color: var(--accent);
+    padding: 1px 6px; border-radius: 10px; letter-spacing: 0.02em;
+  }
+  .sidebar-footer {
+    margin-top: auto; padding: 12px 20px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 7px;
+  }
+  .status-dot {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--success); flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(34,197,94,0.2), 0 0 8px var(--success);
+    animation: pulse-dot 2.5s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(34,197,94,0.2), 0 0 8px var(--success); }
+    50% { box-shadow: 0 0 0 4px rgba(34,197,94,0.1), 0 0 12px var(--success); }
+  }
+  .status-text { font-size: 11px; color: var(--fg-3); font-family: var(--mono); }
+
+  /* ── Main ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar {
+    height: 50px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 28px; gap: 8px; flex-shrink: 0;
+    background: var(--surface);
+  }
+  .topbar-breadcrumb { display: flex; align-items: center; gap: 8px; }
+  .topbar-brand { font-size: 12px; color: var(--fg-3); font-weight: 500; }
+  .topbar-sep { color: var(--fg-3); font-size: 12px; }
+  .page-title { font-size: 13px; font-weight: 600; letter-spacing: -0.01em; color: var(--fg); }
+  .page-subtitle { font-size: 11.5px; color: var(--fg-3); margin-left: 2px; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .topbar-tag {
+    font-size: 10px; font-family: var(--mono); font-weight: 600;
+    padding: 2px 8px; border-radius: 4px; background: var(--accent-dim);
+    color: var(--accent); border: 1px solid rgba(249,115,22,0.2);
+    letter-spacing: 0.04em;
+  }
+  .content { flex: 1; overflow-y: auto; padding: 24px 28px; background: var(--bg); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 18px 20px;
+  }
+  .card-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--fg-3); margin-bottom: 14px;
+  }
+
+  /* ── Inputs ── */
+  .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .input-row-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .field-label {
+    font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--fg-3); margin-bottom: 6px;
+  }
+  input[type="text"], input[type="number"] {
+    width: 100%; background: var(--surface-2); border: 1px solid var(--border-mid);
+    border-radius: var(--radius); color: var(--fg); font-family: var(--mono);
+    font-size: 12.5px; padding: 8px 11px; outline: none; transition: border-color 150ms, box-shadow 150ms;
+  }
+  input[type="text"]::placeholder, input[type="number"]::placeholder { color: var(--fg-3); }
+  input[type="text"]:focus, input[type="number"]:focus {
+    border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+  select {
+    width: 100%; background: var(--surface-2); border: 1px solid var(--border-mid);
+    border-radius: var(--radius); color: var(--fg); font-family: var(--mono);
+    font-size: 12.5px; padding: 8px 11px; outline: none; appearance: none;
+    cursor: pointer; transition: border-color 150ms;
+  }
+  select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-dim); }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px; padding: 8px 15px;
+    border-radius: var(--radius); font-size: 12.5px; font-weight: 600;
+    cursor: pointer; border: none; transition: all 150ms;
+    user-select: none; white-space: nowrap; font-family: var(--sans); letter-spacing: -0.01em;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 0 0 1px rgba(249,115,22,0.5);
+  }
+  .btn-primary:hover { background: var(--accent-2); box-shadow: 0 2px 8px rgba(249,115,22,0.35), 0 0 0 1px rgba(249,115,22,0.5); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost {
+    background: var(--surface-2); color: var(--fg-2);
+    border: 1px solid var(--border-mid);
+  }
+  .btn-ghost:hover { background: var(--surface-3); color: var(--fg); border-color: var(--border-mid); }
+
+  /* ── Results Grid ── */
+  .results-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 18px; }
+  .level-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 16px; transition: border-color 250ms, background 250ms;
+    position: relative; overflow: hidden;
+  }
+  .level-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .level-card.match-exact   { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.03); }
+  .level-card.match-close   { border-color: rgba(234,179,8,0.3); background: rgba(234,179,8,0.03); }
+  .level-card.match-no_match{ border-color: rgba(239,68,68,0.25); background: rgba(239,68,68,0.03); }
+
+  .level-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 12px; }
+  .level-score { font-family: var(--mono); font-size: 32px; font-weight: 700; letter-spacing: -0.05em; line-height: 1; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+  .score-exact   { color: var(--success); }
+  .score-close   { color: var(--warn); }
+  .score-no_match{ color: var(--danger); }
+
+  .score-bar-track { height: 2px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
+  .score-bar-fill  { height: 100%; border-radius: 2px; transition: width 500ms cubic-bezier(0.22,1,0.36,1); }
+  .fill-exact   { background: var(--success); box-shadow: 0 0 6px var(--success); }
+  .fill-close   { background: var(--warn); box-shadow: 0 0 6px var(--warn); }
+  .fill-no_match{ background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+
+  .match-badge {
+    display: inline-flex; align-items: center; gap: 4px; font-size: 9.5px;
+    font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 4px; margin-bottom: 10px;
+  }
+  .badge-exact   { background: var(--success-dim); color: var(--success); }
+  .badge-close   { background: var(--warn-dim);    color: var(--warn); }
+  .badge-no_match{ background: var(--danger-dim);  color: var(--danger); }
+
+  .level-reason { font-size: 11px; color: var(--fg-2); margin-top: 4px; line-height: 1.45; }
+  .level-algo   { font-size: 9.5px; color: var(--fg-3); font-family: var(--mono); margin-top: 8px; }
+  .entity-warn  { font-size: 10px; color: var(--warn); margin-top: 6px; }
+
+  /* ── Loading / error ── */
+  .loading-row { display: flex; align-items: center; gap: 10px; color: var(--fg-3); font-size: 12.5px; margin-top: 18px; }
+  .spinner {
+    width: 15px; height: 15px; border: 1.5px solid var(--border-mid);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 600ms linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-msg {
+    display: flex; align-items: center; gap: 8px; color: var(--danger);
+    font-size: 12px; background: var(--danger-dim);
+    border: 1px solid rgba(239,68,68,0.2); border-radius: var(--radius);
+    padding: 10px 14px; margin-top: 14px;
+  }
+
+  /* ── JSON output ── */
+  .json-output {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 16px; font-family: var(--mono); font-size: 11.5px; color: var(--fg-2);
+    white-space: pre-wrap; overflow-x: auto; line-height: 1.65; margin-top: 14px; min-height: 80px;
+  }
+
+  /* ── Example chips ── */
+  .examples { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+  .example-chip {
+    font-size: 11px; font-family: var(--mono); color: var(--fg-3);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: 4px 10px; cursor: pointer;
+    transition: color 120ms, border-color 120ms, background 120ms; white-space: nowrap;
+  }
+  .example-chip:hover { color: var(--accent); border-color: rgba(249,115,22,0.35); background: var(--surface-2); }
+
+  /* ── Section ── */
+  .section { margin-bottom: 18px; }
+  .section-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+  .section-title  { font-size: 14.5px; font-weight: 600; letter-spacing: -0.02em; }
+  .section-desc   { font-size: 11.5px; color: var(--fg-3); margin-top: 3px; }
+
+  /* ── Attribution ── */
+  .attr-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .attr-section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+
+  .verdict-card { display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: var(--radius-lg); margin-bottom: 16px; border: 1px solid; }
+  .verdict-pass  { background: var(--success-dim); border-color: rgba(62,207,106,0.25); }
+  .verdict-warn  { background: var(--warn-dim);    border-color: rgba(245,166,35,0.25); }
+  .verdict-block { background: var(--danger-dim);  border-color: rgba(239,68,68,0.2); }
+  .verdict-score { font-family: var(--mono); font-size: 36px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+  .verdict-score.pass  { color: var(--success); }
+  .verdict-score.warn  { color: var(--warn); }
+  .verdict-score.block { color: var(--danger); }
+  .verdict-label { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+  .verdict-sub   { font-size: 12px; color: var(--fg-3); margin-top: 2px; }
+
+  .signal-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .signal-item {
+    display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius);
+  }
+  .signal-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .signal-dot.L1 { background: var(--accent); box-shadow: 0 0 6px var(--accent-glow); }
+  .signal-dot.L2 { background: var(--warn); }
+  .signal-dot.L3 { background: #a78bfa; }
+  .signal-name  { font-family: var(--mono); font-size: 11px; color: var(--fg-3); }
+  .signal-assert{ font-size: 12px; color: var(--fg-2); }
+
+  .resolve-examples { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .resolve-chip {
+    font-size: 11px; color: var(--fg-3); background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: 4px; padding: 5px 10px;
+    cursor: pointer; transition: color 120ms, border-color 120ms;
+  }
+  .resolve-chip:hover { color: var(--accent); border-color: rgba(249,115,22,0.35); }
+  .chip-tag { font-family: var(--mono); }
+
+  .attr-scenario-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .attr-chip {
+    font-size: 11px; padding: 5px 12px; border-radius: 4px;
+    border: 1px solid var(--border); background: var(--surface);
+    cursor: pointer; transition: color 120ms, border-color 120ms; color: var(--fg-3);
+    font-weight: 500;
+  }
+  .attr-chip:hover { color: var(--accent); border-color: rgba(249,115,22,0.35); }
+  .attr-chip.danger-chip { color: var(--danger); border-color: rgba(239,68,68,0.2); background: var(--danger-dim); }
+  .attr-chip.warn-chip   { color: var(--warn);   border-color: rgba(245,166,35,0.2); background: var(--warn-dim); }
+  .attr-chip.pass-chip   { color: var(--success); border-color: rgba(62,207,106,0.2); background: var(--success-dim); }
+
+  /* ── Lookalike VPA ── */
+  .vpa-result-card {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); padding: 20px; margin-top: 16px;
+  }
+  .vpa-result-card.risk-high   { border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.04); }
+  .vpa-result-card.risk-medium { border-color: rgba(245,166,35,0.35); background: rgba(245,166,35,0.04); }
+  .vpa-result-card.risk-low    { border-color: rgba(62,207,106,0.35); background: rgba(62,207,106,0.04); }
+  .vpa-risk-badge {
+    display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px;
+    border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .vpa-risk-badge.high   { background: var(--danger-dim); color: var(--danger); }
+  .vpa-risk-badge.medium { background: var(--warn-dim);   color: var(--warn); }
+  .vpa-risk-badge.low    { background: var(--success-dim);color: var(--success); }
+  .vpa-detail-row { display: flex; gap: 6px; align-items: baseline; margin-bottom: 6px; }
+  .vpa-detail-label { font-size: 11px; color: var(--fg-3); width: 140px; flex-shrink: 0; font-family: var(--mono); }
+  .vpa-detail-value { font-size: 12px; color: var(--fg-2); }
+  .vpa-score-big { font-family: var(--mono); font-size: 40px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+  .vpa-score-big.high   { color: var(--danger); }
+  .vpa-score-big.medium { color: var(--warn); }
+  .vpa-score-big.low    { color: var(--success); }
+
+  /* ── Sanctions ── */
+  .sanction-hit {
+    background: var(--surface-2); border: 1px solid rgba(239,68,68,0.3);
+    border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px;
+  }
+  .sanction-clear {
+    background: var(--success-dim); border: 1px solid rgba(62,207,106,0.25);
+    border-radius: var(--radius); padding: 14px; color: var(--success); font-size: 13px;
+    margin-top: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .sanction-name { font-size: 13px; font-weight: 600; color: var(--fg); }
+  .sanction-score { font-family: var(--mono); font-size: 11px; color: var(--warn); margin-left: auto; }
+  .sanction-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+  .sanction-tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 3px;
+    background: var(--danger-dim); color: var(--danger); font-family: var(--mono);
+  }
+
+  /* ── Email prompt in sidebar ── */
+  .email-prompt {
+    padding: 14px 20px; border-top: 1px solid var(--border);
+  }
+  .email-prompt-label { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 6px; }
+  .email-prompt-sub { font-size: 10px; color: var(--fg-3); margin-bottom: 8px; }
+  .email-input-wrap { position: relative; }
+  .email-input-wrap input {
+    font-size: 11px; padding: 7px 10px; width: 100%;
+    background: var(--bg); border: 1px solid var(--border-mid);
+    border-radius: var(--radius); color: var(--fg); font-family: var(--sans);
+  }
+  .email-input-wrap input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
+  .email-submit-btn {
+    margin-top: 6px; width: 100%; background: var(--accent-dim); color: var(--accent);
+    border: 1px solid rgba(249,115,22,0.25); border-radius: var(--radius);
+    font-size: 11px; font-weight: 600; padding: 6px; cursor: pointer;
+    transition: background 150ms; font-family: var(--sans); letter-spacing: -0.01em;
+  }
+  .email-submit-btn:hover { background: rgba(249,115,22,0.2); }
+  .email-sent { font-size: 11px; color: var(--success); margin-top: 6px; display: none; }
+
+  /* ── Mule DB ── */
+  .mule-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 12px; }
+  .mule-table th { text-align: left; padding: 8px 10px; font-size: 9.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--fg-3); border-bottom: 1px solid var(--border); }
+  .mule-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--fg-2); }
+  .mule-table tr:hover td { background: var(--surface-2); cursor: pointer; }
+  .mule-flag-pill { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px; font-family: var(--mono); }
+  .mule-flag-high   { background: var(--danger-dim); color: var(--danger); }
+  .mule-flag-medium { background: var(--warn-dim);   color: var(--warn); }
+  .mule-flag-low    { background: rgba(249,115,22,0.10); color: var(--accent); }
+  .mule-flag-clean  { background: var(--success-dim); color: var(--success); }
+  .mule-consortium  { font-size: 9.5px; font-family: var(--mono); color: var(--fg-3); background: var(--surface-3); padding: 1px 6px; border-radius: 3px; margin-right: 3px; display: inline-block; margin-bottom: 2px; }
+  .mule-detail-overlay {
+    margin-top: 14px; background: var(--surface); border: 1px solid var(--border-mid);
+    border-radius: var(--radius-lg); padding: 18px;
+  }
+  .mule-detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
+  .mule-stat { }
+  .mule-stat-label { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 4px; }
+  .mule-stat-value { font-family: var(--mono); font-size: 14px; color: var(--fg); }
+
+  /* ── Behavioral SDK ── */
+  .behav-live-area {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;
+  }
+  .behav-typing-box {
+    width: 100%; min-height: 80px; background: var(--surface-2); border: 1px solid var(--border-mid);
+    border-radius: var(--radius-lg); padding: 12px; color: var(--fg); font-family: var(--mono);
+    font-size: 13px; resize: none; outline: none; transition: border-color 150ms; line-height: 1.5;
+  }
+  .behav-typing-box:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+  .behav-signal-feed { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; overflow-y: auto; max-height: 180px; }
+  .behav-signal-entry { font-size: 11px; font-family: var(--mono); padding: 3px 0; border-bottom: 1px solid var(--border); color: var(--fg-3); }
+  .behav-signal-entry .sig-time { color: var(--fg-3); margin-right: 6px; }
+  .behav-signal-entry .sig-key  { color: var(--accent); }
+  .behav-signal-entry .sig-val  { color: var(--fg-2); }
+  .behav-stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .behav-stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 12px; }
+  .behav-stat-num { font-family: var(--mono); font-size: 22px; font-weight: 700; letter-spacing: -0.04em; color: var(--fg); line-height: 1; margin-bottom: 4px; }
+  .behav-stat-label { font-size: 10px; color: var(--fg-3); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+  .behav-score-bar { height: 4px; background: rgba(255,255,255,0.06); border-radius: 2px; overflow: hidden; margin-top: 6px; }
+  .behav-score-fill { height: 100%; border-radius: 2px; transition: width 400ms ease; }
+  .device-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .device-row { display: flex; gap: 8px; font-size: 11.5px; }
+  .device-key { color: var(--fg-3); width: 110px; flex-shrink: 0; font-family: var(--mono); font-size: 10.5px; }
+  .device-val { color: var(--fg-2); }
+
+  /* ── VPA Velocity ── */
+  .vel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .vel-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px; }
+  .vel-num { font-family: var(--mono); font-size: 28px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin-bottom: 4px; }
+  .vel-label { font-size: 10px; color: var(--fg-3); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+  .vel-sub { font-size: 10.5px; color: var(--fg-3); margin-top: 4px; font-family: var(--mono); }
+  .vel-risk-high   { color: var(--danger); }
+  .vel-risk-medium { color: var(--warn); }
+  .vel-risk-low    { color: var(--success); }
+  .vel-pattern-bar { display: flex; align-items: flex-end; gap: 3px; height: 48px; margin: 12px 0; }
+  .vel-bar { flex: 1; border-radius: 2px 2px 0 0; min-height: 3px; transition: height 400ms ease; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-row">
+      <div class="brand-icon">
+        <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path fill="#fff" d="M8 1.5a6.5 6.5 0 100 13A6.5 6.5 0 008 1.5zM0 8a8 8 0 1116 0A8 8 0 010 8z"/><path fill="#fff" opacity=".7" d="M8 4.5a3.5 3.5 0 100 7 3.5 3.5 0 000-7zM3 8a5 5 0 1110 0A5 5 0 013 8z"/><circle cx="8" cy="8" r="2" fill="#fff"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">PayeeCheck</div>
+        <div class="brand-sub" id="api-host">loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-section-label">Matchers</div>
+
+  <div class="nav-item active" onclick="switchTab('compare', this)">
+    <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M2 4h12M2 8h8M2 12h10"/></svg>
+    Compare All Levels
+    <span class="nav-badge">L1–L5</span>
+  </div>
+
+  <div class="nav-item" onclick="switchTab('single', this)">
+    <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.4"/><path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M8 5v3l2 1"/></svg>
+    Single Level
+  </div>
+
+  <div class="nav-section-label">Detection</div>
+
+  <div class="nav-item" onclick="switchTab('lookalike', this)">
+    <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M8 2C5.2 2 3 4.2 3 7s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5z"/><path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M10.5 10.5l3 3"/><circle cx="8" cy="7" r="1.5" fill="currentColor" opacity=".4"/></svg>
+    Lookalike VPA
+    <span class="nav-badge">S2</span>
+  </div>
+
+  <div class="nav-item" onclick="switchTab('muledb', this)">
+    <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><rect x="2" y="3" width="12" height="2.5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="7" width="12" height="2.5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="11" width="12" height="2.5" rx="1" stroke="currentColor" stroke-width="1.3"/><circle cx="13" cy="4.25" r="1.5" fill="var(--danger)"/></svg>
+    Mule Database
+    <span class="nav-badge">S3</span>
+  </div>
+
+  <div class="nav-item" onclick="switchTab('behavioral', this)">
+    <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.3" stroke-linecap="round" d="M1 8.5l2.5-5 2.5 6 2-3 2 4.5 2-7 2 4.5"/></svg>
+    Behavioral SDK
+    <span class="nav-badge">S4</span>
+  </div>
+
+  <div class="nav-item" onclick="switchTab('velocity', this)">
+    <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.3" stroke-linecap="round" d="M2 12l3-5 3 2 3-6 3 4"/><path stroke="currentColor" stroke-width="1.3" stroke-linecap="round" d="M14 4l-1.5 1.5M14 4L12.5 5.5"/></svg>
+    VPA Velocity
+    <span class="nav-badge">S5</span>
+  </div>
+
+  <div class="nav-item" onclick="switchTab('sanctions', this)">
+    <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M8 2l1.5 4.5H14l-3.8 2.7 1.5 4.5L8 11l-3.7 2.7 1.5-4.5L2 6.5h4.5z"/></svg>
+    Sanctions Screen
+    <span class="nav-badge">S6</span>
+  </div>
+
+  <div class="nav-section-label">Resolution</div>
+
+  <div class="nav-item" onclick="switchTab('resolve', this)">
+    <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M9 11.5h5M11.5 9v5"/></svg>
+    Entity Resolve
+    <span class="nav-badge">L6</span>
+  </div>
+
+  <div class="nav-item" onclick="switchTab('rings', this)">
+    <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><circle cx="4" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="4" r="2" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="12" r="2" stroke="currentColor" stroke-width="1.4"/><path stroke="currentColor" stroke-width="1.4" d="M6 7.2l4-2.4M6 8.8l4 2.4"/></svg>
+    Fraud Rings
+  </div>
+
+  <div class="nav-section-label">Risk</div>
+
+  <div class="nav-item" onclick="switchTab('attribution', this)">
+    <svg class="nav-icon" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M3 13V7M6 13V4M9 13V9M12 13V6"/></svg>
+    Attribution
+  </div>
+
+  <div class="email-prompt">
+    <div class="email-prompt-label">Get API Access</div>
+    <div class="email-prompt-sub">Optional — drop your email or company name</div>
+    <div class="email-input-wrap">
+      <input id="sidebar-email" type="text" placeholder="you@company.com or Company Inc" autocomplete="off" />
+    </div>
+    <button class="email-submit-btn" onclick="submitEmail()">Request access →</button>
+    <div class="email-sent" id="email-sent-msg">✓ We'll be in touch!</div>
+  </div>
+
+  <div class="sidebar-footer">
+    <span class="status-dot"></span>
+    <span class="status-text">API online</span>
+  </div>
+</nav>
+
+<!-- Main -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-breadcrumb">
+      <span class="topbar-brand">PayeeCheck</span>
+      <span class="topbar-sep">/</span>
+      <span class="page-title" id="page-title">Compare All Levels</span>
+      <span class="page-subtitle" id="page-subtitle">— run a name pair through L1–L5</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-tag">SANDBOX</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── COMPARE ── -->
+    <div class="tab-panel active" id="tab-compare">
+      <div class="section">
+        <div class="field-label" style="margin-bottom:8px">Sample scenarios</div>
+        <div class="examples">
+          <div class="example-chip" onclick="fillCompare('SBI','State Bank of India')">SBI → State Bank of India</div>
+          <div class="example-chip" onclick="fillCompare('Rahul Kumar','Rahul Kmr')">Rahul Kumar → Rahul Kmr</div>
+          <div class="example-chip" onclick="fillCompare('HDFC Bank','HDFC Bnk Ltd')">HDFC Bank → HDFC Bnk Ltd</div>
+          <div class="example-chip" onclick="fillCompare('John Smith Pvt Ltd','John Smith')">John Smith Pvt Ltd → John Smith</div>
+          <div class="example-chip" onclick="fillCompare('Amazon India','Amazon.in Pvt Ltd')">Amazon India → Amazon.in Pvt Ltd</div>
+          <div class="example-chip" onclick="fillCompare('Netflixx','Netflix')">Netflixx → Netflix (typo)</div>
+          <div class="example-chip" onclick="fillCompare('Flipkart Pvt Ltd','Flipkart Internet Pvt Ltd')">Flipkart Pvt → Flipkart Internet</div>
+          <div class="example-chip" onclick="fillCompare('Paytm','Paytm Payments Bank Ltd')">Paytm → Paytm Payments Bank</div>
+        </div>
+
+        <div class="card">
+          <div class="input-row">
+            <div>
+              <div class="field-label">Entered Name</div>
+              <input id="cmp-entered" type="text" placeholder="e.g. SBI" autocomplete="off" />
+            </div>
+            <div>
+              <div class="field-label">Actual / Expected Name</div>
+              <input id="cmp-actual" type="text" placeholder="e.g. State Bank of India" autocomplete="off" />
+            </div>
+          </div>
+          <button class="btn btn-primary" id="cmp-btn" onclick="runCompare()">
+            <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M3 8h10M9 4l4 4-4 4"/></svg>
+            Run All Levels
+          </button>
+        </div>
+      </div>
+
+      <div id="cmp-loading" class="loading-row" style="display:none"><div class="spinner"></div>Running L1–L5 matchers…</div>
+      <div id="cmp-error" class="error-msg" style="display:none"><svg width="14" height="14" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M8 5v4M8 11v.5"/></svg><span id="cmp-error-msg"></span></div>
+      <div id="cmp-results" class="results-grid" style="display:none"></div>
+    </div>
+
+    <!-- ── SINGLE ── -->
+    <div class="tab-panel" id="tab-single">
+      <div class="section">
+        <div class="field-label" style="margin-bottom:8px">Sample scenarios</div>
+        <div class="examples">
+          <div class="example-chip" onclick="fillSingle('Suresh Kumar','Suresh Kmr')">Suresh Kumar → Suresh Kmr</div>
+          <div class="example-chip" onclick="fillSingle('ICICI Bank','ICICI Bnk Lmtd')">ICICI Bank → ICICI Bnk Lmtd</div>
+          <div class="example-chip" onclick="fillSingle('Zomato','Zommato')">Zomato → Zommato (typo)</div>
+          <div class="example-chip" onclick="fillSingle('Reliance Industries Ltd','Reliance Inds')">Reliance Industries → Reliance Inds</div>
+        </div>
+        <div class="card">
+          <div class="input-row">
+            <div>
+              <div class="field-label">Entered Name</div>
+              <input id="s-entered" type="text" placeholder="e.g. Rahul Kumar" autocomplete="off" />
+            </div>
+            <div>
+              <div class="field-label">Actual Name</div>
+              <input id="s-actual" type="text" placeholder="e.g. Rahul Kmr" autocomplete="off" />
+            </div>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap">
+            <button class="btn btn-ghost" onclick="runSingle(1)">L1 Fuzzy</button>
+            <button class="btn btn-ghost" onclick="runSingle(2)">L2 Phonetic</button>
+            <button class="btn btn-ghost" onclick="runSingle(3)">L3 TF-IDF</button>
+            <button class="btn btn-ghost" onclick="runSingle(4)">L4 Embeddings</button>
+            <button class="btn btn-ghost" onclick="runSingle(5)">L5 Siamese</button>
+          </div>
+        </div>
+      </div>
+      <div id="s-loading" class="loading-row" style="display:none"><div class="spinner"></div><span id="s-loading-text">Running matcher…</span></div>
+      <div id="s-error" class="error-msg" style="display:none"><svg width="14" height="14" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M8 5v4M8 11v.5"/></svg><span id="s-error-msg"></span></div>
+      <div id="s-result" style="display:none"></div>
+    </div>
+
+    <!-- ── RESOLVE ── -->
+    <div class="tab-panel" id="tab-resolve">
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Entity Resolution</div>
+            <div class="section-desc">L6 graph-augmented — find known entities sharing any attribute</div>
+          </div>
+        </div>
+
+        <div class="field-label" style="margin-bottom:8px">Seeded demo entities</div>
+        <div class="resolve-examples">
+          <div class="resolve-chip" onclick="fillResolve('K. Ent.','k.enterprises@oksbi','','9000000001')">
+            <span class="chip-tag">Fraud ring</span> — weak name + shared mobile
+          </div>
+          <div class="resolve-chip" onclick="fillResolve('Krishna Enterprises','krishna.ent@ybl','KKBK0004891','9000000001')">
+            <span class="chip-tag">ENT_DEMO_001</span> — all attributes
+          </div>
+          <div class="resolve-chip" onclick="fillResolve('Krishna Traders','krishna.traders@axl','','9000000001')">
+            <span class="chip-tag">ENT_DEMO_003</span> — mobile only
+          </div>
+          <div class="resolve-chip" onclick="fillResolve('Swiggy','swiggy@axisb','','')">
+            <span class="chip-tag">Merchant</span> — Swiggy by VPA
+          </div>
+          <div class="resolve-chip" onclick="fillResolve('Zomato','zomato@hdfcbank','','')">
+            <span class="chip-tag">Merchant</span> — Zomato by VPA
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="input-row">
+            <div>
+              <div class="field-label">Name</div>
+              <input id="r-name" type="text" placeholder="e.g. Krishna Enterprises" autocomplete="off" />
+            </div>
+            <div>
+              <div class="field-label">VPA / UPI</div>
+              <input id="r-vpa" type="text" placeholder="e.g. krishna.ent@ybl" autocomplete="off" />
+            </div>
+          </div>
+          <div class="input-row">
+            <div>
+              <div class="field-label">Account Number</div>
+              <input id="r-account" type="text" placeholder="e.g. KKBK0004891" autocomplete="off" />
+            </div>
+            <div>
+              <div class="field-label">Mobile</div>
+              <input id="r-mobile" type="text" placeholder="e.g. 9000000001" autocomplete="off" />
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="runResolve()">
+            <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M3 8h10M9 4l4 4-4 4"/></svg>
+            Resolve Entity
+          </button>
+        </div>
+
+        <div id="r-loading" class="loading-row" style="display:none"><div class="spinner"></div>Resolving…</div>
+        <div id="r-error" class="error-msg" style="display:none"><svg width="14" height="14" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M8 5v4M8 11v.5"/></svg><span id="r-error-msg"></span></div>
+        <pre class="json-output" id="r-result" style="display:none"></pre>
+      </div>
+    </div>
+
+    <!-- ── RINGS ── -->
+    <div class="tab-panel" id="tab-rings">
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Fraud Ring Detection</div>
+            <div class="section-desc">Scan the entity graph for clusters sharing identifiers. The seeded graph has a 3-entity ring (ENT_DEMO_001/002/003) sharing mobile 9000000001.</div>
+          </div>
+        </div>
+
+        <div class="card" style="display:flex; align-items:center; gap:16px; margin-bottom:0">
+          <div>
+            <div class="field-label" style="margin-bottom:6px">Min ring size</div>
+            <input id="ring-min" type="text" value="2" style="width:72px; text-align:center" />
+          </div>
+          <button class="btn btn-primary" style="margin-top:18px" onclick="runRings()">
+            <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M8 2v3M8 11v3M2 8h3M11 8h3"/></svg>
+            Scan Graph
+          </button>
+        </div>
+
+        <div id="ring-loading" class="loading-row" style="display:none"><div class="spinner"></div>Scanning graph…</div>
+        <div id="ring-error" class="error-msg" style="display:none"><svg width="14" height="14" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M8 5v4M8 11v.5"/></svg><span id="ring-error-msg"></span></div>
+        <pre class="json-output" id="ring-result" style="display:none"></pre>
+      </div>
+    </div>
+
+    <!-- ── ATTRIBUTION ── -->
+    <div class="tab-panel" id="tab-attribution">
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Three-Layer Attribution</div>
+            <div class="section-desc">Transaction + Payee + Temporal signals → risk score &amp; grounded assertions</div>
+          </div>
+        </div>
+
+        <div class="field-label" style="margin-bottom:8px">Pre-built scenarios</div>
+        <div class="attr-scenario-row">
+          <div class="attr-chip danger-chip" onclick="fillAttribution('high-risk')">High Risk — block</div>
+          <div class="attr-chip warn-chip"   onclick="fillAttribution('medium-risk')">Medium Risk — warn</div>
+          <div class="attr-chip pass-chip"   onclick="fillAttribution('low-risk')">Low Risk — pass</div>
+        </div>
+
+        <div class="card">
+          <div class="attr-section-title">Transaction Signals</div>
+          <div class="input-row">
+            <div>
+              <div class="field-label">Input Method</div>
+              <select id="a-input-method">
+                <option value="paste">paste</option>
+                <option value="type">type</option>
+              </select>
+            </div>
+            <div>
+              <div class="field-label">Paste Trust Score (0–1)</div>
+              <input id="a-paste-trust" type="text" placeholder="0.08" autocomplete="off" />
+            </div>
+            <div>
+              <div class="field-label">Amount (₹)</div>
+              <input id="a-amount" type="text" placeholder="24000" autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="attr-section-title" style="margin-top:4px">Payee Signals</div>
+          <div class="input-row" style="grid-template-columns:1fr 1fr 1fr 1fr">
+            <div>
+              <div class="field-label">VPA Age (days)</div>
+              <input id="a-vpa-age" type="text" placeholder="11" autocomplete="off" />
+            </div>
+            <div>
+              <div class="field-label">Mule Flagged</div>
+              <select id="a-mule-flagged">
+                <option value="true">true</option>
+                <option value="false">false</option>
+              </select>
+            </div>
+            <div>
+              <div class="field-label">Mule Flag Count</div>
+              <input id="a-mule-count" type="text" placeholder="3" autocomplete="off" />
+            </div>
+            <div>
+              <div class="field-label">Name Score (0–1)</div>
+              <input id="a-name-score" type="text" placeholder="0.40" autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="attr-section-title" style="margin-top:4px">Temporal / Behavioural Signals</div>
+          <div class="input-row">
+            <div>
+              <div class="field-label">First-time Payee</div>
+              <select id="a-first-time">
+                <option value="true">true</option>
+                <option value="false">false</option>
+              </select>
+            </div>
+            <div>
+              <div class="field-label">Amount vs Avg Ratio</div>
+              <input id="a-amount-ratio" type="text" placeholder="1.2" autocomplete="off" />
+            </div>
+          </div>
+
+          <button class="btn btn-primary" onclick="runAttribution()">
+            <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M3 8h10M9 4l4 4-4 4"/></svg>
+            Compute Risk Score
+          </button>
+        </div>
+
+        <div id="a-loading" class="loading-row" style="display:none"><div class="spinner"></div>Computing…</div>
+        <div id="a-error" class="error-msg" style="display:none"><svg width="14" height="14" fill="none" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path stroke="currentColor" stroke-width="1.4" stroke-linecap="round" d="M8 5v4M8 11v.5"/></svg><span id="a-error-msg"></span></div>
+        <div id="a-result" style="display:none;margin-top:20px"></div>
+      </div>
+    </div>
+
+    <!-- ── LOOKALIKE VPA ── -->
+    <div class="tab-panel" id="tab-lookalike">
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Lookalike VPA Detection</div>
+            <div class="section-desc">Signal 2 — detect VPAs impersonating known brands, banks, or merchants</div>
+          </div>
+        </div>
+
+        <div class="field-label" style="margin-bottom:8px">Test scenarios — click to load</div>
+        <div class="examples">
+          <div class="example-chip" onclick="fillLookalike('paytm.support@oksbi')">paytm.support@oksbi ⚠</div>
+          <div class="example-chip" onclick="fillLookalike('hdfc.helpdesk@ybl')">hdfc.helpdesk@ybl ⚠</div>
+          <div class="example-chip" onclick="fillLookalike('sbibank.refund@axisb')">sbibank.refund@axisb ⚠</div>
+          <div class="example-chip" onclick="fillLookalike('k.enterprises@oksbi')">k.enterprises@oksbi (lookalike biz)</div>
+          <div class="example-chip" onclick="fillLookalike('income.tax.refund@upi')">income.tax.refund@upi ⚠</div>
+          <div class="example-chip" onclick="fillLookalike('swiggy@axisb')">swiggy@axisb ✓ (legit)</div>
+          <div class="example-chip" onclick="fillLookalike('zomato@hdfcbank')">zomato@hdfcbank ✓ (legit)</div>
+          <div class="example-chip" onclick="fillLookalike('rahul.sharma@okicici')">rahul.sharma@okicici ✓ (personal)</div>
+        </div>
+
+        <div class="card">
+          <div class="field-label">VPA / UPI ID to screen</div>
+          <div style="display:flex;gap:10px;margin-top:6px">
+            <input id="vpa-input" type="text" placeholder="e.g. paytm.support@oksbi" autocomplete="off" style="flex:1" />
+            <button class="btn btn-primary" onclick="runLookalike()">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M3 8h10M9 4l4 4-4 4"/></svg>
+              Screen VPA
+            </button>
+          </div>
+        </div>
+
+        <div id="vpa-result"></div>
+      </div>
+    </div>
+
+    <!-- ── MULE DB ── -->
+    <div class="tab-panel" id="tab-muledb">
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Mule Account Database</div>
+            <div class="section-desc">Signal 3 — search 50 synthetic flagged accounts across NPCI-MAS, bank FRM consortiums</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:14px">
+          <div style="display:flex;gap:10px;align-items:flex-end">
+            <div style="flex:1">
+              <div class="field-label">Search by VPA, name, account, or mobile</div>
+              <input id="mule-search" type="text" placeholder="e.g. k.enterprises or 9800000012" autocomplete="off" style="margin-top:6px" />
+            </div>
+            <button class="btn btn-primary" onclick="searchMuleDB()">Search</button>
+            <button class="btn btn-ghost" onclick="loadMuleFilter('high')">High Risk</button>
+            <button class="btn btn-ghost" onclick="loadMuleFilter('medium')">Medium</button>
+            <button class="btn btn-ghost" onclick="loadMuleFilter('all')">All 50</button>
+          </div>
+        </div>
+
+        <div id="mule-result"></div>
+      </div>
+    </div>
+
+    <!-- ── BEHAVIORAL SDK ── -->
+    <div class="tab-panel" id="tab-behavioral">
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Behavioral SDK</div>
+            <div class="section-desc">Signal 4 — real-time keystroke analysis, paste detection &amp; device fingerprinting</div>
+          </div>
+        </div>
+
+        <div class="behav-stats-row">
+          <div class="behav-stat-card">
+            <div class="behav-stat-num" id="b-wpm">0</div>
+            <div class="behav-stat-label">Typing WPM</div>
+            <div class="behav-score-bar"><div class="behav-score-fill" id="b-wpm-bar" style="width:0%;background:var(--accent)"></div></div>
+          </div>
+          <div class="behav-stat-card">
+            <div class="behav-stat-num" id="b-intervals">—</div>
+            <div class="behav-stat-label">Avg Key Interval</div>
+          </div>
+          <div class="behav-stat-card">
+            <div class="behav-stat-num" id="b-paste">No</div>
+            <div class="behav-stat-label">Paste Detected</div>
+          </div>
+          <div class="behav-stat-card">
+            <div class="behav-stat-num" id="b-trust">100%</div>
+            <div class="behav-stat-label">Trust Score</div>
+            <div class="behav-score-bar"><div class="behav-score-fill" id="b-trust-bar" style="width:100%;background:var(--success)"></div></div>
+          </div>
+        </div>
+
+        <div class="behav-live-area">
+          <div>
+            <div class="field-label" style="margin-bottom:6px">Type a payee name or UPI ID below</div>
+            <textarea id="behav-input" class="behav-typing-box" placeholder="Start typing to capture behavioral signals…" rows="4"></textarea>
+            <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+              <button class="btn btn-ghost" style="font-size:11px" onclick="simulateBehav('normal')">Simulate: Normal Typing</button>
+              <button class="btn btn-ghost" style="font-size:11px" onclick="simulateBehav('paste')">Simulate: High-Risk Paste</button>
+              <button class="btn btn-ghost" style="font-size:11px" onclick="simulateBehav('bot')">Simulate: Bot Pattern</button>
+              <button class="btn btn-ghost" style="font-size:11px" onclick="resetBehav()">Reset</button>
+            </div>
+          </div>
+          <div>
+            <div class="field-label" style="margin-bottom:6px">Live signal feed</div>
+            <div class="behav-signal-feed" id="behav-feed">
+              <div style="font-size:11px;color:var(--fg-3);font-family:var(--mono)">Start typing to see signals…</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="attr-section-title" style="margin-bottom:12px">Device Fingerprint</div>
+          <div class="device-grid" id="device-grid"></div>
+        </div>
+
+        <div id="behav-verdict" style="margin-top:14px"></div>
+      </div>
+    </div>
+
+    <!-- ── VPA VELOCITY ── -->
+    <div class="tab-panel" id="tab-velocity">
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">VPA Velocity Engine</div>
+            <div class="section-desc">Signal 5 — transaction velocity, burst detection &amp; anomaly scoring for any UPI VPA</div>
+          </div>
+        </div>
+
+        <div class="field-label" style="margin-bottom:8px">Preset scenarios — click to load</div>
+        <div class="examples">
+          <div class="example-chip" onclick="fillVelocity('k.enterprises@oksbi')">k.enterprises@oksbi (mule burst)</div>
+          <div class="example-chip" onclick="fillVelocity('fastcash.in@ybl')">fastcash.in@ybl (high velocity)</div>
+          <div class="example-chip" onclick="fillVelocity('collect9182@oksbi')">collect9182@oksbi (burst pattern)</div>
+          <div class="example-chip" onclick="fillVelocity('pay.relay@axisb')">pay.relay@axisb (relay node)</div>
+          <div class="example-chip" onclick="fillVelocity('swiggy@axisb')">swiggy@axisb (normal merchant)</div>
+          <div class="example-chip" onclick="fillVelocity('rahul.sharma@okicici')">rahul.sharma@okicici (personal, low)</div>
+          <div class="example-chip" onclick="fillVelocity('uber.india@hdfcbank')">uber.india@hdfcbank (normal high-vol)</div>
+          <div class="example-chip" onclick="fillVelocity('loanshark99@upi')">loanshark99@upi (predatory lender)</div>
+        </div>
+
+        <div class="card" style="margin-bottom:14px">
+          <div style="display:flex;gap:10px;align-items:flex-end">
+            <div style="flex:1">
+              <div class="field-label">VPA to check</div>
+              <input id="vel-input" type="text" placeholder="e.g. fastcash.in@ybl" autocomplete="off" style="margin-top:6px" />
+            </div>
+            <button class="btn btn-primary" onclick="runVelocity()">Check Velocity</button>
+          </div>
+        </div>
+
+        <div id="vel-result"></div>
+      </div>
+    </div>
+
+    <!-- ── SANCTIONS ── -->
+    <div class="tab-panel" id="tab-sanctions">
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Sanctions &amp; PEP Screening</div>
+            <div class="section-desc">Signal 6 — fuzzy name match against OFAC, UN Consolidated, RBI caution lists &amp; PEP database</div>
+          </div>
+        </div>
+
+        <div class="field-label" style="margin-bottom:8px">Test scenarios — click to load</div>
+        <div class="examples">
+          <div class="example-chip" onclick="fillSanctions('Dawood Ibrahim')">Dawood Ibrahim (OFAC/UN)</div>
+          <div class="example-chip" onclick="fillSanctions('Dawud Ibraheem')">Dawud Ibraheem (fuzzy variant)</div>
+          <div class="example-chip" onclick="fillSanctions('Viktor Bout')">Viktor Bout (arms dealer)</div>
+          <div class="example-chip" onclick="fillSanctions('Iqbal Mirchi')">Iqbal Mirchi (D-Company)</div>
+          <div class="example-chip" onclick="fillSanctions('Hafiz Saeed')">Hafiz Saeed (UN/OFAC)</div>
+          <div class="example-chip" onclick="fillSanctions('Lashkar e Taiba')">Lashkar e Taiba (org)</div>
+          <div class="example-chip" onclick="fillSanctions('Rajesh Kumar')">Rajesh Kumar ✓ (no match)</div>
+          <div class="example-chip" onclick="fillSanctions('Priya Sharma')">Priya Sharma ✓ (no match)</div>
+        </div>
+
+        <div class="card">
+          <div class="field-label">Payee / Entity Name</div>
+          <div style="display:flex;gap:10px;margin-top:6px">
+            <input id="sanction-input" type="text" placeholder="e.g. Dawood Ibrahim" autocomplete="off" style="flex:1" />
+            <button class="btn btn-primary" onclick="runSanctions()">
+              <svg width="14" height="14" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M3 8h10M9 4l4 4-4 4"/></svg>
+              Screen Name
+            </button>
+          </div>
+        </div>
+
+        <div id="sanction-result"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<script>
+const API = window.location.hostname === 'localhost' ? 'http://localhost:8000' : '';
+// Optional: set when server has PAYEECHECK_API_KEY configured
+const API_KEY = '';
+document.getElementById('api-host').textContent = window.location.hostname === 'localhost' ? 'localhost:8000' : window.location.host;
+
+function escapeHtml(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+async function apiFetch(path, options = {}) {
+  const headers = { ...(options.headers || {}) };
+  if (API_KEY) headers['X-API-Key'] = API_KEY;
+  return fetch(`${API}${path}`, { ...options, headers });
+}
+
+const LEVEL_META = {
+  1: { name: 'L1 Fuzzy',      algo: 'jaro_winkler + token_sort' },
+  2: { name: 'L2 Phonetic',   algo: 'metaphone + double_metaphone' },
+  3: { name: 'L3 TF-IDF',     algo: 'tfidf cosine similarity' },
+  4: { name: 'L4 Embeddings', algo: 'sentence-transformers' },
+  5: { name: 'L5 Siamese',    algo: 'siamese neural net' },
+};
+
+const PAGE_META = {
+  compare:     { title: 'Compare All Levels',       sub: '— run a name pair through L1–L5' },
+  single:      { title: 'Single Level Match',       sub: '— pick a specific matcher' },
+  lookalike:   { title: 'Lookalike VPA Detection',  sub: '— Signal 2: brand impersonation in UPI IDs' },
+  muledb:      { title: 'Mule Account Database',   sub: '— Signal 3: cross-bank consortium flags' },
+  behavioral:  { title: 'Behavioral SDK',           sub: '— Signal 4: keystroke, paste & device signals' },
+  velocity:    { title: 'VPA Velocity Engine',      sub: '— Signal 5: burst & anomaly detection' },
+  sanctions:   { title: 'Sanctions & PEP Screening',sub: '— Signal 6: fuzzy match against watchlists' },
+  resolve:     { title: 'Entity Resolution',        sub: '— L6 graph-augmented lookup' },
+  rings:       { title: 'Fraud Ring Detection',     sub: '— scan the entity graph' },
+  attribution: { title: 'Three-Layer Attribution',  sub: '— risk score with grounded assertions' },
+};
+
+const ATTRIBUTION_SCENARIOS = {
+  'high-risk': {
+    inputMethod: 'paste', pasteTrust: '0.08', amount: '250000',
+    vpaAge: '11', muleFlagged: 'true', muleCount: '3',
+    nameScore: '0.40', firstTime: 'true', amountRatio: '4.5',
+  },
+  'medium-risk': {
+    inputMethod: 'paste', pasteTrust: '0.25', amount: '45000',
+    vpaAge: '35', muleFlagged: 'false', muleCount: '0',
+    nameScore: '0.60', firstTime: 'true', amountRatio: '1.8',
+  },
+  'low-risk': {
+    inputMethod: 'type', pasteTrust: '0.90', amount: '5000',
+    vpaAge: '365', muleFlagged: 'false', muleCount: '0',
+    nameScore: '0.95', firstTime: 'false', amountRatio: '1.1',
+  },
+};
+
+function switchTab(id, el) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('page-title').textContent = PAGE_META[id].title;
+  document.getElementById('page-subtitle').textContent = PAGE_META[id].sub;
+  if (id === 'behavioral') initBehavTab();
+  if (id === 'muledb') loadMuleFilter('high');
+}
+
+function fillCompare(entered, actual) {
+  document.getElementById('cmp-entered').value = entered;
+  document.getElementById('cmp-actual').value  = actual;
+}
+function fillSingle(entered, actual) {
+  document.getElementById('s-entered').value = entered;
+  document.getElementById('s-actual').value  = actual;
+}
+function fillResolve(name, vpa, account, mobile) {
+  document.getElementById('r-name').value    = name;
+  document.getElementById('r-vpa').value     = vpa;
+  document.getElementById('r-account').value = account;
+  document.getElementById('r-mobile').value  = mobile;
+}
+function fillAttribution(scenario) {
+  const s = ATTRIBUTION_SCENARIOS[scenario];
+  document.getElementById('a-input-method').value = s.inputMethod;
+  document.getElementById('a-paste-trust').value  = s.pasteTrust;
+  document.getElementById('a-amount').value       = s.amount;
+  document.getElementById('a-vpa-age').value      = s.vpaAge;
+  document.getElementById('a-mule-flagged').value = s.muleFlagged;
+  document.getElementById('a-mule-count').value   = s.muleCount;
+  document.getElementById('a-name-score').value   = s.nameScore;
+  document.getElementById('a-first-time').value   = s.firstTime;
+  document.getElementById('a-amount-ratio').value = s.amountRatio;
+}
+
+// Seed high-risk on load
+fillAttribution('high-risk');
+
+function matchClass(t)  { return ({exact:'match-exact',close:'match-close',no_match:'match-no_match'})[t]||''; }
+function badgeClass(t)  { return ({exact:'badge-exact',close:'badge-close',no_match:'badge-no_match'})[t]||''; }
+function scoreClass(t)  { return ({exact:'score-exact',close:'score-close',no_match:'score-no_match'})[t]||''; }
+function fillClass(t)   { return ({exact:'fill-exact',close:'fill-close',no_match:'fill-no_match'})[t]||''; }
+function matchLabel(t)  { return ({exact:'Exact',close:'Close',no_match:'No Match'})[t]||t; }
+
+function buildLevelCard(level, data) {
+  const pct = Math.round((data.score || 0) * 100);
+  const meta = LEVEL_META[level] || { name: 'Level ' + level, algo: '' };
+  return `
+    <div class="level-card ${matchClass(data.match)}">
+      <div class="level-label">${escapeHtml(meta.name)}</div>
+      <div class="level-score ${scoreClass(data.match)}">${pct}<span style="font-size:14px;opacity:.5">%</span></div>
+      <div class="score-bar-track"><div class="score-bar-fill ${fillClass(data.match)}" style="width:${pct}%"></div></div>
+      <div class="match-badge ${badgeClass(data.match)}">${escapeHtml(matchLabel(data.match))}</div>
+      <div class="level-reason">${escapeHtml(data.reason||'')}</div>
+      ${data.entity_mismatch ? '<div class="entity-warn">⚠ entity type mismatch</div>' : ''}
+      <div class="level-algo">${escapeHtml(data.algorithm||meta.algo)}</div>
+    </div>`;
+}
+
+async function runCompare() {
+  const entered = document.getElementById('cmp-entered').value.trim();
+  const actual  = document.getElementById('cmp-actual').value.trim();
+  if (!entered || !actual) return;
+  const btn = document.getElementById('cmp-btn');
+  const loading = document.getElementById('cmp-loading');
+  const error   = document.getElementById('cmp-error');
+  const results = document.getElementById('cmp-results');
+  btn.disabled = true; loading.style.display = 'flex';
+  error.style.display = 'none'; results.style.display = 'none'; results.innerHTML = '';
+  try {
+    const res = await apiFetch('/compare', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({entered,actual}) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    let html = '';
+    for (let l = 1; l <= 5; l++) {
+      const key = `level_${l}`;
+      if (data.results[key]) html += buildLevelCard(l, data.results[key]);
+    }
+    results.innerHTML = html; results.style.display = 'grid';
+  } catch(e) { document.getElementById('cmp-error-msg').textContent = e.message; error.style.display = 'flex'; }
+  finally { btn.disabled = false; loading.style.display = 'none'; }
+}
+
+async function runSingle(level) {
+  const entered = document.getElementById('s-entered').value.trim();
+  const actual  = document.getElementById('s-actual').value.trim();
+  if (!entered || !actual) return;
+  const loading = document.getElementById('s-loading');
+  const error   = document.getElementById('s-error');
+  const result  = document.getElementById('s-result');
+  document.getElementById('s-loading-text').textContent = `Running ${LEVEL_META[level].name}…`;
+  loading.style.display = 'flex'; error.style.display = 'none';
+  result.style.display = 'none'; result.innerHTML = '';
+  try {
+    const res = await apiFetch(`/match/${level}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({entered,actual}) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    result.innerHTML = `<div class="results-grid" style="grid-template-columns:1fr;max-width:220px">${buildLevelCard(level,data)}</div>`;
+    result.style.display = 'block';
+  } catch(e) { document.getElementById('s-error-msg').textContent = e.message; error.style.display = 'flex'; }
+  finally { loading.style.display = 'none'; }
+}
+
+async function runResolve() {
+  const body = {
+    name:    document.getElementById('r-name').value.trim()    || null,
+    vpa:     document.getElementById('r-vpa').value.trim()     || null,
+    account: document.getElementById('r-account').value.trim() || null,
+    mobile:  document.getElementById('r-mobile').value.trim()  || null,
+  };
+  const loading = document.getElementById('r-loading');
+  const error   = document.getElementById('r-error');
+  const result  = document.getElementById('r-result');
+  loading.style.display = 'flex'; error.style.display = 'none'; result.style.display = 'none';
+  try {
+    const res = await apiFetch('/resolve', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    result.textContent = JSON.stringify(data, null, 2); result.style.display = 'block';
+  } catch(e) { document.getElementById('r-error-msg').textContent = e.message; error.style.display = 'flex'; }
+  finally { loading.style.display = 'none'; }
+}
+
+async function runRings() {
+  const minSize = parseInt(document.getElementById('ring-min').value) || 2;
+  const loading = document.getElementById('ring-loading');
+  const error   = document.getElementById('ring-error');
+  const result  = document.getElementById('ring-result');
+  loading.style.display = 'flex'; error.style.display = 'none'; result.style.display = 'none';
+  try {
+    const res = await apiFetch(`/rings?min_size=${minSize}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    result.textContent = JSON.stringify(data, null, 2); result.style.display = 'block';
+  } catch(e) { document.getElementById('ring-error-msg').textContent = e.message; error.style.display = 'flex'; }
+  finally { loading.style.display = 'none'; }
+}
+
+async function runAttribution() {
+  const body = {
+    transaction: {
+      input_method:      document.getElementById('a-input-method').value,
+      paste_trust_score: parseFloat(document.getElementById('a-paste-trust').value) || 0,
+      amount:            parseInt(document.getElementById('a-amount').value) || 0,
+    },
+    payee: {
+      vpa_age_days:   parseInt(document.getElementById('a-vpa-age').value) || 999,
+      mule_flagged:   document.getElementById('a-mule-flagged').value === 'true',
+      mule_flag_count:parseInt(document.getElementById('a-mule-count').value) || 0,
+      name_score:     parseFloat(document.getElementById('a-name-score').value) || 1,
+    },
+    temporal: {
+      first_time_payee:     document.getElementById('a-first-time').value === 'true',
+      amount_vs_avg_ratio:  parseFloat(document.getElementById('a-amount-ratio').value) || 1,
+    },
+  };
+
+  const loading = document.getElementById('a-loading');
+  const error   = document.getElementById('a-error');
+  const result  = document.getElementById('a-result');
+  loading.style.display = 'flex'; error.style.display = 'none'; result.style.display = 'none';
+
+  try {
+    const res = await apiFetch('/attribution', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    const verdictClass = `verdict-${escapeHtml(data.verdict)}`;
+    const scoreClass   = escapeHtml(data.verdict);
+    const verdictLabel = escapeHtml(String(data.verdict || '').toUpperCase());
+
+    const signalHtml = (data.grounded_assertions || []).map(sig => {
+      const layer = sig.signal === 'clipboard_paste' || sig.signal === 'high_value' ? 'L1'
+                  : sig.signal === 'first_time_payee' || sig.signal === 'unusual_amount' ? 'L3' : 'L2';
+      return `<div class="signal-item">
+        <div class="signal-dot ${layer}"></div>
+        <div>
+          <div class="signal-name">${escapeHtml(sig.signal)}</div>
+          <div class="signal-assert">${escapeHtml(sig.assertion)}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    result.innerHTML = `
+      <div class="verdict-card ${verdictClass}">
+        <div class="verdict-score ${scoreClass}">${escapeHtml(data.risk_score)}</div>
+        <div>
+          <div class="verdict-label">${verdictLabel}</div>
+          <div class="verdict-sub">${escapeHtml(data.total_signals_fired)} signal${data.total_signals_fired !== 1 ? 's' : ''} fired · risk score ${escapeHtml(data.risk_score)}/100</div>
+        </div>
+      </div>
+      ${signalHtml ? `<div class="signal-list">${signalHtml}</div>` : '<div style="color:var(--fg-3);font-size:13px;margin-top:12px">No signals fired — transaction appears clean.</div>'}
+    `;
+    result.style.display = 'block';
+  } catch(e) { document.getElementById('a-error-msg').textContent = e.message; error.style.display = 'flex'; }
+  finally { loading.style.display = 'none'; }
+}
+
+// ══════════════════════════════════════════════════════════════
+// SIGNAL 3 — Mule Account Database (50 synthetic records)
+// ══════════════════════════════════════════════════════════════
+const MULE_DB = [
+  { id:'MUL001', name:'K. Enterprises',         vpa:'k.enterprises@oksbi',      account:'SBI9912340001', bank:'SBI',      mobile:'9000000001', flags:9, consortiums:['NPCI-MAS','HDFC-Alert','SBI-FRAUD'], last_flagged:'2025-07-12', amount:4850000 },
+  { id:'MUL002', name:'Krishna Traders',         vpa:'krishna.traders@axl',      account:'AXIS8821340002', bank:'Axis',    mobile:'9000000001', flags:7, consortiums:['NPCI-MAS','Axis-FMS'],              last_flagged:'2025-07-10', amount:2300000 },
+  { id:'MUL003', name:'Fast Cash Services',      vpa:'fastcash.in@ybl',          account:'YESB7731230003', bank:'Yes',     mobile:'9800000003', flags:11,consortiums:['NPCI-MAS','FinCERT-India','RBI-WL'], last_flagged:'2025-07-18', amount:8200000 },
+  { id:'MUL004', name:'Collect Pay',             vpa:'collect9182@oksbi',        account:'SBI9001230004',  bank:'SBI',     mobile:'9800000004', flags:8, consortiums:['NPCI-MAS','SBI-FRAUD'],              last_flagged:'2025-07-15', amount:3700000 },
+  { id:'MUL005', name:'Pay Relay Node',          vpa:'pay.relay@axisb',          account:'AXIS7712340005', bank:'Axis',    mobile:'9700000005', flags:12,consortiums:['NPCI-MAS','FinCERT-India'],          last_flagged:'2025-07-20', amount:9600000 },
+  { id:'MUL006', name:'M. Ansari Trading',       vpa:'m.ansari.trade@okhdfcbank',account:'HDFC8812340006', bank:'HDFC',    mobile:'9600000006', flags:6, consortiums:['HDFC-Alert','ICICI-FRM'],            last_flagged:'2025-07-08', amount:1800000 },
+  { id:'MUL007', name:'Ravi Kumar',              vpa:'ravi.kumar99@oksbi',       account:'SBI7701230007',  bank:'SBI',     mobile:'9500000007', flags:5, consortiums:['NPCI-MAS','SBI-FRAUD'],              last_flagged:'2025-07-05', amount:950000  },
+  { id:'MUL008', name:'Suresh Finance',          vpa:'suresh.fin@okicici',       account:'ICIC8891230008', bank:'ICICI',   mobile:'9400000008', flags:8, consortiums:['ICICI-FRM','FinCERT-India'],         last_flagged:'2025-07-14', amount:3200000 },
+  { id:'MUL009', name:'Dinesh Yadav',            vpa:'dinesh.y@ybl',             account:'YESB6612340009', bank:'Yes',     mobile:'9300000009', flags:4, consortiums:['NPCI-MAS'],                         last_flagged:'2025-06-28', amount:700000  },
+  { id:'MUL010', name:'Global Pay Hub',          vpa:'globalpay@oksbi',          account:'SBI9932100010',  bank:'SBI',     mobile:'9200000010', flags:10,consortiums:['NPCI-MAS','SBI-FRAUD','RBI-WL'],     last_flagged:'2025-07-19', amount:7400000 },
+  { id:'MUL011', name:'Rapid Transfer Co',       vpa:'rapid.txn@axisb',          account:'AXIS8801230011', bank:'Axis',    mobile:'9100000011', flags:7, consortiums:['Axis-FMS','FinCERT-India'],          last_flagged:'2025-07-11', amount:2700000 },
+  { id:'MUL012', name:'Santosh Kumar',           vpa:'santosh.k@okhdfcbank',     account:'HDFC7712340012', bank:'HDFC',    mobile:'9000000012', flags:3, consortiums:['HDFC-Alert'],                       last_flagged:'2025-06-20', amount:420000  },
+  { id:'MUL013', name:'Mahesh Enterprises',      vpa:'mahesh.ent@okicici',       account:'ICIC8823100013', bank:'ICICI',   mobile:'8900000013', flags:6, consortiums:['ICICI-FRM','NPCI-MAS'],             last_flagged:'2025-07-03', amount:1600000 },
+  { id:'MUL014', name:'Quick Loan Services',     vpa:'quickloan@oksbi',          account:'SBI9801230014',  bank:'SBI',     mobile:'8800000014', flags:9, consortiums:['NPCI-MAS','RBI-WL','SBI-FRAUD'],    last_flagged:'2025-07-17', amount:5100000 },
+  { id:'MUL015', name:'Priya Collections',       vpa:'priya.coll@ybl',           account:'YESB7723100015', bank:'Yes',     mobile:'8700000015', flags:5, consortiums:['NPCI-MAS'],                         last_flagged:'2025-06-30', amount:880000  },
+  { id:'MUL016', name:'Mukesh Tiwari',           vpa:'mukesh.t@okaxis',          account:'AXIS6612340016', bank:'Axis',    mobile:'8600000016', flags:4, consortiums:['Axis-FMS'],                         last_flagged:'2025-06-25', amount:560000  },
+  { id:'MUL017', name:'India Transfer Net',      vpa:'india.txn@okhdfcbank',     account:'HDFC9912340017', bank:'HDFC',    mobile:'8500000017', flags:11,consortiums:['NPCI-MAS','HDFC-Alert','FinCERT-India'],last_flagged:'2025-07-21', amount:8900000},
+  { id:'MUL018', name:'Anil Sharma',             vpa:'anil.sharma@okicici',      account:'ICIC7712340018', bank:'ICICI',   mobile:'8400000018', flags:2, consortiums:['ICICI-FRM'],                        last_flagged:'2025-06-10', amount:180000  },
+  { id:'MUL019', name:'Rajesh Gupta',            vpa:'rajesh.g@oksbi',           account:'SBI8812340019',  bank:'SBI',     mobile:'8300000019', flags:1, consortiums:['SBI-FRAUD'],                        last_flagged:'2025-05-28', amount:90000   },
+  { id:'MUL020', name:'Mohan Lal',               vpa:'mohan.lal@ybl',            account:'YESB6601230020', bank:'Yes',     mobile:'8200000020', flags:3, consortiums:['NPCI-MAS'],                         last_flagged:'2025-06-14', amount:340000  },
+  { id:'MUL021', name:'Sunil Finance Hub',       vpa:'sunil.hub@axisb',          account:'AXIS8812340021', bank:'Axis',    mobile:'8100000021', flags:7, consortiums:['Axis-FMS','NPCI-MAS'],              last_flagged:'2025-07-06', amount:2100000 },
+  { id:'MUL022', name:'D. Ibrahim Trading',      vpa:'d.ibrahim.t@oksbi',        account:'SBI9923100022',  bank:'SBI',     mobile:'8000000022', flags:12,consortiums:['NPCI-MAS','FinCERT-India','RBI-WL'], last_flagged:'2025-07-22', amount:11200000},
+  { id:'MUL023', name:'Kapil Verma',             vpa:'kapil.v@okhdfcbank',       account:'HDFC7712340023', bank:'HDFC',    mobile:'9911000023', flags:2, consortiums:['HDFC-Alert'],                       last_flagged:'2025-05-15', amount:160000  },
+  { id:'MUL024', name:'Sahil Mishra',            vpa:'sahil.m@okicici',          account:'ICIC8801230024', bank:'ICICI',   mobile:'9812000024', flags:1, consortiums:['ICICI-FRM'],                        last_flagged:'2025-04-20', amount:75000   },
+  { id:'MUL025', name:'Vivek Dubey',             vpa:'vivek.d@ybl',              account:'YESB7712340025', bank:'Yes',     mobile:'9713000025', flags:4, consortiums:['NPCI-MAS','Axis-FMS'],              last_flagged:'2025-06-19', amount:620000  },
+  { id:'MUL026', name:'Money Move Co',           vpa:'moneymove@oksbi',          account:'SBI9801230026',  bank:'SBI',     mobile:'9614000026', flags:9, consortiums:['NPCI-MAS','SBI-FRAUD','FinCERT-India'],last_flagged:'2025-07-16', amount:6300000},
+  { id:'MUL027', name:'Deepak Pandey',           vpa:'deepak.p@axisb',           account:'AXIS7701230027', bank:'Axis',    mobile:'9515000027', flags:2, consortiums:['Axis-FMS'],                         last_flagged:'2025-06-01', amount:210000  },
+  { id:'MUL028', name:'Rohan Joshi',             vpa:'rohan.j@okicici',          account:'ICIC8811230028', bank:'ICICI',   mobile:'9416000028', flags:1, consortiums:['ICICI-FRM'],                        last_flagged:'2025-03-30', amount:55000   },
+  { id:'MUL029', name:'Arjun Rao',               vpa:'arjun.r@okhdfcbank',       account:'HDFC6612340029', bank:'HDFC',    mobile:'9317000029', flags:5, consortiums:['HDFC-Alert','NPCI-MAS'],            last_flagged:'2025-07-01', amount:1100000 },
+  { id:'MUL030', name:'Loanshark Services',      vpa:'loanshark99@upi',          account:'IDBI9912340030', bank:'IDBI',    mobile:'9218000030', flags:10,consortiums:['NPCI-MAS','RBI-WL'],                last_flagged:'2025-07-20', amount:7800000 },
+  { id:'MUL031', name:'Kiran Kumar',             vpa:'kiran.k@oksbi',            account:'SBI7712340031',  bank:'SBI',     mobile:'9119000031', flags:3, consortiums:['SBI-FRAUD'],                        last_flagged:'2025-06-08', amount:390000  },
+  { id:'MUL032', name:'Jagan Reddy',             vpa:'jagan.r@ybl',              account:'YESB8812340032', bank:'Yes',     mobile:'9020000032', flags:6, consortiums:['NPCI-MAS','FinCERT-India'],         last_flagged:'2025-07-04', amount:1750000 },
+  { id:'MUL033', name:'Vimal Nair',              vpa:'vimal.n@axisb',            account:'AXIS7723100033', bank:'Axis',    mobile:'8921000033', flags:4, consortiums:['Axis-FMS'],                         last_flagged:'2025-06-22', amount:670000  },
+  { id:'MUL034', name:'Kamal Menon',             vpa:'kamal.m@okicici',          account:'ICIC9912340034', bank:'ICICI',   mobile:'8822000034', flags:7, consortiums:['ICICI-FRM','NPCI-MAS'],             last_flagged:'2025-07-09', amount:2450000 },
+  { id:'MUL035', name:'Tamal Sen',               vpa:'tamal.s@okhdfcbank',       account:'HDFC8812340035', bank:'HDFC',    mobile:'8723000035', flags:2, consortiums:['HDFC-Alert'],                       last_flagged:'2025-05-25', amount:195000  },
+  { id:'MUL036', name:'Abhishek Singh',          vpa:'abhishek.s@oksbi',         account:'SBI8801230036',  bank:'SBI',     mobile:'8624000036', flags:1, consortiums:['SBI-FRAUD'],                        last_flagged:'2025-04-10', amount:65000   },
+  { id:'MUL037', name:'Neha Sinha',              vpa:'neha.s@ybl',               account:'YESB7712340037', bank:'Yes',     mobile:'8525000037', flags:5, consortiums:['NPCI-MAS'],                         last_flagged:'2025-07-02', amount:930000  },
+  { id:'MUL038', name:'Priya Iyer',              vpa:'priya.iyer@axisb',         account:'AXIS6601230038', bank:'Axis',    mobile:'8426000038', flags:3, consortiums:['Axis-FMS'],                         last_flagged:'2025-06-12', amount:450000  },
+  { id:'MUL039', name:'Cash Bridge Ltd',         vpa:'cashbridge@oksbi',         account:'SBI9901230039',  bank:'SBI',     mobile:'8327000039', flags:10,consortiums:['NPCI-MAS','SBI-FRAUD','RBI-WL'],    last_flagged:'2025-07-22', amount:8500000 },
+  { id:'MUL040', name:'Rekha Patel',             vpa:'rekha.p@okhdfcbank',       account:'HDFC7712340040', bank:'HDFC',    mobile:'8228000040', flags:1, consortiums:['HDFC-Alert'],                       last_flagged:'2025-03-15', amount:40000   },
+  { id:'MUL041', name:'Usha Tripathi',           vpa:'usha.t@okicici',           account:'ICIC8823100041', bank:'ICICI',   mobile:'8129000041', flags:2, consortiums:['ICICI-FRM'],                        last_flagged:'2025-05-05', amount:175000  },
+  { id:'MUL042', name:'Asha Pillai',             vpa:'asha.p@ybl',               account:'YESB6612340042', bank:'Yes',     mobile:'8030000042', flags:4, consortiums:['NPCI-MAS'],                         last_flagged:'2025-06-18', amount:590000  },
+  { id:'MUL043', name:'Nisha Verma',             vpa:'nisha.v@axisb',            account:'AXIS8801230043', bank:'Axis',    mobile:'9930000043', flags:6, consortiums:['Axis-FMS','FinCERT-India'],          last_flagged:'2025-07-07', amount:1920000 },
+  { id:'MUL044', name:'Instant Payz',            vpa:'instantpayz@oksbi',        account:'SBI9912340044',  bank:'SBI',     mobile:'9830000044', flags:11,consortiums:['NPCI-MAS','SBI-FRAUD','FinCERT-India','RBI-WL'],last_flagged:'2025-07-23', amount:9900000},
+  { id:'MUL045', name:'Divya Tripathi',          vpa:'divya.t@okhdfcbank',       account:'HDFC7701230045', bank:'HDFC',    mobile:'9730000045', flags:2, consortiums:['HDFC-Alert'],                       last_flagged:'2025-05-18', amount:230000  },
+  { id:'MUL046', name:'Anita Singh',             vpa:'anita.s@okicici',          account:'ICIC8812340046', bank:'ICICI',   mobile:'9630000046', flags:3, consortiums:['ICICI-FRM'],                        last_flagged:'2025-06-03', amount:370000  },
+  { id:'MUL047', name:'Sunita Yadav',            vpa:'sunita.y@ybl',             account:'YESB6623100047', bank:'Yes',     mobile:'9530000047', flags:5, consortiums:['NPCI-MAS'],                         last_flagged:'2025-06-27', amount:860000  },
+  { id:'MUL048', name:'Kavita Sharma',           vpa:'kavita.s@axisb',           account:'AXIS7712340048', bank:'Axis',    mobile:'9430000048', flags:1, consortiums:['Axis-FMS'],                         last_flagged:'2025-04-05', amount:48000   },
+  { id:'MUL049', name:'Sneha Mishra',            vpa:'sneha.m@oksbi',            account:'SBI8812340049',  bank:'SBI',     mobile:'9330000049', flags:4, consortiums:['NPCI-MAS','SBI-FRAUD'],              last_flagged:'2025-06-21', amount:710000  },
+  { id:'MUL050', name:'Ultra Cash Net',          vpa:'ultracash@upi',            account:'KOTAK9901230050',bank:'Kotak',   mobile:'9230000050', flags:13,consortiums:['NPCI-MAS','FinCERT-India','RBI-WL','HDFC-Alert'],last_flagged:'2025-07-24', amount:14500000},
+];
+
+function muleRiskLevel(flags) {
+  if (flags >= 7) return 'high';
+  if (flags >= 3) return 'medium';
+  if (flags >= 1) return 'low';
+  return 'clean';
+}
+
+function muleTableHTML(records) {
+  if (!records.length) return '<div style="color:var(--fg-3);font-size:13px;padding:16px 0">No records matched.</div>';
+  return `
+    <table class="mule-table">
+      <thead><tr>
+        <th>ID</th><th>Name</th><th>VPA</th><th>Bank</th>
+        <th>Flags</th><th>Consortiums</th><th>Last Flagged</th><th>Suspicious ₹</th>
+      </tr></thead>
+      <tbody>${records.map(r => {
+        const rl = muleRiskLevel(r.flags);
+        const fcls = {high:'mule-flag-high',medium:'mule-flag-medium',low:'mule-flag-low',clean:'mule-flag-clean'}[rl];
+        return `<tr onclick="showMuleDetail('${escapeHtml(r.id)}')">
+          <td><span style="font-family:var(--mono);font-size:10.5px;color:var(--fg-3)">${escapeHtml(r.id)}</span></td>
+          <td style="color:var(--fg)">${escapeHtml(r.name)}</td>
+          <td><span style="font-family:var(--mono);font-size:11px">${escapeHtml(r.vpa)}</span></td>
+          <td>${escapeHtml(r.bank)}</td>
+          <td><span class="mule-flag-pill ${fcls}">${escapeHtml(r.flags)}</span></td>
+          <td>${r.consortiums.map(c=>`<span class="mule-consortium">${escapeHtml(c)}</span>`).join('')}</td>
+          <td style="font-family:var(--mono);font-size:11px;white-space:nowrap">${escapeHtml(r.last_flagged)}</td>
+          <td style="font-family:var(--mono);font-size:11px;color:var(--danger)">₹${(r.amount/100000).toFixed(1)}L</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>`;
+}
+
+function searchMuleDB() {
+  const q = document.getElementById('mule-search').value.trim().toLowerCase();
+  const results = q ? MULE_DB.filter(r =>
+    r.name.toLowerCase().includes(q) ||
+    r.vpa.toLowerCase().includes(q) ||
+    r.account.toLowerCase().includes(q) ||
+    r.mobile.includes(q)
+  ) : MULE_DB.filter(r => r.flags >= 5);
+  renderMuleResults(results);
+}
+
+function loadMuleFilter(level) {
+  const results = level === 'all' ? MULE_DB
+    : level === 'high' ? MULE_DB.filter(r => r.flags >= 7)
+    : MULE_DB.filter(r => r.flags >= 3 && r.flags < 7);
+  renderMuleResults(results);
+}
+
+function renderMuleResults(records) {
+  const container = document.getElementById('mule-result');
+  const label = records.length === MULE_DB.length ? 'All 50 records'
+    : `${records.length} record${records.length!==1?'s':''} matched`;
+  container.innerHTML = `
+    <div style="font-size:11px;color:var(--fg-3);margin-bottom:8px;font-family:var(--mono)">${escapeHtml(label)}</div>
+    ${muleTableHTML(records)}
+  `;
+}
+
+function showMuleDetail(id) {
+  const r = MULE_DB.find(x => x.id === id);
+  if (!r) return;
+  const rl = muleRiskLevel(r.flags);
+  const riskColors = {high:'var(--danger)',medium:'var(--warn)',low:'var(--accent)',clean:'var(--success)'};
+  const existing = document.getElementById('mule-detail-'+id);
+  if (existing) { existing.remove(); return; }
+  const detail = document.createElement('div');
+  detail.id = 'mule-detail-'+id;
+  detail.className = 'mule-detail-overlay';
+  detail.innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+      <div style="font-size:11px;font-family:var(--mono);color:var(--fg-3)">${escapeHtml(r.id)}</div>
+      <div style="font-size:15px;font-weight:600;color:var(--fg)">${escapeHtml(r.name)}</div>
+      <span style="margin-left:auto;font-size:12px;font-weight:700;color:${riskColors[rl]};text-transform:uppercase">${escapeHtml(rl.toUpperCase())} RISK · ${escapeHtml(r.flags)} flags</span>
+    </div>
+    <div class="mule-detail-grid">
+      <div class="mule-stat"><div class="mule-stat-label">VPA</div><div class="mule-stat-value" style="font-size:12px">${escapeHtml(r.vpa)}</div></div>
+      <div class="mule-stat"><div class="mule-stat-label">Account</div><div class="mule-stat-value" style="font-size:12px">${escapeHtml(r.account)}</div></div>
+      <div class="mule-stat"><div class="mule-stat-label">Bank</div><div class="mule-stat-value">${escapeHtml(r.bank)}</div></div>
+      <div class="mule-stat"><div class="mule-stat-label">Mobile</div><div class="mule-stat-value">${escapeHtml(r.mobile)}</div></div>
+      <div class="mule-stat"><div class="mule-stat-label">Last Flagged</div><div class="mule-stat-value">${escapeHtml(r.last_flagged)}</div></div>
+      <div class="mule-stat"><div class="mule-stat-label">Suspicious Volume</div><div class="mule-stat-value" style="color:var(--danger)">₹${escapeHtml(r.amount.toLocaleString('en-IN'))}</div></div>
+    </div>
+    <div class="mule-stat-label" style="margin-bottom:8px">Consortium Flags</div>
+    <div>${r.consortiums.map(c=>`<span class="mule-consortium" style="font-size:11px">${escapeHtml(c)}</span>`).join('')}</div>
+    <div style="font-size:11px;color:var(--fg-3);margin-top:12px">
+      Verdict: This VPA/account combination has been flagged ${escapeHtml(r.flags)} time${r.flags!==1?'s':''} across ${escapeHtml(r.consortiums.length)} consortium${r.consortiums.length!==1?'s':''}.
+      ${rl==='high'?'⛔ Block immediately and file STR.':rl==='medium'?'⚠ Enhanced due diligence required.':'Review with customer.'}
+    </div>
+  `;
+  document.getElementById('mule-result').appendChild(detail);
+}
+
+// ══════════════════════════════════════════════════════════════
+// SIGNAL 4 — Behavioral SDK (live keystroke + device fingerprint)
+// ══════════════════════════════════════════════════════════════
+let behavKeystrokes = [];
+let behavPasteDetected = false;
+let behavSessionStart = Date.now();
+let behavSimInterval = null;
+
+function initDeviceFingerprint() {
+  const grid = document.getElementById('device-grid');
+  if (!grid) return;
+  const ua = navigator.userAgent;
+  const os = /Windows/.test(ua) ? 'Windows' : /Mac/.test(ua) ? 'macOS' : /Linux/.test(ua) ? 'Linux' : /Android/.test(ua) ? 'Android' : /iOS/.test(ua) ? 'iOS' : 'Unknown';
+  const browser = /Chrome/.test(ua) && !/Edg/.test(ua) ? 'Chrome' : /Safari/.test(ua) && !/Chrome/.test(ua) ? 'Safari' : /Firefox/.test(ua) ? 'Firefox' : /Edg/.test(ua) ? 'Edge' : 'Unknown';
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Unknown';
+  const rows = [
+    ['Browser', browser], ['OS', os],
+    ['Screen', `${screen.width}×${screen.height}`], ['Timezone', tz],
+    ['Language', navigator.language], ['Cores', navigator.hardwareConcurrency || '?'],
+    ['Touch', 'ontouchstart' in window ? 'Yes' : 'No'], ['Plugins', navigator.plugins?.length || 0],
+  ];
+  grid.innerHTML = rows.map(([k,v]) => `
+    <div class="device-row">
+      <span class="device-key">${escapeHtml(k)}</span>
+      <span class="device-val">${escapeHtml(v)}</span>
+    </div>`).join('');
+}
+
+function addBehavSignal(key, value) {
+  const feed = document.getElementById('behav-feed');
+  if (!feed) return;
+  const t = ((Date.now() - behavSessionStart) / 1000).toFixed(2);
+  const entry = document.createElement('div');
+  entry.className = 'behav-signal-entry';
+  entry.innerHTML = `<span class="sig-time">+${escapeHtml(t)}s</span><span class="sig-key">${escapeHtml(key)}</span>: <span class="sig-val">${escapeHtml(value)}</span>`;
+  if (feed.firstChild && feed.firstChild.textContent === 'Start typing to see signals…') feed.innerHTML = '';
+  feed.insertBefore(entry, feed.firstChild);
+  if (feed.children.length > 30) feed.removeChild(feed.lastChild);
+  updateBehavStats();
+}
+
+function updateBehavStats() {
+  const intervals = behavKeystrokes;
+  const avgMs = intervals.length > 1 ? intervals.slice(1).reduce((a,b,i)=>a+(b-intervals[i]),0)/(intervals.length-1) : 0;
+  const elapsed = (Date.now() - behavSessionStart) / 60000;
+  const chars = document.getElementById('behav-input')?.value.length || 0;
+  const wpm = elapsed > 0 ? Math.round((chars / 5) / elapsed) : 0;
+  const trust = Math.max(0, 100 - (behavPasteDetected ? 45 : 0) - (wpm > 250 ? 40 : 0) - (avgMs < 30 && avgMs > 0 ? 30 : 0));
+
+  const wpmEl = document.getElementById('b-wpm');
+  const intEl = document.getElementById('b-intervals');
+  const pasteEl = document.getElementById('b-paste');
+  const trustEl = document.getElementById('b-trust');
+  const wpmBar = document.getElementById('b-wpm-bar');
+  const trustBar = document.getElementById('b-trust-bar');
+
+  if (wpmEl) wpmEl.textContent = wpm;
+  if (intEl) intEl.textContent = avgMs > 0 ? `${Math.round(avgMs)}ms` : '—';
+  if (pasteEl) { pasteEl.textContent = behavPasteDetected ? 'YES' : 'No'; pasteEl.style.color = behavPasteDetected ? 'var(--danger)' : 'var(--fg)'; }
+  if (trustEl) { trustEl.textContent = trust + '%'; trustEl.style.color = trust >= 70 ? 'var(--success)' : trust >= 40 ? 'var(--warn)' : 'var(--danger)'; }
+  if (wpmBar)   { wpmBar.style.width = Math.min(wpm / 3, 100) + '%'; }
+  if (trustBar) { trustBar.style.width = trust + '%'; trustBar.style.background = trust >= 70 ? 'var(--success)' : trust >= 40 ? 'var(--warn)' : 'var(--danger)'; }
+
+  const verdict = document.getElementById('behav-verdict');
+  if (verdict && chars > 3) {
+    const v = trust >= 70 ? {cls:'pass',label:'PASS',desc:'Behavioral profile consistent with genuine human input.'}
+      : trust >= 40 ? {cls:'warn',label:'REVIEW',desc:'Elevated risk signals detected. Consider step-up auth.'}
+      : {cls:'block',label:'BLOCK',desc:'Strong indicators of non-human input or compromised session.'};
+    verdict.innerHTML = `
+      <div class="verdict-card verdict-${escapeHtml(v.cls)}" style="padding:12px 16px">
+        <div class="verdict-score ${escapeHtml(v.cls)}" style="font-size:28px">${escapeHtml(trust)}</div>
+        <div>
+          <div class="verdict-label" style="font-size:14px">${escapeHtml(v.label)}</div>
+          <div class="verdict-sub">${escapeHtml(v.desc)}</div>
+        </div>
+      </div>`;
+  }
+}
+
+function initBehavTab() {
+  behavKeystrokes = []; behavPasteDetected = false; behavSessionStart = Date.now();
+  initDeviceFingerprint();
+  const inp = document.getElementById('behav-input');
+  if (!inp || inp._behavInit) return;
+  inp._behavInit = true;
+  inp.addEventListener('keydown', e => {
+    behavKeystrokes.push(Date.now());
+    if (e.key.length === 1) addBehavSignal('keydown', `"${e.key}" interval:${behavKeystrokes.length>1?behavKeystrokes[behavKeystrokes.length-1]-behavKeystrokes[behavKeystrokes.length-2]:0}ms`);
+  });
+  inp.addEventListener('paste', () => { behavPasteDetected = true; addBehavSignal('PASTE_EVENT', 'clipboard content detected — trust penalised'); });
+}
+
+function simulateBehav(type) {
+  resetBehav();
+  const inp = document.getElementById('behav-input');
+  if (!inp) return;
+  if (type === 'normal') {
+    const text = 'Rahul Sharma HDFC Bank';
+    let i = 0;
+    const iv = setInterval(() => {
+      if (i >= text.length) { clearInterval(iv); return; }
+      inp.value += text[i++];
+      behavKeystrokes.push(Date.now());
+      addBehavSignal('keydown', `"${text[i-1]}" interval:${behavKeystrokes.length>1?behavKeystrokes[behavKeystrokes.length-1]-behavKeystrokes[behavKeystrokes.length-2]:0}ms`);
+    }, 90 + Math.random() * 80);
+  } else if (type === 'paste') {
+    inp.value = 'k.enterprises@oksbi — pasted from clipboard';
+    behavKeystrokes = [Date.now()]; behavPasteDetected = true;
+    addBehavSignal('PASTE_EVENT', 'clipboard content detected — trust penalised');
+    addBehavSignal('content_length', '38 chars pasted in 0ms');
+    updateBehavStats();
+  } else if (type === 'bot') {
+    const text = 'automated-vpa@oksbi';
+    let i = 0;
+    const iv = setInterval(() => {
+      if (i >= text.length) { clearInterval(iv); return; }
+      inp.value += text[i++];
+      behavKeystrokes.push(Date.now());
+      addBehavSignal('keydown', `"${text[i-1]}" interval:12ms`);
+    }, 12);
+  }
+}
+
+function resetBehav() {
+  if (behavSimInterval) { clearInterval(behavSimInterval); behavSimInterval = null; }
+  behavKeystrokes = []; behavPasteDetected = false; behavSessionStart = Date.now();
+  const inp = document.getElementById('behav-input');
+  if (inp) inp.value = '';
+  const feed = document.getElementById('behav-feed');
+  if (feed) feed.innerHTML = '<div style="font-size:11px;color:var(--fg-3);font-family:var(--mono)">Start typing to see signals…</div>';
+  const verdict = document.getElementById('behav-verdict');
+  if (verdict) verdict.innerHTML = '';
+  updateBehavStats();
+}
+
+// ══════════════════════════════════════════════════════════════
+// SIGNAL 5 — VPA Velocity Engine (30 synthetic VPA profiles)
+// ══════════════════════════════════════════════════════════════
+const VEL_DB = {
+  'k.enterprises@oksbi':    { owner:'K. Enterprises',  txn_1h:18, txn_6h:94,  txn_24h:312, txn_7d:1840, senders_24h:187, avg:14200,  max:98000,  pattern:[2,4,8,18,12,6,3,1],   risk:'high',   note:'Burst incoming + no outbound delays — classic mule relay' },
+  'fastcash.in@ybl':        { owner:'Fast Cash Svc',   txn_1h:24, txn_6h:118, txn_24h:489, txn_7d:2910, senders_24h:234, avg:8700,   max:49000,  pattern:[1,3,9,24,16,8,4,2],   risk:'high',   note:'Velocity exceeds 99th percentile of YBL personal accounts' },
+  'collect9182@oksbi':      { owner:'Collect 9182',    txn_1h:11, txn_6h:67,  txn_24h:198, txn_7d:1120, senders_24h:142, avg:22000,  max:150000, pattern:[0,2,5,11,8,4,1,0],    risk:'high',   note:'High-value burst, many unique senders — money mule node' },
+  'pay.relay@axisb':        { owner:'Pay Relay',       txn_1h:31, txn_6h:142, txn_24h:601, txn_7d:3400, senders_24h:298, avg:5400,   max:35000,  pattern:[3,6,12,31,22,11,5,2], risk:'high',   note:'Relay node: funds pass through with median hold <2 minutes' },
+  'loanshark99@upi':        { owner:'Loan Svc 99',     txn_1h:8,  txn_6h:44,  txn_24h:156, txn_7d:980,  senders_24h:89,  avg:31000,  max:200000, pattern:[0,1,4,8,6,3,1,0],     risk:'high',   note:'Predatory loan collection pattern — irregular high-value' },
+  'globalpay@oksbi':        { owner:'Global Pay Hub',  txn_1h:14, txn_6h:78,  txn_24h:280, txn_7d:1620, senders_24h:165, avg:18400,  max:120000, pattern:[1,3,7,14,10,5,2,1],   risk:'high',   note:'Multiple flag sources; associated with MUL010' },
+  'instantpayz@oksbi':      { owner:'Instant Payz',    txn_1h:22, txn_6h:109, txn_24h:420, txn_7d:2540, senders_24h:210, avg:12000,  max:85000,  pattern:[2,4,10,22,15,7,3,1],  risk:'high',   note:'New VPA (<30 days), immediately high velocity — red flag' },
+  'ultracash@upi':          { owner:'Ultra Cash Net',  txn_1h:38, txn_6h:167, txn_24h:712, txn_7d:4200, senders_24h:351, avg:7800,   max:60000,  pattern:[4,8,16,38,26,13,6,3], risk:'high',   note:'Highest velocity in dataset — active mule network hub' },
+  'suresh.fin@okicici':     { owner:'Suresh Finance',  txn_1h:5,  txn_6h:28,  txn_24h:89,  txn_7d:510,  senders_24h:54,  avg:9800,   max:42000,  pattern:[0,1,3,5,4,2,1,0],     risk:'medium', note:'Elevated vs personal baseline; monitor for escalation' },
+  'mahesh.ent@okicici':     { owner:'Mahesh Ent',      txn_1h:4,  txn_6h:21,  txn_24h:74,  txn_7d:420,  senders_24h:48,  avg:12400,  max:55000,  pattern:[0,1,2,4,3,2,1,0],     risk:'medium', note:'Medium velocity — 6x above personal peer group' },
+  'moneymove@oksbi':        { owner:'Money Move Co',   txn_1h:7,  txn_6h:38,  txn_24h:130, txn_7d:740,  senders_24h:78,  avg:16200,  max:90000,  pattern:[1,2,4,7,5,3,1,0],     risk:'medium', note:'Mid-tier velocity with high avg amount — risk escalating' },
+  'cashbridge@oksbi':       { owner:'Cash Bridge Ltd', txn_1h:9,  txn_6h:51,  txn_24h:188, txn_7d:1080, senders_24h:112, avg:21000,  max:110000, pattern:[1,2,5,9,7,3,2,1],     risk:'medium', note:'Recent spike; previously low velocity' },
+  'rapid.txn@axisb':        { owner:'Rapid Transfer',  txn_1h:6,  txn_6h:33,  txn_24h:112, txn_7d:640,  senders_24h:67,  avg:8900,   max:38000,  pattern:[0,1,3,6,5,2,1,0],     risk:'medium', note:'Moderate velocity with many small txns' },
+  'swiggy@axisb':           { owner:'Swiggy India',    txn_1h:290, txn_6h:1720, txn_24h:6800, txn_7d:47000, senders_24h:4200, avg:310, max:2800, pattern:[18,38,65,80,72,60,42,25], risk:'low', note:'Known merchant — high volume is expected and normalised' },
+  'zomato@hdfcbank':        { owner:'Zomato Ltd',      txn_1h:240, txn_6h:1400, txn_24h:5500, txn_7d:38000, senders_24h:3800, avg:280, max:2400, pattern:[15,30,55,70,60,50,36,20], risk:'low', note:'Verified merchant — whitelisted, volume consistent with brand' },
+  'uber.india@hdfcbank':    { owner:'Uber India',      txn_1h:180, txn_6h:1100, txn_24h:4200, txn_7d:29000, senders_24h:2900, avg:220, max:1800, pattern:[12,25,45,60,52,42,30,16], risk:'low', note:'Verified merchant — high volume normalised for rideshare' },
+  'bookmyshow@yesbank':     { owner:'BookMyShow',      txn_1h:45,  txn_6h:280,  txn_24h:1100, txn_7d:7200,  senders_24h:980,  avg:580, max:4800, pattern:[4,9,18,28,24,18,12,7],  risk:'low',  note:'Verified merchant — ticketing platform, volume is expected' },
+  'rahul.sharma@okicici':   { owner:'Rahul Sharma',    txn_1h:0,  txn_6h:2,   txn_24h:5,   txn_7d:18,   senders_24h:4,   avg:2400,   max:15000,  pattern:[0,0,0,1,1,0,0,0],     risk:'low',    note:'Normal personal usage — well within peer group baseline' },
+  'priya.iyer@axisb':       { owner:'Priya Iyer',      txn_1h:0,  txn_6h:1,   txn_24h:3,   txn_7d:12,   senders_24h:3,   avg:1800,   max:8000,   pattern:[0,0,0,0,1,0,0,0],     risk:'low',    note:'Low volume personal account — no anomalies detected' },
+  'arjun.r@okhdfcbank':     { owner:'Arjun Rao',       txn_1h:1,  txn_6h:4,   txn_24h:11,  txn_7d:42,   senders_24h:8,   avg:3200,   max:18000,  pattern:[0,0,1,1,1,0,0,0],     risk:'low',    note:'Slightly elevated vs individual baseline — within limits' },
+};
+
+function fillVelocity(vpa) {
+  document.getElementById('vel-input').value = vpa;
+}
+
+function runVelocity() {
+  const vpa = document.getElementById('vel-input').value.trim().toLowerCase();
+  const container = document.getElementById('vel-result');
+  if (!vpa) return;
+
+  // Find exact or fuzzy match
+  let entry = VEL_DB[vpa];
+  if (!entry) {
+    const key = Object.keys(VEL_DB).find(k => k.includes(vpa.split('@')[0]) || vpa.includes(k.split('@')[0]));
+    entry = key ? VEL_DB[key] : null;
+  }
+  if (!entry) {
+    // Generate synthetic for unknown VPAs
+    entry = { owner: vpa.split('@')[0], txn_1h:1, txn_6h:4, txn_24h:9, txn_7d:31, senders_24h:6, avg:2100, max:12000, pattern:[0,0,1,1,1,0,0,0], risk:'low', note:'No velocity record found — defaulting to low baseline profile.' };
+  }
+
+  const riskColor = entry.risk === 'high' ? 'var(--danger)' : entry.risk === 'medium' ? 'var(--warn)' : 'var(--success)';
+  const riskLabel = entry.risk.toUpperCase();
+  const maxBar = Math.max(...entry.pattern, 1);
+  const barsHtml = entry.pattern.map((v,i) => {
+    const pct = Math.round((v / maxBar) * 100);
+    const hrs = ['-28h','-24h','-18h','-12h','-6h','-3h','-1h','now'];
+    return `<div style="display:flex;flex-direction:column;align-items:center;flex:1;gap:3px">
+      <div class="vel-bar" style="width:100%;height:${pct ? pct*0.48 : 3}px;background:${entry.risk==='high'?'var(--danger)':entry.risk==='medium'?'var(--warn)':'var(--success)'};opacity:${0.3 + pct * 0.007}"></div>
+      <div style="font-size:8.5px;color:var(--fg-3);font-family:var(--mono)">${hrs[i]}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="vel-grid">
+      <div class="vel-card">
+        <div class="vel-num vel-risk-${entry.risk}">${entry.txn_1h}</div>
+        <div class="vel-label">Txns / 1 Hour</div>
+        <div class="vel-sub">rolling window</div>
+      </div>
+      <div class="vel-card">
+        <div class="vel-num vel-risk-${entry.risk}">${entry.txn_6h}</div>
+        <div class="vel-label">Txns / 6 Hours</div>
+        <div class="vel-sub">rolling window</div>
+      </div>
+      <div class="vel-card">
+        <div class="vel-num vel-risk-${entry.risk}">${entry.txn_24h}</div>
+        <div class="vel-label">Txns / 24 Hours</div>
+        <div class="vel-sub">${entry.senders_24h} unique senders</div>
+      </div>
+      <div class="vel-card">
+        <div class="vel-num" style="color:var(--fg-2)">${entry.txn_7d.toLocaleString()}</div>
+        <div class="vel-label">Txns / 7 Days</div>
+        <div class="vel-sub">₹${entry.avg.toLocaleString()} avg · ₹${entry.max.toLocaleString()} max</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title" style="margin-bottom:10px">Transaction volume — last 28 hours</div>
+      <div class="vel-pattern-bar">${barsHtml}</div>
+    </div>
+
+    <div class="verdict-card verdict-${entry.risk === 'high' ? 'block' : entry.risk === 'medium' ? 'warn' : 'pass'}" style="margin-top:0">
+      <div style="font-family:var(--mono);font-size:28px;font-weight:700;color:${riskColor}">${escapeHtml(riskLabel)}</div>
+      <div>
+        <div style="font-size:14px;font-weight:600;color:var(--fg);margin-bottom:3px">${escapeHtml(entry.owner)} · <span style="font-family:var(--mono);font-size:12px;color:var(--fg-3)">${escapeHtml(vpa)}</span></div>
+        <div style="font-size:12px;color:var(--fg-3)">${escapeHtml(entry.note)}</div>
+      </div>
+    </div>`;
+}
+
+// ── Email prompt ──────────────────────────────────────────────
+function submitEmail() {
+  const val = document.getElementById('sidebar-email').value.trim();
+  if (!val) return;
+  document.getElementById('sidebar-email').value = '';
+  const msg = document.getElementById('email-sent-msg');
+  msg.style.display = 'block';
+  setTimeout(() => { msg.style.display = 'none'; }, 4000);
+}
+
+// ── Lookalike VPA (Signal 2) — synthetic client-side ─────────
+const KNOWN_BRAND_HANDLES = [
+  'paytm','phonepe','gpay','googlepay','bhim','amazon','flipkart',
+  'swiggy','zomato','hdfc','sbi','icici','axis','kotak','pnb','bob',
+  'ubi','federal','iob','indusind','yes','rbl','incometax','income',
+  'tax','refund','support','helpdesk','customer','care','official',
+  'service','help','alert','notify','bank','upi','npci','rbi',
+];
+const SAFE_VPAS = ['swiggy@axisb','zomato@hdfcbank','bookmyshow@yesbank','irctc@axisb','lici@unionbank'];
+const VPA_HANDLE_MAP = {
+  '@oksbi': 'State Bank of India',
+  '@okaxis': 'Axis Bank',
+  '@okhdfcbank': 'HDFC Bank',
+  '@okicici': 'ICICI Bank',
+  '@ybl': 'PhonePe / Yes Bank',
+  '@axisb': 'Axis Bank',
+  '@hdfcbank': 'HDFC Bank',
+  '@upi': 'NPCI UPI',
+  '@paytm': 'Paytm Payments Bank',
+};
+
+function lookalikeSynth(vpa) {
+  vpa = vpa.trim().toLowerCase();
+  if (SAFE_VPAS.includes(vpa)) {
+    return { risk: 'low', score: 3, flags: [], verdict: 'CLEAR', reason: 'Known legitimate merchant VPA in whitelist.' };
+  }
+  const [local, handle] = vpa.includes('@') ? vpa.split('@').map((v,i) => i===0?v:'@'+v) : [vpa, ''];
+  const flags = [];
+  let score = 0;
+
+  // Check brand impersonation in local part
+  const localTokens = local.replace(/[._\-]/g, ' ').split(' ');
+  const brandHits = localTokens.filter(t => KNOWN_BRAND_HANDLES.includes(t));
+  if (brandHits.length > 0) {
+    flags.push({ type: 'BRAND_IMPERSONATION', detail: `Local part contains brand keyword: "${brandHits.join(', ')}"` });
+    score += 35;
+  }
+
+  // Suspicious keywords like refund, support, helpdesk
+  const suspiciousKeywords = ['support','helpdesk','refund','alert','official','service','help','care','customer','notify'];
+  const suspHits = localTokens.filter(t => suspiciousKeywords.includes(t));
+  if (suspHits.length > 0) {
+    flags.push({ type: 'SUSPICIOUS_KEYWORD', detail: `High-risk keyword in VPA: "${suspHits.join(', ')}"` });
+    score += 25;
+  }
+
+  // Handle mismatch — brand in local but handle doesn't match brand
+  if (brandHits.length > 0 && handle) {
+    const expectedHandle = Object.keys(VPA_HANDLE_MAP).find(h => brandHits.some(b => VPA_HANDLE_MAP[h].toLowerCase().includes(b)));
+    if (expectedHandle && handle !== expectedHandle) {
+      flags.push({ type: 'HANDLE_MISMATCH', detail: `Brand "${brandHits[0]}" expected handle ${expectedHandle} but found ${handle}` });
+      score += 30;
+    }
+  }
+
+  // New/rare handle
+  const knownHandles = Object.keys(VPA_HANDLE_MAP);
+  if (handle && !knownHandles.includes(handle)) {
+    flags.push({ type: 'UNKNOWN_HANDLE', detail: `Handle ${handle} not in verified PSP registry` });
+    score += 10;
+  }
+
+  // Numeric padding
+  if (/\d{4,}/.test(local)) {
+    flags.push({ type: 'NUMERIC_PADDING', detail: 'Long numeric sequence in local part — common in mule VPAs' });
+    score += 15;
+  }
+
+  score = Math.min(score, 100);
+  const risk = score >= 60 ? 'high' : score >= 25 ? 'medium' : 'low';
+  const verdict = score >= 60 ? 'BLOCK' : score >= 25 ? 'REVIEW' : 'CLEAR';
+  const reason = risk === 'high'
+    ? 'High probability of brand impersonation or fraudulent VPA. Do not proceed.'
+    : risk === 'medium'
+    ? 'Suspicious patterns detected. Manual review recommended.'
+    : 'No impersonation signals detected. VPA appears legitimate.';
+
+  return { risk, score, flags, verdict, reason, handle_bank: VPA_HANDLE_MAP[handle] || null };
+}
+
+function fillLookalike(vpa) {
+  document.getElementById('vpa-input').value = vpa;
+}
+
+function runLookalike() {
+  const vpa = document.getElementById('vpa-input').value.trim();
+  if (!vpa) return;
+  const container = document.getElementById('vpa-result');
+  const r = lookalikeSynth(vpa);
+
+  const flagsHtml = r.flags.length > 0
+    ? r.flags.map(f => `
+        <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:10px;font-family:var(--mono);color:var(--danger);background:var(--danger-dim);padding:2px 8px;border-radius:3px;white-space:nowrap;align-self:flex-start">${escapeHtml(f.type)}</span>
+          <span style="font-size:12px;color:var(--fg-2)">${escapeHtml(f.detail)}</span>
+        </div>`).join('')
+    : '<div style="font-size:12px;color:var(--fg-3);padding:8px 0">No impersonation flags detected.</div>';
+
+  container.innerHTML = `
+    <div class="vpa-result-card risk-${escapeHtml(r.risk)}">
+      <div style="display:flex;align-items:center;gap:20px;margin-bottom:16px">
+        <div>
+          <div class="vpa-score-big ${escapeHtml(r.risk)}">${escapeHtml(r.score)}</div>
+          <div style="font-size:10px;color:var(--fg-3);font-family:var(--mono);margin-top:2px">RISK SCORE</div>
+        </div>
+        <div>
+          <div class="vpa-risk-badge ${escapeHtml(r.risk)}">${r.risk === 'high' ? '⛔' : r.risk === 'medium' ? '⚠' : '✓'} ${escapeHtml(r.verdict)}</div>
+          <div style="font-size:13px;color:var(--fg);font-weight:500;margin-bottom:4px">${escapeHtml(vpa)}</div>
+          <div style="font-size:12px;color:var(--fg-3)">${escapeHtml(r.reason)}</div>
+          ${r.handle_bank ? `<div style="font-size:11px;color:var(--fg-3);margin-top:4px;font-family:var(--mono)">Handle resolves to: ${escapeHtml(r.handle_bank)}</div>` : ''}
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--fg-3);margin-bottom:4px">Signal Flags (${escapeHtml(r.flags.length)})</div>
+      ${flagsHtml}
+    </div>`;
+}
+
+// ── Sanctions Screening (Signal 6) — synthetic client-side ───
+const SANCTIONS_LIST = [
+  { name: 'Dawood Ibrahim Kaskar', aliases: ['dawood ibrahim','dawood ibraheem','dawud ibrahim','d. ibrahim'], lists: ['OFAC-SDN','UN-1267','RBI-Caution'], type: 'PEP/Criminal', nationality: 'IN/PK' },
+  { name: 'Iqbal Mirchi', aliases: ['iqbal mirchi','iqbal memon','iq mirchi'], lists: ['OFAC-SDN','IN-NIA'], type: 'D-Company Associate', nationality: 'IN' },
+  { name: 'Hafiz Muhammad Saeed', aliases: ['hafiz saeed','hafiz muhammad','h. saeed','hafis saeed'], lists: ['OFAC-SDN','UN-1267','FATF'], type: 'Designated Terrorist', nationality: 'PK' },
+  { name: 'Viktor Bout', aliases: ['viktor bout','victor bout','v. bout','viktor anatolievich'], lists: ['OFAC-SDN','UN-Consolidated'], type: 'Arms Trafficker', nationality: 'RU' },
+  { name: 'Lashkar-e-Taiba', aliases: ['lashkar e taiba','lashkar-e-tayyiba','let','lashkar taiba','pasban-e-ahle hadis'], lists: ['OFAC-SDN','UN-1267','MHA-India'], type: 'Terrorist Organisation', nationality: 'PK' },
+  { name: 'Ravi Shankar Prasad', aliases: [], lists: [], type: 'Indian Politician (PEP)', nationality: 'IN' },
+];
+
+function jaroSim(s1, s2) {
+  if (s1 === s2) return 1;
+  const matchDist = Math.floor(Math.max(s1.length, s2.length) / 2) - 1;
+  let s1Matches = 0, s2Matches = 0;
+  const s1m = new Array(s1.length).fill(false);
+  const s2m = new Array(s2.length).fill(false);
+  for (let i = 0; i < s1.length; i++) {
+    const start = Math.max(0, i - matchDist);
+    const end   = Math.min(i + matchDist + 1, s2.length);
+    for (let j = start; j < end; j++) {
+      if (s2m[j] || s1[i] !== s2[j]) continue;
+      s1m[i] = true; s2m[j] = true; s1Matches++; break;
+    }
+  }
+  if (s1Matches === 0) return 0;
+  let transpositions = 0, k = 0;
+  for (let i = 0; i < s1.length; i++) {
+    if (!s1m[i]) continue;
+    while (!s2m[k]) k++;
+    if (s1[i] !== s2[k]) transpositions++;
+    k++;
+  }
+  return (s1Matches/s1.length + s1Matches/s2.length + (s1Matches - transpositions/2)/s1Matches) / 3;
+}
+
+function sanctionSynth(query) {
+  const q = query.trim().toLowerCase();
+  const hits = [];
+  for (const entry of SANCTIONS_LIST) {
+    const allNames = [entry.name.toLowerCase(), ...entry.aliases];
+    let bestScore = 0;
+    let bestAlias = '';
+    for (const alias of allNames) {
+      const score = jaroSim(q, alias);
+      // Also check substring containment
+      const containScore = alias.includes(q) || q.includes(alias) ? 0.85 : 0;
+      const s = Math.max(score, containScore);
+      if (s > bestScore) { bestScore = s; bestAlias = alias; }
+    }
+    if (bestScore >= 0.78) {
+      hits.push({ ...entry, matchScore: Math.round(bestScore * 100), matchedAlias: bestAlias });
+    }
+  }
+  hits.sort((a, b) => b.matchScore - a.matchScore);
+  return hits;
+}
+
+function fillSanctions(name) {
+  document.getElementById('sanction-input').value = name;
+}
+
+function runSanctions() {
+  const query = document.getElementById('sanction-input').value.trim();
+  if (!query) return;
+  const container = document.getElementById('sanction-result');
+  const hits = sanctionSynth(query);
+
+  if (hits.length === 0) {
+    container.innerHTML = `
+      <div class="sanction-clear">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M3 8l3.5 3.5 6.5-7"/></svg>
+        No matches found in OFAC-SDN, UN-1267, FATF, or RBI caution lists for "<strong>${escapeHtml(query)}</strong>"
+      </div>`;
+    return;
+  }
+
+  const hitsHtml = hits.map(h => `
+    <div class="sanction-hit">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span class="sanction-name">${escapeHtml(h.name)}</span>
+        <span class="sanction-score">${escapeHtml(h.matchScore)}% match</span>
+      </div>
+      <div style="font-size:11px;color:var(--fg-3);margin-bottom:6px;font-family:var(--mono)">
+        Matched on: "${escapeHtml(h.matchedAlias)}" · Type: ${escapeHtml(h.type)} · Nationality: ${escapeHtml(h.nationality)}
+      </div>
+      <div class="sanction-tags">
+        ${h.lists.map(l => `<span class="sanction-tag">${escapeHtml(l)}</span>`).join('')}
+      </div>
+    </div>`).join('');
+
+  const riskLevel = hits[0].matchScore >= 90 ? 'BLOCK' : 'REVIEW';
+  const riskColor = hits[0].matchScore >= 90 ? 'var(--danger)' : 'var(--warn)';
+
+  container.innerHTML = `
+    <div style="margin-top:16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:12px;font-weight:600;color:${riskColor}">${riskLevel}</span>
+        <span style="font-size:12px;color:var(--fg-3)">${escapeHtml(hits.length)} watchlist hit${hits.length !== 1 ? 's' : ''} found for "${escapeHtml(query)}"</span>
+      </div>
+      ${hitsHtml}
+      <div style="font-size:10px;color:var(--fg-3);margin-top:12px;font-family:var(--mono)">
+        Screened against: OFAC-SDN · UN Security Council 1267 · FATF · RBI Caution List · IN-NIA · MHA-India
+      </div>
+    </div>`;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const active = document.querySelector('.tab-panel.active');
+  if (!active) return;
+  if (active.id === 'tab-compare')     runCompare();
+  if (active.id === 'tab-resolve')     runResolve();
+  if (active.id === 'tab-attribution') runAttribution();
+  if (active.id === 'tab-lookalike')   runLookalike();
+  if (active.id === 'tab-muledb')      searchMuleDB();
+  if (active.id === 'tab-velocity')    runVelocity();
+  if (active.id === 'tab-sanctions')   runSanctions();
+});
+
+document.getElementById('sidebar-email').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitEmail();
+});
+</script>
+</body>
+</html>

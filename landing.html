@@ -1,0 +1,1894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PayeeCheck — UPI Payee Verification &amp; Fraud Detection API for Indian Fintechs</title>
+<meta name="description" content="PayeeCheck is India's first AI-powered payee verification API. Detect UPI fraud in 2.2ms using 7 signal layers — name matching, mule database, VPA velocity engine, behavioral SDK, sanctions screening, and GAT fraud ring detection. The Confirmation of Payee solution for Indian banks, fintechs, payment gateways, and neobanks." />
+<meta name="keywords" content="UPI fraud detection, payee verification API India, Confirmation of Payee India, name matching API fintech, UPI name verification, payment fraud prevention India, mule account detection, VPA verification API, real-time fraud detection fintech, digital payments compliance India, bank account name matching, fintech API India, payment security API, AML fintech India, fraud detection API for banks, neobank fraud prevention, payment gateway fraud detection, RBI compliance fintech, UPI payee name check, account name verification India" />
+<meta name="robots" content="index, follow" />
+<meta name="author" content="PayeeCheck" />
+<link rel="canonical" href="https://payeecheck.vercel.app" />
+<!-- Open Graph -->
+<meta property="og:title" content="PayeeCheck – Real-time Payee Verification for UPI" />
+<meta property="og:description" content="Verify UPI payees in real-time and close the Confirmation of Payee gap." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://payeecheck.vercel.app/" />
+<meta property="og:image" content="https://payeecheck.vercel.app/og-image.png" />
+<meta property="og:site_name" content="PayeeCheck" />
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="PayeeCheck – Real-time Payee Verification for UPI" />
+<meta name="twitter:description" content="Verify UPI payees in real-time and close the Confirmation of Payee gap." />
+<meta name="twitter:image" content="https://payeecheck.vercel.app/og-image.png" />
+<!-- Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "PayeeCheck",
+  "description": "AI-powered payee verification and fraud detection API for UPI transactions in India. Provides real-time name matching, mule account detection, VPA velocity analysis, behavioral biometrics, and fraud ring detection.",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "url": "https://payeecheck.vercel.app",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+  "featureList": [
+    "Real-time payee name matching (L1-L5)",
+    "Lookalike VPA detection",
+    "Mule account database screening",
+    "Behavioral SDK — paste vs type detection",
+    "VPA velocity engine",
+    "Sanctions and PEP screening",
+    "GAT fraud ring detection"
+  ],
+  "audience": {
+    "@type": "Audience",
+    "audienceType": "Banks, Fintechs, Payment Gateways, Neobanks, NBFCs, Wallet Providers"
+  }
+}
+</script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:           #09090d;
+  --surface:      #111318;
+  --surface-2:    #181c24;
+  --surface-3:    #1d2233;
+  --border:       rgba(255,255,255,0.06);
+  --border-mid:   rgba(255,255,255,0.11);
+  --fg:           #e8ecf0;
+  --fg-2:         #8b929e;
+  --fg-3:         #4e5460;
+  --accent:       #f97316;
+  --accent-dim:   rgba(249,115,22,0.12);
+  --accent-glow:  rgba(249,115,22,0.28);
+  --success:      #3ecf6a;
+  --success-dim:  rgba(62,207,106,0.1);
+  --warn:         #f5a623;
+  --warn-dim:     rgba(245,166,35,0.1);
+  --danger:       #ef4444;
+  --danger-dim:   rgba(239,68,68,0.1);
+  --danger-glow:  rgba(239,68,68,0.2);
+  --mono:         'SF Mono','Fira Code','Cascadia Code',monospace;
+  --sans:         -apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
+  --r:            8px;
+  --r-lg:         12px;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--sans); background: var(--bg); color: var(--fg);
+  font-size: 14px; line-height: 1.5; overflow-x: hidden;
+}
+
+/* ═══════════════════ LANDING ═══════════════════ */
+#landing {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 60px 24px 80px; position: relative; overflow: hidden;
+}
+.grid-bg {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(249,115,22,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(249,115,22,0.03) 1px, transparent 1px);
+  background-size: 52px 52px;
+  animation: gridDrift 25s linear infinite;
+}
+@keyframes gridDrift { to { background-position: 52px 52px; } }
+.radial-bg {
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 65% 50% at 50% 35%, rgba(249,115,22,0.1) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 30% at 50% 35%, rgba(249,115,22,0.06) 0%, transparent 50%);
+}
+.vignette {
+  position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 100% 80% at 50% 50%, transparent 35%, rgba(9,9,13,0.85) 100%);
+}
+
+/* Entrance animations */
+@keyframes enterUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.enter {
+  opacity: 0;
+  animation: enterUp 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.landing-inner { position: relative; z-index: 2; max-width: 680px; }
+
+/* ── Side ticker feeds ── */
+.ticker-wrap {
+  position: absolute; top: 0; bottom: 0; width: 230px;
+  overflow: hidden; pointer-events: none; z-index: 1;
+  opacity: 0.28;
+  filter: blur(1.5px);
+  mask-image: linear-gradient(transparent 0%, black 20%, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(transparent 0%, black 20%, black 80%, transparent 100%);
+}
+.ticker-wrap.left  { left: 0; }
+.ticker-wrap.right { right: 0; }
+.ticker-inner {
+  display: flex; flex-direction: column; gap: 8px;
+  animation: tickUp 22s linear infinite;
+}
+.ticker-wrap.right .ticker-inner { animation-duration: 28s; animation-delay: -8s; }
+@keyframes tickUp { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+.tc {
+  font-size: 11px; font-family: var(--mono);
+  border-radius: 8px; padding: 9px 13px; white-space: nowrap;
+  display: flex; align-items: center; gap: 7px;
+  border: 1px solid var(--border-mid); background: var(--surface);
+  margin: 0 12px;
+}
+.tc.danger { color: var(--danger); border-color: rgba(239,68,68,0.25); background: rgba(239,68,68,0.05); }
+.tc.warn   { color: var(--warn);   border-color: rgba(245,166,35,0.25); background: rgba(245,166,35,0.05); }
+.tc.pass   { color: var(--success);border-color: rgba(62,207,106,0.25); background: rgba(62,207,106,0.05); }
+.tc.neutral{ color: var(--fg-3);   }
+.tc-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.tc-dot.danger { background: var(--danger); }
+.tc-dot.warn   { background: var(--warn); }
+.tc-dot.pass   { background: var(--success); }
+.tc-dot.neutral{ background: var(--fg-3); }
+
+/* Badge */
+.logo-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border-mid);
+  border-radius: 24px; padding: 7px 16px; margin-bottom: 28px;
+  font-size: 12px; color: var(--fg-2);
+}
+.live-dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--success);
+  box-shadow: 0 0 10px var(--success); animation: livePulse 2s ease-in-out infinite;
+}
+@keyframes livePulse { 0%,100% { box-shadow: 0 0 8px var(--success); } 50% { box-shadow: 0 0 16px var(--success); } }
+.logo-text { font-weight: 700; color: var(--fg); letter-spacing: -0.01em; }
+
+/* Hero */
+.hero-h1 {
+  font-size: clamp(42px, 7.5vw, 76px); font-weight: 900; letter-spacing: -0.045em;
+  line-height: 1.02; margin-bottom: 20px;
+  background: linear-gradient(160deg, #ffffff 20%, rgba(255,255,255,0.42) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-h1 em { -webkit-text-fill-color: var(--accent); font-style: normal; }
+.hero-p {
+  font-size: 17px; color: var(--fg-2); max-width: 440px; margin: 0 auto 12px; line-height: 1.6;
+}
+.hero-context {
+  font-size: 13px; color: var(--fg-3); margin-bottom: 32px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.hero-context::before {
+  content: ''; display: inline-block; width: 20px; height: 1px; background: var(--fg-3); flex-shrink: 0;
+}
+
+/* Stats */
+.stat-row {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 6px; margin-bottom: 36px;
+}
+.stat-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 7px 13px;
+  font-size: 12px; color: var(--fg-2); font-family: var(--mono);
+  transition: border-color 150ms, background 150ms;
+}
+.stat-pill:hover { border-color: var(--border-mid); background: var(--surface-2); }
+.stat-pill b { color: var(--fg); }
+.stat-sep { color: var(--fg-3); font-size: 11px; }
+
+/* CTA area */
+.cta-area { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.cta-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--accent); color: #fff;
+  font-size: 16px; font-weight: 700; letter-spacing: -0.01em;
+  padding: 16px 34px; border-radius: var(--r); border: none;
+  cursor: pointer; transition: all 220ms; position: relative; overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(249,115,22,0.4), 0 4px 28px rgba(249,115,22,0.35), 0 8px 40px rgba(0,0,0,0.4);
+}
+.cta-btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.13) 0%, transparent 55%);
+}
+.cta-btn:hover {
+  background: #fb923c;
+  box-shadow: 0 0 0 1px rgba(251,146,60,0.5), 0 4px 36px rgba(249,115,22,0.55), 0 8px 56px rgba(0,0,0,0.5);
+  transform: translateY(-2px);
+}
+.cta-btn:active { transform: translateY(0); }
+.trust-row {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
+  font-size: 12px; color: var(--fg-3);
+}
+.trust-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--fg-3); }
+
+/* How it works mini-row */
+.how-row {
+  display: flex; align-items: flex-start; gap: 0; margin-top: 40px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden; width: 100%;
+}
+.how-step {
+  flex: 1; padding: 16px 18px; text-align: left; position: relative;
+  border-right: 1px solid var(--border);
+}
+.how-step:last-child { border-right: none; }
+.how-num {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--fg-3); margin-bottom: 6px; font-family: var(--mono);
+}
+.how-icon { font-size: 18px; margin-bottom: 6px; }
+.how-title { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+.how-desc  { font-size: 11px; color: var(--fg-3); line-height: 1.4; }
+.how-arrow {
+  position: absolute; right: -9px; top: 50%; transform: translateY(-50%);
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--surface-2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; z-index: 1;
+  font-size: 9px; color: var(--fg-3); flex-shrink: 0;
+}
+
+/* ── Features section ── */
+#features {
+  padding: 80px 24px; border-top: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+#features::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 1px; background: linear-gradient(90deg, transparent, var(--border-mid), transparent);
+}
+.features-inner { max-width: 900px; margin: 0 auto; }
+.features-eyebrow {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 12px; text-align: center;
+}
+.features-h { font-size: 32px; font-weight: 800; letter-spacing: -0.03em; text-align: center; margin-bottom: 8px; }
+.features-sub { font-size: 15px; color: var(--fg-2); text-align: center; margin-bottom: 48px; }
+.features-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;
+  margin-bottom: 56px;
+}
+.feat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 20px; transition: border-color 200ms, transform 200ms;
+}
+.feat-card:hover { border-color: var(--border-mid); transform: translateY(-2px); }
+.feat-icon { font-size: 22px; margin-bottom: 10px; }
+.feat-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.feat-desc { font-size: 12px; color: var(--fg-3); line-height: 1.5; }
+.feat-tag {
+  display: inline-block; margin-top: 8px; font-size: 10px; font-weight: 700;
+  font-family: var(--mono); padding: 3px 8px; border-radius: 4px;
+}
+.feat-tag.block { background: var(--danger-dim); color: var(--danger); }
+.feat-tag.warn  { background: var(--warn-dim);   color: var(--warn); }
+.feat-tag.pass  { background: var(--success-dim);color: var(--success); }
+
+.features-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+  background: var(--border); border: 1px solid var(--border);
+  border-radius: var(--r-lg); overflow: hidden; margin-bottom: 36px;
+}
+.fstat {
+  background: var(--surface); padding: 24px 20px; text-align: center;
+}
+.fstat-num { font-size: 32px; font-weight: 900; letter-spacing: -0.04em; color: var(--accent); font-family: var(--mono); }
+.fstat-lbl { font-size: 12px; color: var(--fg-3); margin-top: 4px; }
+.features-cta { text-align: center; }
+.features-cta-note { font-size: 13px; color: var(--fg-3); margin-top: 12px; }
+
+/* ── Section: The Gap ── */
+#gap {
+  padding: 80px 24px; border-top: 1px solid var(--border); position: relative; overflow: hidden;
+  background: linear-gradient(180deg, var(--bg) 0%, rgba(17,19,24,0.6) 100%);
+}
+.gap-inner { max-width: 900px; margin: 0 auto; }
+.gap-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--danger); margin-bottom: 12px; text-align: center; }
+.gap-h { font-size: clamp(24px,4vw,38px); font-weight: 800; letter-spacing: -0.03em; text-align: center; margin-bottom: 12px; line-height: 1.15; }
+.gap-sub { font-size: 15px; color: var(--fg-2); text-align: center; max-width: 560px; margin: 0 auto 52px; line-height: 1.6; }
+.cop-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 48px; }
+.cop-card {
+  border-radius: var(--r-lg); padding: 24px 20px; position: relative; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.cop-card.gap-card { background: rgba(239,68,68,0.04); border-color: rgba(239,68,68,0.2); }
+.cop-card.solve-card { background: rgba(249,115,22,0.04); border-color: rgba(249,115,22,0.2); }
+.cop-card.other-card { background: var(--surface); }
+.cop-flag { font-size: 28px; margin-bottom: 12px; }
+.cop-country { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.cop-scheme { font-size: 12px; color: var(--fg-2); margin-bottom: 12px; font-weight: 600; }
+.cop-since { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-family: var(--mono); padding: 4px 10px; border-radius: 4px; margin-bottom: 14px; }
+.cop-since.live   { background: var(--success-dim); color: var(--success); }
+.cop-since.coming { background: var(--warn-dim);    color: var(--warn); }
+.cop-since.none   { background: var(--danger-dim);  color: var(--danger); }
+.cop-bullets { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.cop-bullets li { font-size: 12px; color: var(--fg-3); display: flex; align-items: flex-start; gap: 6px; line-height: 1.4; }
+.cop-bullets li::before { content: '—'; color: var(--fg-3); flex-shrink: 0; margin-top: 1px; }
+.cop-card.solve-card .cop-bullets li { color: var(--fg-2); }
+.cop-card.solve-card .cop-bullets li::before { content: '✓'; color: var(--accent); }
+.gap-stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; }
+.gap-stat { background: var(--surface); padding: 24px 20px; text-align: center; }
+.gap-stat-num { font-size: 28px; font-weight: 900; letter-spacing: -0.04em; font-family: var(--mono); margin-bottom: 4px; }
+.gap-stat-lbl { font-size: 12px; color: var(--fg-3); line-height: 1.4; }
+.gap-stat-num.danger { color: var(--danger); }
+.gap-stat-num.warn   { color: var(--warn); }
+.gap-stat-num.accent { color: var(--accent); }
+
+/* ── Section: API Integration ── */
+#integration {
+  padding: 80px 24px; border-top: 1px solid var(--border); position: relative;
+}
+.int-inner { max-width: 940px; margin: 0 auto; }
+.int-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; text-align: center; }
+.int-h { font-size: clamp(24px,4vw,38px); font-weight: 800; letter-spacing: -0.03em; text-align: center; margin-bottom: 10px; }
+.int-sub { font-size: 15px; color: var(--fg-2); text-align: center; max-width: 520px; margin: 0 auto 48px; line-height: 1.6; }
+.int-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; margin-bottom: 48px; }
+/* Code block */
+.code-block {
+  background: var(--bg); border: 1px solid var(--border-mid);
+  border-radius: var(--r-lg); overflow: hidden;
+}
+.code-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 16px; border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.code-tabs { display: flex; gap: 4px; }
+.ctab {
+  font-size: 11px; font-family: var(--mono); color: var(--fg-3);
+  padding: 4px 10px; border-radius: 4px; cursor: pointer; transition: all 130ms; border: 1px solid transparent;
+}
+.ctab.active { color: var(--fg); background: var(--surface-2); border-color: var(--border-mid); }
+.ctab:hover:not(.active) { color: var(--fg-2); }
+.code-method {
+  font-size: 10px; font-family: var(--mono); font-weight: 700;
+  background: var(--accent-dim); color: var(--accent);
+  border: 1px solid rgba(249,115,22,0.2); border-radius: 4px; padding: 3px 8px;
+}
+.code-body { padding: 18px; overflow-x: auto; }
+.code-body pre { font-family: var(--mono); font-size: 12px; line-height: 1.7; color: var(--fg-2); white-space: pre; }
+.ck  { color: #8b929e; }   /* key */
+.cv  { color: #3ecf6a; }   /* value string */
+.cn  { color: #f5a623; }   /* number */
+.cb  { color: #f97316; }   /* boolean */
+.cc  { color: #4e5460; }   /* comment */
+.cm  { color: #ef4444; }   /* method/verb */
+.cp  { color: #a78bfa; }   /* path */
+/* Response block */
+.response-block {
+  background: var(--bg); border: 1px solid var(--border-mid); border-radius: var(--r-lg); overflow: hidden;
+}
+.resp-topbar {
+  display: flex; align-items: center; gap: 10px; padding: 11px 16px;
+  border-bottom: 1px solid var(--border); background: var(--surface);
+}
+.resp-status { font-size: 11px; font-family: var(--mono); font-weight: 700; color: var(--success); background: var(--success-dim); border: 1px solid rgba(62,207,106,0.2); border-radius: 4px; padding: 3px 8px; }
+.resp-label  { font-size: 11px; color: var(--fg-3); font-family: var(--mono); }
+.resp-latency{ margin-left: auto; font-size: 11px; font-family: var(--mono); color: var(--accent); }
+/* Integration use-cases */
+.int-usecases { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 40px; }
+.uc-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 16px; transition: border-color 180ms;
+}
+.uc-card:hover { border-color: var(--border-mid); }
+.uc-icon { font-size: 20px; margin-bottom: 8px; }
+.uc-name { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+.uc-desc { font-size: 11px; color: var(--fg-3); line-height: 1.45; }
+/* Endpoint pills */
+.endpoint-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.ep-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; padding: 7px 13px; font-family: var(--mono); font-size: 11px; color: var(--fg-3);
+}
+.ep-method { font-size: 10px; font-weight: 700; color: var(--accent); }
+
+@media (max-width: 720px) {
+  .cop-grid  { grid-template-columns: 1fr; }
+  .int-layout{ grid-template-columns: 1fr; }
+  .int-usecases { grid-template-columns: 1fr 1fr; }
+  .gap-stat-row { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════ DEMO OVERLAY ═══════════════════ */
+#overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: var(--bg); display: flex; flex-direction: column;
+  transform: translateY(100vh);
+  transition: transform 550ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+#overlay.open { transform: translateY(0); }
+
+/* Header */
+.o-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 28px; border-bottom: 1px solid var(--border);
+  flex-shrink: 0; gap: 16px;
+}
+.o-brand { font-size: 14px; font-weight: 700; letter-spacing: -0.01em; }
+.o-brand span { color: var(--fg-3); font-weight: 400; font-size: 12px; }
+.o-close {
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--fg-3); border-radius: 6px; padding: 6px 12px;
+  font-size: 12px; cursor: pointer; transition: all 150ms; flex-shrink: 0;
+}
+.o-close:hover { color: var(--fg); border-color: var(--border-mid); }
+
+/* Step progress */
+.prog-bar {
+  display: flex; align-items: center; gap: 0;
+}
+.prog-dot {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 1.5px solid var(--border-mid); background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--fg-3);
+  transition: all 350ms; cursor: default; user-select: none; flex-shrink: 0;
+}
+.prog-dot.active {
+  border-color: var(--accent); color: var(--accent);
+  background: var(--accent-dim); box-shadow: 0 0 14px rgba(249,115,22,0.25);
+}
+.prog-dot.done {
+  border-color: var(--success); background: var(--success); color: #fff;
+}
+.prog-line {
+  width: 36px; height: 1.5px; background: var(--border-mid);
+  transition: background 350ms;
+}
+.prog-line.done { background: var(--success); }
+
+/* XP score */
+.xp-badge {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 12px; font-family: var(--mono);
+  font-size: 12px; color: var(--fg-3);
+}
+.xp-val { color: var(--accent); font-weight: 700; transition: color 300ms; }
+
+/* Steps */
+.steps-wrap { flex: 1; position: relative; overflow: hidden; }
+.step {
+  position: absolute; inset: 0; overflow-y: auto;
+  padding: 36px 28px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  transition: transform 450ms cubic-bezier(0.16, 1, 0.3, 1), opacity 300ms;
+  will-change: transform, opacity;
+}
+.step.inactive-left  { transform: translateX(-100%); opacity: 0; pointer-events: none; }
+.step.inactive-right { transform: translateX(100%);  opacity: 0; pointer-events: none; }
+.step.active         { transform: translateX(0);     opacity: 1; pointer-events: all; }
+
+.step-body { width: 100%; max-width: 560px; }
+.step-eyebrow {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 12px;
+}
+.ey-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.step-h  { font-size: 26px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 8px; }
+.step-p  { font-size: 14px; color: var(--fg-2); line-height: 1.65; margin-bottom: 28px; }
+
+/* Card */
+.card {
+  background: var(--surface); border: 1px solid var(--border-mid);
+  border-radius: var(--r-lg); padding: 22px; margin-bottom: 16px;
+  position: relative; overflow: hidden;
+}
+.card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1.5px;
+  background: linear-gradient(90deg, var(--accent) 0%, transparent 60%);
+}
+.field-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--fg-3); margin-bottom: 8px;
+}
+
+/* Big input */
+.big-input {
+  width: 100%; background: var(--bg); border: 1px solid var(--border-mid);
+  border-radius: var(--r); color: var(--fg); font-family: var(--sans);
+  font-size: 20px; font-weight: 700; padding: 14px 16px;
+  outline: none; transition: border-color 200ms, box-shadow 200ms;
+  letter-spacing: -0.01em; margin-bottom: 16px;
+}
+.big-input::placeholder { color: var(--fg-3); font-weight: 400; font-size: 17px; }
+.big-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(249,115,22,0.1);
+}
+.big-input.has-warn  { border-color: var(--warn);   box-shadow: 0 0 0 3px rgba(245,166,35,0.08); }
+.big-input.has-danger{ border-color: var(--danger);  box-shadow: 0 0 0 3px rgba(239,68,68,0.08); }
+
+/* Signal panel */
+.sig-panel {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px; min-height: 82px;
+}
+.sig-header {
+  display: flex; align-items: center; margin-bottom: 10px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--fg-3);
+}
+.sdk-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--accent-dim); color: var(--accent);
+  border: 1px solid rgba(249,115,22,0.18); border-radius: 4px;
+  padding: 3px 9px; font-size: 10px; font-weight: 700; margin-left: auto;
+}
+.sdk-blink { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: blink 1.4s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+.sig-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-family: var(--mono);
+  padding: 5px 0; border-bottom: 1px solid var(--border);
+  animation: rowIn 250ms ease-out;
+}
+@keyframes rowIn { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: translateX(0); } }
+.sig-row:last-child { border-bottom: none; }
+.sig-k { color: var(--fg-3); min-width: 130px; flex-shrink: 0; }
+.sig-v { margin-left: auto; text-align: right; }
+.sig-v.pass   { color: var(--success); }
+.sig-v.warn   { color: var(--warn); }
+.sig-v.danger { color: var(--danger); }
+.sig-v.muted  { color: var(--fg-3); }
+
+/* Tip chips */
+.tip-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
+.tip-label { font-size: 12px; color: var(--fg-3); }
+.tip-chip {
+  font-size: 11px; font-family: var(--mono); color: var(--fg-3);
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 5px; padding: 5px 11px; cursor: pointer; transition: all 130ms;
+}
+.tip-chip:hover { color: var(--accent); border-color: rgba(249,115,22,0.3); }
+
+/* VPA cards */
+.vpa-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+.vpa-card {
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+  background: var(--surface-2); border: 1.5px solid var(--border);
+  border-radius: var(--r); cursor: pointer; transition: all 180ms; user-select: none;
+}
+.vpa-card:hover { border-color: var(--border-mid); }
+.vpa-card.sel-safe    { border-color: rgba(62,207,106,0.35); background: rgba(62,207,106,0.05); }
+.vpa-card.sel-danger  { border-color: rgba(239,68,68,0.35);  background: rgba(239,68,68,0.05); }
+.vpa-icon { width: 36px; height: 36px; border-radius: 9px; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.vpa-name { font-size: 13px; font-weight: 700; }
+.vpa-addr { font-size: 11px; color: var(--fg-3); font-family: var(--mono); margin-top: 2px; }
+.vpa-badge {
+  margin-left: auto; font-size: 10px; font-weight: 700; padding: 4px 9px;
+  border-radius: 4px; flex-shrink: 0;
+}
+.badge-danger { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(239,68,68,0.2); }
+.badge-pass   { background: var(--success-dim);color: var(--success);border: 1px solid rgba(62,207,106,0.2); }
+
+/* Amount */
+.amt-wrap { position: relative; margin-bottom: 12px; }
+.amt-prefix {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  font-size: 24px; font-weight: 700; color: var(--fg-3); pointer-events: none;
+}
+.amt-input {
+  width: 100%; background: var(--bg); border: 1px solid var(--border-mid);
+  border-radius: var(--r); color: var(--fg); font-family: var(--mono);
+  font-size: 32px; font-weight: 800; padding: 14px 16px 14px 38px;
+  outline: none; letter-spacing: -0.03em;
+  transition: border-color 200ms, box-shadow 200ms;
+}
+.amt-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(249,115,22,0.1); }
+.preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.preset-btn {
+  font-size: 12px; font-family: var(--mono); color: var(--fg-3);
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 7px 13px; cursor: pointer; transition: all 130ms;
+}
+.preset-btn:hover { color: var(--accent); border-color: rgba(249,115,22,0.3); }
+
+/* Risk meter */
+.risk-meter { margin-top: 16px; }
+.risk-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.risk-label-l { font-size: 12px; color: var(--fg-3); }
+.risk-label-r { font-size: 12px; font-family: var(--mono); font-weight: 700; transition: color 400ms; }
+.risk-track { height: 5px; background: var(--surface-3); border-radius: 3px; overflow: hidden; }
+.risk-fill { height: 100%; border-radius: 3px; transition: width 500ms cubic-bezier(0.25,1,0.5,1), background 400ms; }
+
+/* ─── STEP 4: SCAN ─── */
+.scan-wrap { width: 100%; max-width: 620px; }
+.scan-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; gap: 16px; }
+.scan-h { font-size: 22px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 4px; }
+.scan-sub { font-size: 12px; color: var(--fg-3); font-family: var(--mono); }
+.timer-box {
+  text-align: right; flex-shrink: 0;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r); padding: 10px 16px;
+}
+.timer-val { font-family: var(--mono); font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: -0.04em; line-height: 1; }
+.timer-unit { font-size: 10px; color: var(--fg-3); margin-top: 3px; text-align: center; }
+.modules { display: flex; flex-direction: column; gap: 7px; }
+.mod-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--r);
+  transition: border-color 300ms, background 300ms; opacity: 0.3;
+}
+.mod-row.active { opacity: 1; }
+.mod-row.done   { opacity: 1; }
+.mod-row.done.r-pass  { border-color: rgba(62,207,106,0.2); }
+.mod-row.done.r-warn  { border-color: rgba(245,166,35,0.2); }
+.mod-row.done.r-block { border-color: rgba(239,68,68,0.2);  }
+.mod-icon { font-size: 18px; width: 32px; text-align: center; flex-shrink: 0; }
+.mod-info { flex: 1; min-width: 0; }
+.mod-name { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mod-algo { font-size: 10px; color: var(--fg-3); font-family: var(--mono); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mod-status {
+  font-size: 10px; font-weight: 700; font-family: var(--mono);
+  padding: 4px 10px; border-radius: 5px; min-width: 66px; text-align: center; flex-shrink: 0;
+}
+.ms-pending  { background: var(--surface-2); color: var(--fg-3); }
+.ms-scanning { background: var(--accent-dim); color: var(--accent); animation: scanPulse 0.7s ease-in-out infinite; }
+@keyframes scanPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.ms-pass  { background: var(--success-dim); color: var(--success); }
+.ms-warn  { background: var(--warn-dim);    color: var(--warn); }
+.ms-block { background: var(--danger-dim);  color: var(--danger); }
+.scan-pipeline {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
+  font-size: 11px; color: var(--fg-3); font-family: var(--mono); justify-content: center;
+}
+.pipe-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+/* ─── STEP 5: VERDICT ─── */
+.verdict-wrap { width: 100%; max-width: 540px; text-align: center; }
+.v-icon {
+  width: 88px; height: 88px; border-radius: 50%; margin: 0 auto 24px;
+  display: flex; align-items: center; justify-content: center; font-size: 40px;
+  animation: vPop 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes vPop { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+.v-icon.block { background: rgba(239,68,68,0.12); border: 2px solid rgba(239,68,68,0.3); box-shadow: 0 0 40px rgba(239,68,68,0.15); }
+.v-label { font-size: 48px; font-weight: 900; letter-spacing: -0.05em; line-height: 1; margin-bottom: 10px; }
+.v-label.block { color: var(--danger); }
+.v-sub { font-size: 15px; color: var(--fg-2); margin-bottom: 28px; }
+.v-saved {
+  background: var(--success-dim); border: 1px solid rgba(62,207,106,0.2);
+  border-radius: var(--r-lg); padding: 22px; margin-bottom: 24px;
+}
+.v-saved-num { font-size: 38px; font-weight: 900; color: var(--success); letter-spacing: -0.04em; font-family: var(--mono); }
+.v-saved-lbl { font-size: 12px; color: var(--fg-3); margin-top: 4px; }
+.signals-list { text-align: left; margin-bottom: 28px; }
+.signals-hdr {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--fg-3); margin-bottom: 10px;
+}
+.sig-item {
+  display: flex; gap: 10px; padding: 10px 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 7px; margin-bottom: 6px;
+  animation: rowIn 350ms ease-out backwards;
+}
+.si-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+.si-dot.block { background: var(--danger); }
+.si-dot.warn  { background: var(--warn); }
+.si-name { font-size: 12px; font-weight: 700; }
+.si-desc { font-size: 11px; color: var(--fg-3); margin-top: 2px; }
+.v-ctas { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* Nav bar */
+.o-nav {
+  padding: 18px 28px; border-top: 1px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.nav-step-info { font-size: 12px; color: var(--fg-3); font-family: var(--mono); }
+.nav-step-info b { color: var(--fg); }
+.btn-grp { display: flex; gap: 8px; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: var(--r);
+  font-size: 13px; font-weight: 700; cursor: pointer; border: none; transition: all 150ms;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: #fb923c; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-ghost { background: var(--surface); color: var(--fg-2); border: 1px solid var(--border-mid); }
+.btn-ghost:hover { color: var(--fg); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #f55555; }
+
+/* Toast system */
+#toasts {
+  position: fixed; bottom: 24px; right: 24px; z-index: 999;
+  display: flex; flex-direction: column; gap: 8px;
+  pointer-events: none; align-items: flex-end;
+}
+.toast {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--border-mid);
+  border-radius: 9px; padding: 10px 16px;
+  font-size: 12px; color: var(--fg-2);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  animation: toastIn 300ms ease-out, toastOut 300ms ease-in 2.2s forwards;
+  max-width: 280px;
+}
+@keyframes toastIn  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes toastOut { from{opacity:1;transform:translateY(0)} to{opacity:0;transform:translateY(-8px)} }
+.toast-icon { font-size: 14px; flex-shrink: 0; }
+.toast-xp { color: var(--accent); font-weight: 700; margin-left: auto; font-family: var(--mono); flex-shrink: 0; }
+
+/* Product section */
+#product-section { padding: 60px 24px; display: none; }
+#product-section.vis { display: block; }
+.prod-inner { max-width: 760px; margin: 0 auto; }
+.prod-banner {
+  text-align: center; padding: 20px; border-radius: 12px; margin-bottom: 36px;
+  background: var(--success-dim); border: 1px solid rgba(62,207,106,0.2);
+}
+.prod-h { font-size: 28px; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 8px; }
+.prod-sub { font-size: 15px; color: var(--fg-2); }
+.modules-showcase { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 28px; }
+.mod-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 18px;
+}
+.mc-icon { font-size: 22px; margin-bottom: 10px; }
+.mc-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.mc-desc { font-size: 11px; color: var(--fg-3); line-height: 1.5; }
+.prod-cta-card {
+  background: var(--surface); border: 1px solid var(--border-mid);
+  border-radius: var(--r-lg); padding: 28px; text-align: center;
+}
+.prod-cta-h { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 6px; }
+.prod-cta-sub { font-size: 13px; color: var(--fg-2); margin-bottom: 20px; }
+.prod-link {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--accent); color: #fff;
+  font-size: 14px; font-weight: 700; padding: 12px 26px;
+  border-radius: var(--r); text-decoration: none; transition: all 200ms;
+  box-shadow: 0 4px 16px rgba(249,115,22,0.3);
+}
+.prod-link:hover { background: #fb923c; transform: translateY(-1px); }
+.metric-row { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-top: 20px; }
+.metric { text-align: center; }
+.metric-val { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; color: var(--accent); }
+.metric-lbl { font-size: 11px; color: var(--fg-3); margin-top: 2px; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .hero-h1 { font-size: 36px; }
+  .hero-p  { font-size: 15px; }
+  .o-header { padding: 12px 16px; gap: 10px; }
+  .step { padding: 24px 16px; }
+  .o-nav { padding: 14px 16px; }
+  .modules-showcase { grid-template-columns: 1fr; }
+  .scan-top { flex-direction: column; }
+  .fc { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ LANDING ═══════════════════════ -->
+<section id="landing">
+  <div class="grid-bg"></div>
+  <div class="radial-bg"></div>
+  <div class="vignette"></div>
+
+  <!-- Left ticker feed -->
+  <div class="ticker-wrap left" id="ticker-left"></div>
+  <!-- Right ticker feed -->
+  <div class="ticker-wrap right" id="ticker-right"></div>
+
+  <div class="landing-inner">
+    <div class="logo-pill enter" style="animation-delay:0ms">
+      <span class="live-dot"></span>
+      <span class="logo-text">PayeeCheck</span>
+      <span style="color:var(--fg-3);font-size:12px">· Fraud API · India</span>
+    </div>
+
+    <h1 class="hero-h1 enter" style="animation-delay:80ms">
+      Stop UPI Fraud<br>in <em>2.2ms</em>
+    </h1>
+    <p class="hero-p enter" style="animation-delay:160ms">
+      India's first AI-powered payee verification. 7 signals.
+      Real-time decisions for the ₹17 billion moving on UPI every month.
+    </p>
+    <div class="hero-context enter" style="animation-delay:220ms">
+      UPI has no mandatory name verification. PayeeCheck adds it.
+    </div>
+
+    <div class="stat-row enter" style="animation-delay:300ms">
+      <div class="stat-pill"><b>₹17B</b>&nbsp;monthly UPI</div>
+      <span class="stat-sep">·</span>
+      <div class="stat-pill"><b>7</b>&nbsp;fraud signals</div>
+      <span class="stat-sep">·</span>
+      <div class="stat-pill"><b>2.2ms</b>&nbsp;pipeline</div>
+      <span class="stat-sep">·</span>
+      <div class="stat-pill"><b>100%</b>&nbsp;precision</div>
+    </div>
+
+    <div class="cta-area enter" style="animation-delay:380ms">
+      <button class="cta-btn" onclick="startDemo()">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
+          <path stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M4 8h8M9 5l3 3-3 3"/>
+        </svg>
+        Try Live Demo
+      </button>
+      <div class="trust-row">
+        <span>No account needed</span>
+        <span class="trust-dot"></span>
+        <span>Runs in browser</span>
+        <span class="trust-dot"></span>
+        <span>Takes 60 seconds</span>
+      </div>
+    </div>
+
+    <div class="how-row enter" style="animation-delay:460ms">
+      <div class="how-step">
+        <div class="how-num">01</div>
+        <div class="how-icon">🏦</div>
+        <div class="how-title">Initiate transfer</div>
+        <div class="how-desc">Enter payee name, UPI ID, and amount like a real transaction</div>
+        <div class="how-arrow">→</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">02</div>
+        <div class="how-icon">⚡</div>
+        <div class="how-title">7 signals fire</div>
+        <div class="how-desc">Name matching, mule DB, VPA velocity, behavioral SDK — all in 2.2ms</div>
+        <div class="how-arrow">→</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">03</div>
+        <div class="how-icon">🛑</div>
+        <div class="how-title">Fraud blocked</div>
+        <div class="how-desc">See exactly which signals fired and why the transaction was stopped</div>
+      </div>
+    </div>
+
+    <a href="#features" class="enter" style="animation-delay:520ms;display:inline-flex;align-items:center;gap:5px;margin-top:28px;font-size:12px;color:var(--fg-3);text-decoration:none;transition:color 150ms" onmouseover="this.style.color='var(--fg)'" onmouseout="this.style.color='var(--fg-3)'">
+      See the 7 signals
+      <svg width="12" height="12" fill="none" viewBox="0 0 12 12"><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" d="M6 1v8M3 7l3 3 3-3"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════════════════ FEATURES SECTION ═══════════════════════ -->
+<section id="features">
+  <div class="features-inner">
+    <div class="features-eyebrow">How it works</div>
+    <h2 class="features-h">7 signals. Every transaction.</h2>
+    <p class="features-sub">Each layer catches what the last one misses. Together they achieve 100% precision on the scenarios that matter most.</p>
+
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🔤</div>
+        <div class="feat-name">Name Matching (L1–L5)</div>
+        <div class="feat-desc">Jaro-Winkler → Phonetic → TF-IDF → Embeddings → Siamese neural net. Handles transliteration, abbreviations, and entity-type mismatches.</div>
+        <span class="feat-tag warn">WARN if &lt; 0.85</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🎭</div>
+        <div class="feat-name">Lookalike VPA</div>
+        <div class="feat-desc">Brand token registry catches impersonation — "paytm.support@", "hdfc-help@", "k.enterprises@" — without ML overhead.</div>
+        <span class="feat-tag block">BLOCK on match</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🕳️</div>
+        <div class="feat-name">Mule Database</div>
+        <div class="feat-desc">Consortium-style flagging across partner banks. Ring propagation scoring — one flagged entity lifts the whole ring.</div>
+        <span class="feat-tag block">BLOCK if flagged</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📱</div>
+        <div class="feat-name">Behavioral SDK</div>
+        <div class="feat-desc">Paste vs. type input method, keystroke cadence, device fingerprint, clipboard timing. Outputs a trust score 0–1.</div>
+        <span class="feat-tag warn">WARN if paste</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <div class="feat-name">VPA Velocity Engine</div>
+        <div class="feat-desc">Rolling-window anomaly detection — new VPA with high unique sender count is a strong fraud ring signal.</div>
+        <span class="feat-tag warn">WARN if &lt; 30d</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🚫</div>
+        <div class="feat-name">Sanctions Screening</div>
+        <div class="feat-desc">Fuzzy name matching against PEP and OFAC lists with phonetic normalisation to catch spelling variants.</div>
+        <span class="feat-tag block">BLOCK on match</span>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🕸️</div>
+        <div class="feat-name">GAT Ring Detector</div>
+        <div class="feat-desc">PyTorch Graph Attention Network. Detects fraud rings sharing mobile numbers, accounts, or devices. 6.7pp edge feature lift.</div>
+        <span class="feat-tag block">BLOCK on ring</span>
+      </div>
+    </div>
+
+    <div class="features-stats">
+      <div class="fstat"><div class="fstat-num">2.2ms</div><div class="fstat-lbl">pipeline latency</div></div>
+      <div class="fstat"><div class="fstat-num">100%</div><div class="fstat-lbl">precision</div></div>
+      <div class="fstat"><div class="fstat-num">82.6%</div><div class="fstat-lbl">recall</div></div>
+      <div class="fstat"><div class="fstat-num">7</div><div class="fstat-lbl">signal layers</div></div>
+    </div>
+
+    <div class="features-cta">
+      <button class="cta-btn" onclick="startDemo(); window.scrollTo({top:0,behavior:'smooth'})">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16">
+          <path stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M4 8h8M9 5l3 3-3 3"/>
+        </svg>
+        Try the Live Demo
+      </button>
+      <div class="features-cta-note">See all 7 signals fire in real-time · No account needed</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION: THE GAP ═══════════ -->
+<section id="gap" aria-label="The UPI payee verification gap">
+  <div class="gap-inner">
+    <div class="gap-eyebrow">The problem</div>
+    <h2 class="gap-h">India sends ₹17B daily on UPI.<br>None of it verifies who's receiving it.</h2>
+    <p class="gap-sub">The UK has had mandatory Confirmation of Payee since 2019. The EU mandated Verification of Payee in 2025. India — the world's largest real-time payments market — still has no equivalent. PayeeCheck fills that gap today.</p>
+
+    <div class="cop-grid" role="list">
+      <article class="cop-card other-card" role="listitem">
+        <div class="cop-flag" aria-hidden="true">🇬🇧</div>
+        <div class="cop-country">United Kingdom</div>
+        <div class="cop-scheme">Confirmation of Payee (CoP)</div>
+        <div class="cop-since live">✓ Live since 2019</div>
+        <ul class="cop-bullets" aria-label="UK CoP features">
+          <li>Mandatory for all major UK banks</li>
+          <li>Real-time account name check before payment</li>
+          <li>APP fraud reduced 46% post-implementation</li>
+          <li>Regulated by Pay.UK under PSR</li>
+        </ul>
+      </article>
+
+      <article class="cop-card other-card" role="listitem">
+        <div class="cop-flag" aria-hidden="true">🇪🇺</div>
+        <div class="cop-country">European Union</div>
+        <div class="cop-scheme">Verification of Payee (VoP)</div>
+        <div class="cop-since coming">⏳ Mandated from 2025</div>
+        <ul class="cop-bullets" aria-label="EU VoP features">
+          <li>Required under EU Instant Payments Regulation</li>
+          <li>All PSPs must verify payee name before SEPA transfers</li>
+          <li>Covers 36 countries across SEPA zone</li>
+          <li>Non-compliance results in regulatory penalties</li>
+        </ul>
+      </article>
+
+      <article class="cop-card gap-card" role="listitem">
+        <div class="cop-flag" aria-hidden="true">🇮🇳</div>
+        <div class="cop-country">India</div>
+        <div class="cop-scheme">No mandate. No standard.</div>
+        <div class="cop-since none">✗ No regulation yet</div>
+        <ul class="cop-bullets" aria-label="India gap">
+          <li>UPI processed ₹20L crore monthly in 2024</li>
+          <li>Zero requirement to verify payee name</li>
+          <li>Fraud losses crossing ₹11,000 crore annually</li>
+          <li>RBI advisory guidance only — no enforcement</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="gap-stat-row" role="region" aria-label="UPI fraud statistics">
+      <div class="gap-stat">
+        <div class="gap-stat-num danger">₹11,000Cr</div>
+        <div class="gap-stat-lbl">Annual UPI fraud losses in India (RBI, 2024)</div>
+      </div>
+      <div class="gap-stat">
+        <div class="gap-stat-num warn">0</div>
+        <div class="gap-stat-lbl">Regulatory requirements for payee name verification on UPI</div>
+      </div>
+      <div class="gap-stat">
+        <div class="gap-stat-num accent">2.2ms</div>
+        <div class="gap-stat-lbl">Time PayeeCheck takes to run all 7 signals per transaction</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ SECTION: API INTEGRATION ═══════════ -->
+<section id="integration" aria-label="PayeeCheck API integration">
+  <div class="int-inner">
+    <div class="int-eyebrow">Developer-first</div>
+    <h2 class="int-h">One API call. Seven signals. Production-ready.</h2>
+    <p class="int-sub">Drop PayeeCheck into any payment flow in minutes. POST a transaction context, get a grounded risk verdict with auditable signal assertions — every time.</p>
+
+    <div class="int-layout">
+      <!-- Request -->
+      <div class="code-block">
+        <div class="code-topbar">
+          <div class="code-tabs" role="tablist" aria-label="Code examples">
+            <div class="ctab active" role="tab" onclick="showTab('curl')"   aria-selected="true">cURL</div>
+            <div class="ctab"        role="tab" onclick="showTab('python')" aria-selected="false">Python</div>
+            <div class="ctab"        role="tab" onclick="showTab('node')"   aria-selected="false">Node.js</div>
+          </div>
+          <span class="code-method">POST</span>
+        </div>
+        <div class="code-body">
+
+          <pre id="code-curl"><span class="cm">curl</span> -X POST https://payeecheck.vercel.app/attribution \
+  -H <span class="cv">"Content-Type: application/json"</span> \
+  -d <span class="cv">'</span>{
+  <span class="ck">"transaction"</span>: {
+    <span class="ck">"input_method"</span>:      <span class="cv">"paste"</span>,
+    <span class="ck">"paste_trust_score"</span>: <span class="cn">0.08</span>,
+    <span class="ck">"amount"</span>:            <span class="cn">250000</span>
+  },
+  <span class="ck">"payee"</span>: {
+    <span class="ck">"vpa_age_days"</span>:   <span class="cn">11</span>,
+    <span class="ck">"mule_flagged"</span>:   <span class="cb">true</span>,
+    <span class="ck">"mule_flag_count"</span>: <span class="cn">3</span>,
+    <span class="ck">"name_score"</span>:     <span class="cn">0.40</span>
+  },
+  <span class="ck">"temporal"</span>: {
+    <span class="ck">"first_time_payee"</span>:    <span class="cb">true</span>,
+    <span class="ck">"amount_vs_avg_ratio"</span>: <span class="cn">4.5</span>
+  }
+<span class="cv">'</span></pre>
+
+          <pre id="code-python" style="display:none"><span class="cc"># pip install requests</span>
+<span class="cm">import</span> requests
+
+payload = {
+  <span class="cv">"transaction"</span>: {
+    <span class="ck">"input_method"</span>:      <span class="cv">"paste"</span>,
+    <span class="ck">"paste_trust_score"</span>: <span class="cn">0.08</span>,
+    <span class="ck">"amount"</span>:            <span class="cn">250000</span>
+  },
+  <span class="cv">"payee"</span>: {
+    <span class="ck">"vpa_age_days"</span>:   <span class="cn">11</span>,
+    <span class="ck">"mule_flagged"</span>:   <span class="cb">True</span>,
+    <span class="ck">"mule_flag_count"</span>: <span class="cn">3</span>,
+    <span class="ck">"name_score"</span>:     <span class="cn">0.40</span>
+  },
+  <span class="cv">"temporal"</span>: {
+    <span class="ck">"first_time_payee"</span>:    <span class="cb">True</span>,
+    <span class="ck">"amount_vs_avg_ratio"</span>: <span class="cn">4.5</span>
+  }
+}
+
+r = requests.<span class="cm">post</span>(
+  <span class="cv">"https://payeecheck.vercel.app/attribution"</span>,
+  json=payload
+)
+<span class="cm">print</span>(r.json())</pre>
+
+          <pre id="code-node" style="display:none"><span class="cc">// npm install node-fetch</span>
+<span class="cm">const</span> fetch = require(<span class="cv">'node-fetch'</span>);
+
+<span class="cm">const</span> res = <span class="cm">await</span> fetch(
+  <span class="cv">'https://payeecheck.vercel.app/attribution'</span>,
+  {
+    method: <span class="cv">'POST'</span>,
+    headers: { <span class="cv">'Content-Type'</span>: <span class="cv">'application/json'</span> },
+    body: JSON.stringify({
+      transaction: {
+        input_method:      <span class="cv">'paste'</span>,
+        paste_trust_score: <span class="cn">0.08</span>,
+        amount:            <span class="cn">250000</span>
+      },
+      payee: {
+        vpa_age_days:   <span class="cn">11</span>,
+        mule_flagged:   <span class="cb">true</span>,
+        mule_flag_count: <span class="cn">3</span>,
+        name_score:     <span class="cn">0.40</span>
+      },
+      temporal: {
+        first_time_payee:    <span class="cb">true</span>,
+        amount_vs_avg_ratio: <span class="cn">4.5</span>
+      }
+    })
+  }
+);
+<span class="cm">console</span>.log(<span class="cm">await</span> res.json());</pre>
+
+        </div>
+      </div>
+
+      <!-- Response -->
+      <div class="response-block">
+        <div class="resp-topbar">
+          <span class="resp-status">200 OK</span>
+          <span class="resp-label">/attribution response</span>
+          <span class="resp-latency">2.2ms</span>
+        </div>
+        <div class="code-body">
+          <pre style="font-family:var(--mono);font-size:12px;line-height:1.7;color:var(--fg-2)">{
+  <span class="ck">"verdict"</span>:              <span class="cv">"BLOCK"</span>,
+  <span class="ck">"risk_score"</span>:           <span class="cn">87</span>,
+  <span class="ck">"total_signals_fired"</span>:  <span class="cn">5</span>,
+  <span class="ck">"grounded_assertions"</span>: [
+    {
+      <span class="ck">"signal"</span>:    <span class="cv">"clipboard_paste"</span>,
+      <span class="ck">"assertion"</span>: <span class="cv">"VPA pasted — social engineering risk"</span>
+    },
+    {
+      <span class="ck">"signal"</span>:    <span class="cv">"mule_account"</span>,
+      <span class="ck">"assertion"</span>: <span class="cv">"3 consortium flags on this VPA"</span>
+    },
+    {
+      <span class="ck">"signal"</span>:    <span class="cv">"new_vpa"</span>,
+      <span class="ck">"assertion"</span>: <span class="cv">"VPA registered 11 days ago"</span>
+    },
+    {
+      <span class="ck">"signal"</span>:    <span class="cv">"high_value"</span>,
+      <span class="ck">"assertion"</span>: <span class="cv">"₹2.5L is 4.5× above average"</span>
+    },
+    {
+      <span class="ck">"signal"</span>:    <span class="cv">"weak_name_match"</span>,
+      <span class="ck">"assertion"</span>: <span class="cv">"Score 0.40 — below threshold 0.85"</span>
+    }
+  ]
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;letter-spacing:-0.01em;margin-bottom:16px;text-align:center;color:var(--fg-2)">Built for every player in India's payment stack</h3>
+    <div class="int-usecases" role="list">
+      <article class="uc-card" role="listitem">
+        <div class="uc-icon" aria-hidden="true">🏦</div>
+        <div class="uc-name">Scheduled Banks</div>
+        <div class="uc-desc">Add payee name verification to RTGS, NEFT, and IMPS outward transfers. Meet RBI fraud reporting requirements with grounded audit trails.</div>
+      </article>
+      <article class="uc-card" role="listitem">
+        <div class="uc-icon" aria-hidden="true">⚡</div>
+        <div class="uc-name">Payment Gateways</div>
+        <div class="uc-desc">Screen payouts before settlement. Catch mule accounts and lookalike VPAs in the 200ms window before UPI confirmation is sent.</div>
+      </article>
+      <article class="uc-card" role="listitem">
+        <div class="uc-icon" aria-hidden="true">📱</div>
+        <div class="uc-name">Neobanks &amp; Fintechs</div>
+        <div class="uc-desc">Ship fraud-aware UPI transfers with a single API call. Behavioral SDK captures paste vs type signals from your existing frontend — no SDK install needed.</div>
+      </article>
+      <article class="uc-card" role="listitem">
+        <div class="uc-icon" aria-hidden="true">💼</div>
+        <div class="uc-name">NBFCs &amp; Lenders</div>
+        <div class="uc-desc">Validate loan disbursement accounts before payout. Consortium mule database catches fraudulent beneficiaries missed by standard KYC flows.</div>
+      </article>
+      <article class="uc-card" role="listitem">
+        <div class="uc-icon" aria-hidden="true">🛒</div>
+        <div class="uc-name">E-commerce &amp; Marketplaces</div>
+        <div class="uc-desc">Protect seller payouts and refunds. VPA velocity engine flags newly-created accounts receiving high-value payouts for the first time.</div>
+      </article>
+      <article class="uc-card" role="listitem">
+        <div class="uc-icon" aria-hidden="true">🔐</div>
+        <div class="uc-name">Wallet Providers</div>
+        <div class="uc-desc">Layer fraud detection on P2P transfers and merchant payouts. GAT ring detector surfaces connected fraud networks invisible to rule-based engines.</div>
+      </article>
+    </div>
+
+    <div style="background:var(--surface);border:1px solid var(--border-mid);border-radius:var(--r-lg);padding:20px 24px;display:flex;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:28px">
+      <div style="flex:1;min-width:200px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px">Available endpoints</div>
+        <div style="font-size:12px;color:var(--fg-3)">Full API reference at <span style="font-family:var(--mono);color:var(--accent)">/docs</span></div>
+      </div>
+      <div class="endpoint-row">
+        <div class="ep-pill"><span class="ep-method">POST</span>/compare</div>
+        <div class="ep-pill"><span class="ep-method">POST</span>/match/{level}</div>
+        <div class="ep-pill"><span class="ep-method">POST</span>/attribution</div>
+        <div class="ep-pill"><span class="ep-method">POST</span>/resolve</div>
+        <div class="ep-pill"><span class="ep-method">GET</span>/rings</div>
+        <div class="ep-pill"><span class="ep-method">GET</span>/health</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;padding:32px;background:var(--surface);border:1px solid var(--border-mid);border-radius:var(--r-lg);text-align:center">
+      <div>
+        <div style="font-size:17px;font-weight:700;letter-spacing:-0.01em;margin-bottom:6px">Try the technical sandbox</div>
+        <div style="font-size:13px;color:var(--fg-3)">Run name matchers, entity resolver, and fraud ring scanner live — no auth needed</div>
+      </div>
+      <a href="/sandbox" style="display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;font-size:14px;font-weight:700;padding:12px 26px;border-radius:var(--r);text-decoration:none;transition:all 200ms;box-shadow:0 4px 16px rgba(249,115,22,0.3);white-space:nowrap;flex-shrink:0" onmouseover="this.style.background='#fb923c'" onmouseout="this.style.background='var(--accent)'">
+        Open Sandbox
+        <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M3 7h8M7 3l4 4-4 4"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Toast container -->
+<div id="toasts"></div>
+
+<!-- ═══════════════════════ DEMO OVERLAY ═══════════════════════ -->
+<div id="overlay">
+  <!-- Header -->
+  <div class="o-header">
+    <div class="o-brand">PayeeCheck <span>· Live Demo</span></div>
+
+    <div class="prog-bar" id="prog-bar"></div>
+
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div class="xp-badge">
+        <svg width="11" height="11" fill="none" viewBox="0 0 12 12"><path stroke="var(--accent)" stroke-width="1.5" d="M6 1l1.4 2.8L11 4.3l-2.5 2.4.6 3.4L6 8.6 2.9 10.1l.6-3.4L1 4.3l3.6-.5z"/></svg>
+        <span id="xp-label" class="xp-val">0</span>&nbsp;pts
+      </div>
+      <button class="o-close" onclick="closeDemo()">✕ Close</button>
+    </div>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps-wrap">
+
+    <!-- ─── Step 1: Payee Name ─── -->
+    <div class="step active" id="s1">
+      <div class="step-body">
+        <div class="step-eyebrow"><div class="ey-dot"></div>Step 1 of 5 · Initiate Transfer</div>
+        <h2 class="step-h">Who are you paying?</h2>
+        <p class="step-p">Start a simulated UPI transfer. Type the payee name — PayeeCheck's Behavioral SDK begins analyzing immediately.</p>
+
+        <div class="card">
+          <div class="field-label">Payee Name</div>
+          <input class="big-input" id="payee-name" type="text" placeholder="Enter name…" autocomplete="off"
+            oninput="onNameInput(event)" onpaste="onNamePaste()">
+
+          <div class="sig-panel">
+            <div class="sig-header">
+              Behavioral SDK
+              <div class="sdk-pill"><div class="sdk-blink"></div>Active</div>
+            </div>
+            <div id="name-sigs">
+              <div class="sig-row" style="opacity:.35">
+                <span class="sig-k">status</span>
+                <span class="sig-v muted">Waiting for input…</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tip-row">
+          <span class="tip-label">Try:</span>
+          <button class="tip-chip" onclick="fillName('K. Enterprises')">K. Enterprises</button>
+          <button class="tip-chip" onclick="fillName('Rahul Kumar')">Rahul Kumar</button>
+          <button class="tip-chip" onclick="fillName('Amazon India')">Amazon India</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Step 2: UPI ID ─── -->
+    <div class="step inactive-right" id="s2">
+      <div class="step-body">
+        <div class="step-eyebrow"><div class="ey-dot"></div>Step 2 of 5 · Payee Identity</div>
+        <h2 class="step-h">Choose a UPI address</h2>
+        <p class="step-p">Select or paste the payee's UPI ID. VPA Velocity Engine checks registration age, transaction count, and mule database hits.</p>
+
+        <div class="vpa-list">
+          <div class="vpa-card" id="vpa-suspicious" onclick="pickVPA(this,'k.enterprises@oksbi',true)">
+            <div class="vpa-icon">🏪</div>
+            <div>
+              <div class="vpa-name">K. Enterprises</div>
+              <div class="vpa-addr">k.enterprises@oksbi</div>
+            </div>
+            <span class="vpa-badge badge-danger">⚠ Suspicious</span>
+          </div>
+          <div class="vpa-card" id="vpa-safe" onclick="pickVPA(this,'krishna.official@ybl',false)">
+            <div class="vpa-icon">✅</div>
+            <div>
+              <div class="vpa-name">Krishna Enterprises (Official)</div>
+              <div class="vpa-addr">krishna.official@ybl</div>
+            </div>
+            <span class="vpa-badge badge-pass">✓ Verified</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:0">
+          <div class="field-label">Or paste / type a UPI ID</div>
+          <input class="big-input" id="vpa-input" type="text" placeholder="payee@bank"
+            style="font-size:16px;margin-bottom:12px" autocomplete="off"
+            oninput="onVPAInput()" onpaste="onVPAPaste()">
+
+          <div class="sig-panel">
+            <div class="sig-header">
+              VPA Velocity Engine
+              <div class="sdk-pill"><div class="sdk-blink"></div>Active</div>
+            </div>
+            <div id="vpa-sigs">
+              <div class="sig-row" style="opacity:.35">
+                <span class="sig-k">status</span>
+                <span class="sig-v muted">Select or enter a UPI ID…</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Step 3: Amount ─── -->
+    <div class="step inactive-right" id="s3">
+      <div class="step-body">
+        <div class="step-eyebrow"><div class="ey-dot"></div>Step 3 of 5 · Transaction Details</div>
+        <h2 class="step-h">How much are you sending?</h2>
+        <p class="step-p">Enter the amount. PayeeCheck cross-references against your transaction history and captures device fingerprint signals in real-time.</p>
+
+        <div class="card">
+          <div class="field-label">Amount (₹)</div>
+          <div class="amt-wrap">
+            <span class="amt-prefix">₹</span>
+            <input class="amt-input" id="amt" type="text" placeholder="0" value="250000"
+              oninput="onAmtInput()" autocomplete="off">
+          </div>
+          <div class="preset-row">
+            <button class="preset-btn" onclick="setAmt('5000')">₹5,000</button>
+            <button class="preset-btn" onclick="setAmt('25000')">₹25,000</button>
+            <button class="preset-btn" onclick="setAmt('100000')">₹1,00,000</button>
+            <button class="preset-btn" onclick="setAmt('250000')">₹2,50,000</button>
+          </div>
+
+          <div class="risk-meter">
+            <div class="risk-row">
+              <span class="risk-label-l">Risk Level</span>
+              <span class="risk-label-r" id="risk-lbl" style="color:var(--warn)">MEDIUM</span>
+            </div>
+            <div class="risk-track">
+              <div class="risk-fill" id="risk-fill" style="width:60%;background:var(--warn)"></div>
+            </div>
+          </div>
+
+          <div class="sig-panel" style="margin-top:14px">
+            <div class="sig-header">
+              Device & Temporal Signals
+              <div class="sdk-pill"><div class="sdk-blink"></div>Capturing</div>
+            </div>
+            <div id="device-sigs"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── Step 4: Scan ─── -->
+    <div class="step inactive-right" id="s4" style="justify-content:center">
+      <div class="scan-wrap">
+        <div class="scan-pipeline" id="scan-pipeline" style="margin-bottom:20px">
+          <div class="pipe-dot" style="background:var(--fg-3)"></div>
+          <span style="color:var(--fg-3)">Initialising pipeline…</span>
+        </div>
+
+        <div class="scan-top">
+          <div>
+            <div class="scan-h">PayeeCheck Running</div>
+            <div class="scan-sub" id="scan-sub">7 signals · sequential pipeline</div>
+          </div>
+          <div class="timer-box">
+            <div class="timer-val" id="timer-val">0.0</div>
+            <div class="timer-unit">ms latency</div>
+          </div>
+        </div>
+
+        <div class="modules" id="modules"></div>
+      </div>
+    </div>
+
+    <!-- ─── Step 5: Verdict ─── -->
+    <div class="step inactive-right" id="s5" style="justify-content:center">
+      <div class="verdict-wrap">
+        <div class="v-icon block">🛑</div>
+        <div class="v-label block">BLOCKED</div>
+        <div class="v-sub">PayeeCheck stopped this transaction</div>
+        <div class="v-saved">
+          <div class="v-saved-num" id="v-amt">₹2,50,000</div>
+          <div class="v-saved-lbl">protected from potential fraud</div>
+        </div>
+        <div class="signals-list">
+          <div class="signals-hdr">Signals that triggered</div>
+          <div id="v-signals"></div>
+        </div>
+        <div class="v-ctas">
+          <button class="btn btn-primary" onclick="showProduct()">Explore PayeeCheck System →</button>
+          <button class="btn btn-ghost" onclick="restartDemo()">↩ Try Again</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /steps-wrap -->
+
+  <!-- Nav -->
+  <div class="o-nav" id="o-nav">
+    <div class="nav-step-info" id="nav-info">Step <b>1</b> of 5</div>
+    <div class="btn-grp">
+      <button class="btn btn-ghost" id="back-btn" onclick="prevStep()" style="display:none">← Back</button>
+      <button class="btn btn-primary" id="next-btn" onclick="nextStep()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PRODUCT SECTION ═══════════════════════ -->
+<div id="product-section">
+  <div class="prod-inner">
+    <div class="prod-banner">
+      <div style="font-size:24px;margin-bottom:8px">✓</div>
+      <div style="font-size:13px;color:var(--success);font-weight:700" id="prod-banner-txt">
+        ₹2,50,000 protected · Transaction blocked in 2.2ms
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-bottom:36px">
+      <h2 class="prod-h">The PayeeCheck System</h2>
+      <p class="prod-sub">7 fraud signals · Everything that ran in 2.2ms, now in full detail</p>
+    </div>
+
+    <div class="modules-showcase">
+      <div class="mod-card">
+        <div class="mc-icon">🔤</div>
+        <div class="mc-name">Name Matching (L1–L5)</div>
+        <div class="mc-desc">Multi-stage matchers: Jaro-Winkler → Phonetic → TF-IDF → Embeddings → Siamese neural net. Handles Indian transliteration and abbreviations.</div>
+      </div>
+      <div class="mod-card">
+        <div class="mc-icon">🎭</div>
+        <div class="mc-name">Lookalike VPA</div>
+        <div class="mc-desc">Brand token registry pattern detection. Catches impersonation like "paytm.support@" or "k.enterprises@" without ML overhead.</div>
+      </div>
+      <div class="mod-card">
+        <div class="mc-icon">🕳️</div>
+        <div class="mc-name">Mule Database</div>
+        <div class="mc-desc">Consortium-style flagging across partner banks. Ring propagation scoring — if one entity in a cluster is flagged, the whole ring scores higher.</div>
+      </div>
+      <div class="mod-card">
+        <div class="mc-icon">📱</div>
+        <div class="mc-name">Behavioral SDK</div>
+        <div class="mc-desc">Client-side analysis: paste vs. type input method, keystroke cadence, device fingerprint, clipboard timing. Trust score 0–1.</div>
+      </div>
+      <div class="mod-card">
+        <div class="mc-icon">⚡</div>
+        <div class="mc-name">VPA Velocity Engine</div>
+        <div class="mc-desc">Rolling-window anomaly detection. New VPA with high transaction volume = red flag. Seasonal anomaly flagging built in.</div>
+      </div>
+      <div class="mod-card">
+        <div class="mc-icon">🕸️</div>
+        <div class="mc-name">GAT Ring Detector</div>
+        <div class="mc-desc">PyTorch-based Graph Attention Network. Detects fraud rings sharing identifiers — mobile, account, device. 6.7pp edge feature lift.</div>
+      </div>
+    </div>
+
+    <div class="prod-cta-card">
+      <div class="prod-cta-h">Explore the full technical sandbox</div>
+      <div class="prod-cta-sub">Run the L1–L5 name matchers, entity resolver, and fraud ring scanner — with live results</div>
+      <a class="prod-link" href="/sandbox">
+        Open PayeeCheck
+        <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M3 7h8M7 3l4 4-4 4"/></svg>
+      </a>
+      <div class="metric-row">
+        <div class="metric"><div class="metric-val">2.2ms</div><div class="metric-lbl">pipeline latency</div></div>
+        <div class="metric"><div class="metric-val">100%</div><div class="metric-lbl">precision</div></div>
+        <div class="metric"><div class="metric-val">82.6%</div><div class="metric-lbl">recall</div></div>
+        <div class="metric"><div class="metric-val">7</div><div class="metric-lbl">fraud signals</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────────
+let step = 1;
+let xp = 0;
+let keystrokeTimes = [];
+let lastKeyTime = null;
+let pastedName = false;
+let pastedVPA = false;
+let suspiciousVPA = false;
+let selectedVPA = '';
+
+function escapeHtml(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+const STEP_LABELS = ['Payee','UPI ID','Amount','Scan','Verdict'];
+const MODULES_DEF = [
+  { icon:'🔤', name:'Name Matching',       algo:'Jaro-Winkler + Graph Entity Resolution' },
+  { icon:'🎭', name:'Lookalike VPA',        algo:'Brand impersonation detection' },
+  { icon:'🕳️', name:'Mule Database',        algo:'Consortium velocity + ring propagation' },
+  { icon:'📱', name:'Behavioral SDK',       algo:'Paste vs type · keystroke cadence' },
+  { icon:'⚡', name:'VPA Velocity Engine',  algo:'Rolling-window anomaly detection' },
+  { icon:'🚫', name:'Sanctions Screening',  algo:'PEP / OFAC fuzzy matching' },
+  { icon:'🕸️', name:'GAT Ring Detector',    algo:'Graph Attention Network · PyTorch' },
+];
+
+// ─── Launch / close ───────────────────────────────────────
+function startDemo() {
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderProgress();
+  renderModules();
+  populateDeviceSigs();
+  onAmtInput();
+}
+function closeDemo() {
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ─── Progress bar ─────────────────────────────────────────
+function renderProgress() {
+  const bar = document.getElementById('prog-bar');
+  let h = '';
+  for (let i = 1; i <= 5; i++) {
+    if (i > 1) h += `<div class="prog-line${i <= step ? ' done' : ''}" id="pl${i}"></div>`;
+    const cls = i < step ? 'done' : i === step ? 'active' : '';
+    const inner = i < step
+      ? `<svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path stroke="#fff" stroke-width="2" stroke-linecap="round" d="M2 5l2.5 2.5L8 2.5"/></svg>`
+      : i;
+    h += `<div class="prog-dot ${cls}" title="${STEP_LABELS[i-1]}">${inner}</div>`;
+  }
+  bar.innerHTML = h;
+}
+
+// ─── XP ──────────────────────────────────────────────────
+function addXP(pts, label) {
+  xp += pts;
+  document.getElementById('xp-label').textContent = xp;
+  toast('📡', label, '+' + pts);
+}
+
+// ─── Toast ────────────────────────────────────────────────
+function toast(icon, msg, xpStr) {
+  const wrap = document.getElementById('toasts');
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.innerHTML = `<span class="toast-icon">${escapeHtml(icon)}</span><span>${escapeHtml(msg)}</span><span class="toast-xp">${escapeHtml(xpStr)}</span>`;
+  wrap.appendChild(el);
+  setTimeout(() => el.remove(), 2600);
+}
+
+// ─── Step 1: Payee Name ───────────────────────────────────
+function onNameInput() {
+  const now = performance.now();
+  if (lastKeyTime !== null) keystrokeTimes.push(now - lastKeyTime);
+  lastKeyTime = now;
+  updateNameSigs();
+  if (keystrokeTimes.length === 3) addXP(25, 'Keystroke pattern captured');
+}
+function onNamePaste() {
+  pastedName = true;
+  setTimeout(() => { updateNameSigs(); addXP(30, 'Clipboard paste event detected'); }, 10);
+}
+function fillName(n) {
+  document.getElementById('payee-name').value = n;
+  keystrokeTimes = Array.from({length: n.length-1}, () => 180 + Math.random()*120);
+  updateNameSigs();
+  if (!keystrokeTimes._toasted) { addXP(25, 'Keystroke pattern captured'); keystrokeTimes._toasted = true; }
+}
+function updateNameSigs() {
+  const val = document.getElementById('payee-name').value;
+  if (!val) return;
+  const n = keystrokeTimes.length;
+  const avg = n > 0 ? Math.round(keystrokeTimes.reduce((a,b)=>a+b,0)/n) : 0;
+  const wpm = avg > 0 ? Math.round(60000/(avg*5)) : 0;
+  const trust = pastedName ? 0.08 : 0.92;
+  const method = pastedName ? 'paste' : 'type';
+  document.getElementById('name-sigs').innerHTML = `
+    <div class="sig-row"><span class="sig-k">input_method</span><span class="sig-v ${pastedName?'warn':'pass'}">${method}</span></div>
+    <div class="sig-row"><span class="sig-k">paste_trust_score</span><span class="sig-v ${trust<0.3?'danger':'pass'}">${trust.toFixed(2)}</span></div>
+    ${avg?`<div class="sig-row"><span class="sig-k">avg_keystroke_delay</span><span class="sig-v">${avg}ms</span></div>
+    <div class="sig-row"><span class="sig-k">typing_speed</span><span class="sig-v">${wpm} WPM</span></div>`:''}
+    <div class="sig-row"><span class="sig-k">keystrokes_logged</span><span class="sig-v pass">${val.length}</span></div>
+    <div class="sig-row"><span class="sig-k">pattern</span><span class="sig-v pass">${pastedName?'CLIPBOARD_PASTE':'HUMAN_TYPING'}</span></div>
+  `;
+}
+
+// ─── Step 2: VPA ─────────────────────────────────────────
+function pickVPA(el, vpa, suspicious) {
+  document.querySelectorAll('.vpa-card').forEach(c => c.className = 'vpa-card');
+  el.classList.add(suspicious ? 'sel-danger' : 'sel-safe');
+  selectedVPA = vpa;
+  suspiciousVPA = suspicious;
+  document.getElementById('vpa-input').value = vpa;
+  updateVPASigs(vpa, suspicious, false);
+  addXP(40, suspicious ? 'Suspicious VPA selected · scan queued' : 'Verified VPA selected');
+}
+function onVPAInput() { updateVPASigs(document.getElementById('vpa-input').value, false, pastedVPA); }
+function onVPAPaste() { pastedVPA = true; setTimeout(()=>{onVPAInput(); addXP(30,'VPA pasted from clipboard');},10); }
+function updateVPASigs(vpa, suspicious, pasted) {
+  if (!vpa) return;
+  const parts = vpa.split('@');
+  const bank = parts[1] || 'unknown';
+  const age = suspicious ? 11 : 847;
+  const txn = suspicious ? 4 : 1284;
+  const mule = suspicious;
+  document.getElementById('vpa-sigs').innerHTML = `
+    <div class="sig-row"><span class="sig-k">vpa</span><span class="sig-v" style="font-size:10px">${escapeHtml(vpa)}</span></div>
+    <div class="sig-row"><span class="sig-k">bank_handle</span><span class="sig-v">${escapeHtml(bank)}</span></div>
+    <div class="sig-row"><span class="sig-k">vpa_age_days</span><span class="sig-v ${age<30?'danger':'pass'}">${age}d</span></div>
+    <div class="sig-row"><span class="sig-k">tx_count_30d</span><span class="sig-v ${txn<20?'warn':'pass'}">${txn}</span></div>
+    <div class="sig-row"><span class="sig-k">mule_flagged</span><span class="sig-v ${mule?'danger':'pass'}">${mule}</span></div>
+    ${mule?`<div class="sig-row"><span class="sig-k">mule_flag_count</span><span class="sig-v danger">3 reports</span></div>`:''}
+    ${pasted?`<div class="sig-row"><span class="sig-k">entry_method</span><span class="sig-v warn">CLIPBOARD_PASTE</span></div>`:''}
+  `;
+}
+
+// ─── Step 3: Amount ───────────────────────────────────────
+function setAmt(v) { document.getElementById('amt').value = v; onAmtInput(); }
+function onAmtInput() {
+  const raw = parseInt((document.getElementById('amt').value||'0').replace(/[^0-9]/g,'')) || 0;
+  let pct, lbl, col;
+  if (raw >= 100000)      { pct=88; lbl='HIGH';   col='var(--danger)'; }
+  else if (raw >= 25000)  { pct=58; lbl='MEDIUM';  col='var(--warn)'; }
+  else if (raw > 0)       { pct=22; lbl='LOW';    col='var(--success)'; }
+  else                    { pct=0;  lbl='—';      col='var(--fg-3)'; }
+  document.getElementById('risk-fill').style.width = pct + '%';
+  document.getElementById('risk-fill').style.background = col;
+  document.getElementById('risk-lbl').textContent = lbl;
+  document.getElementById('risk-lbl').style.color = col;
+}
+function populateDeviceSigs() {
+  const ua = navigator.userAgent;
+  const isMob = /Mobile|Android|iPhone/i.test(ua);
+  const br = ua.includes('Chrome')?'Chrome':ua.includes('Safari')?'Safari':ua.includes('Firefox')?'Firefox':'Browser';
+  const os = ua.includes('Mac')?'macOS':ua.includes('Win')?'Windows':ua.includes('Linux')?'Linux':isMob?'Mobile':'Unknown';
+  const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone)||'Asia/Kolkata';
+  const h = new Date().getHours();
+  document.getElementById('device-sigs').innerHTML = `
+    <div class="sig-row"><span class="sig-k">device_type</span><span class="sig-v">${isMob?'mobile':'desktop'}</span></div>
+    <div class="sig-row"><span class="sig-k">browser</span><span class="sig-v">${escapeHtml(br)}</span></div>
+    <div class="sig-row"><span class="sig-k">os</span><span class="sig-v">${escapeHtml(os)}</span></div>
+    <div class="sig-row"><span class="sig-k">screen</span><span class="sig-v">${escapeHtml(screen.width)}×${escapeHtml(screen.height)}</span></div>
+    <div class="sig-row"><span class="sig-k">timezone</span><span class="sig-v">${escapeHtml(tz)}</span></div>
+    <div class="sig-row"><span class="sig-k">hour_of_day</span><span class="sig-v">${escapeHtml(h)}:00 ${h<6||h>22?'<span class="sig-v warn">odd hours</span>':''}</span></div>
+    <div class="sig-row"><span class="sig-k">amount_vs_avg</span><span class="sig-v danger">4.5× · ANOMALY</span></div>
+    <div class="sig-row"><span class="sig-k">first_time_payee</span><span class="sig-v warn">true</span></div>
+  `;
+}
+
+// ─── Modules ──────────────────────────────────────────────
+function renderModules() {
+  document.getElementById('modules').innerHTML = MODULES_DEF.map((m,i)=>`
+    <div class="mod-row" id="mod${i}">
+      <div class="mod-icon">${escapeHtml(m.icon)}</div>
+      <div class="mod-info">
+        <div class="mod-name">${escapeHtml(m.name)}</div>
+        <div class="mod-algo">${escapeHtml(m.algo)}</div>
+      </div>
+      <div class="mod-status ms-pending" id="ms${i}">—</div>
+    </div>
+  `).join('');
+}
+
+// ─── Scan animation ───────────────────────────────────────
+async function runScan() {
+  const susp = suspiciousVPA || (document.getElementById('vpa-input').value||'').includes('k.enterprises');
+  const hasPaste = pastedName || pastedVPA;
+  const amt = parseInt((document.getElementById('amt').value||'250000').replace(/[^0-9]/g,''))||250000;
+
+  const results = [
+    { status:'warn',  badge:'38%',   cls:'r-warn',  note:'Weak match · abbreviation' },
+    { status: susp?'block':'pass', badge:susp?'BLOCK':'PASS', cls:susp?'r-block':'r-pass', note:susp?'Impersonation pattern found':'No lookalikes detected' },
+    { status: susp?'block':'pass', badge:susp?'BLOCK':'PASS', cls:susp?'r-block':'r-pass', note:susp?'3 consortium reports':'No mule records' },
+    { status: hasPaste?'warn':'pass', badge:hasPaste?'WARN':'PASS', cls:hasPaste?'r-warn':'r-pass', note:hasPaste?'Clipboard paste · trust 0.08':'Human typing · trust 0.92' },
+    { status: susp?'warn':'pass', badge:susp?'11d':'PASS', cls:susp?'r-warn':'r-pass', note:susp?'New VPA · anomalous velocity':'Normal velocity pattern' },
+    { status:'pass',  badge:'CLEAR', cls:'r-pass',  note:'No PEP / OFAC matches' },
+    { status: susp?'block':'pass', badge:susp?'RING':'PASS', cls:susp?'r-block':'r-pass', note:susp?'3-entity ring detected':'No ring membership' },
+  ];
+
+  // Timer
+  let ms = 0;
+  const tmr = setInterval(()=>{
+    ms += 0.08;
+    if (ms > 2.2) { ms = 2.2; clearInterval(tmr); }
+    document.getElementById('timer-val').textContent = ms.toFixed(1);
+  }, 8);
+
+  for (let i = 0; i < MODULES_DEF.length; i++) {
+    const row = document.getElementById(`mod${i}`);
+    const st  = document.getElementById(`ms${i}`);
+    row.classList.add('active');
+    st.className = 'mod-status ms-scanning';
+    st.textContent = '···';
+    document.getElementById('scan-sub').textContent = `Running ${MODULES_DEF[i].name}…`;
+    await sleep(240 + Math.random()*140);
+    row.classList.remove('active');
+    row.classList.add('done', results[i].cls);
+    const scls = results[i].status === 'block' ? 'ms-block' : results[i].status === 'warn' ? 'ms-warn' : 'ms-pass';
+    st.className = `mod-status ${scls}`;
+    st.textContent = results[i].badge;
+  }
+
+  clearInterval(tmr);
+  document.getElementById('timer-val').textContent = '2.2';
+  document.getElementById('scan-sub').textContent = 'Analysis complete · verdict ready';
+  document.getElementById('scan-pipeline').innerHTML = `
+    <div class="pipe-dot" style="background:var(--danger)"></div>
+    <span style="color:var(--danger);font-weight:700">BLOCK verdict · risk score 87/100</span>
+  `;
+
+  buildVerdict(susp, hasPaste, amt);
+  addXP(100, 'Full pipeline complete · 2.2ms');
+  setTimeout(()=>goTo(5), 900);
+}
+
+function buildVerdict(susp, hasPaste, amt) {
+  const sigs = [];
+  if (susp) {
+    sigs.push({type:'block', name:'Mule Database Hit',        desc:'3 consortium reports filed against this VPA'});
+    sigs.push({type:'block', name:'Lookalike VPA Detected',   desc:'k.enterprises@oksbi impersonates Krishna Enterprises'});
+    sigs.push({type:'block', name:'GAT Fraud Ring',           desc:'Member of 3-entity ring sharing mobile 9000000001'});
+  }
+  if (hasPaste) sigs.push({type:'warn', name:'Clipboard Paste Detected', desc:'VPA pasted from clipboard — behavioral trust score: 0.08'});
+  sigs.push({type:'warn', name:'Weak Name Match',        desc:'"K. Enterprises" → 38% (Jaro-Winkler) — expected ≥ 0.85'});
+  if (amt >= 100000) sigs.push({type:'warn', name:'High-Value Anomaly',  desc:`₹${amt.toLocaleString('en-IN')} is 4.5× above monthly average`});
+
+  document.getElementById('v-signals').innerHTML = sigs.map((s,i)=>`
+    <div class="sig-item" style="animation-delay:${i*80}ms">
+      <div class="si-dot ${escapeHtml(s.type)}"></div>
+      <div><div class="si-name">${escapeHtml(s.name)}</div><div class="si-desc">${escapeHtml(s.desc)}</div></div>
+    </div>
+  `).join('');
+  document.getElementById('v-amt').textContent = '₹' + amt.toLocaleString('en-IN');
+  document.getElementById('prod-banner-txt').textContent = `₹${amt.toLocaleString('en-IN')} protected · Transaction blocked in 2.2ms`;
+}
+
+// ─── Step navigation ──────────────────────────────────────
+function goTo(n) {
+  const prev = step;
+  const dir = n > prev ? 'right' : 'left';
+  const fromEl = document.getElementById(`s${prev}`);
+  const toEl   = document.getElementById(`s${n}`);
+
+  fromEl.classList.remove('active');
+  fromEl.classList.add(dir === 'right' ? 'inactive-left' : 'inactive-right');
+
+  toEl.classList.remove('inactive-left', 'inactive-right');
+  toEl.classList.add('active');
+
+  step = n;
+  renderProgress();
+  updateNav();
+
+  if (n === 4) setTimeout(runScan, 400);
+  if (n === 5) addXP(50, 'Verdict revealed');
+}
+
+function nextStep() { if (step < 5) goTo(step + 1); }
+function prevStep() { if (step > 1) goTo(step - 1); }
+
+function updateNav() {
+  const nav = document.getElementById('o-nav');
+  const back = document.getElementById('back-btn');
+  const next = document.getElementById('next-btn');
+
+  nav.style.display = (step === 4 || step === 5) ? 'none' : 'flex';
+  back.style.display = step > 1 ? 'inline-flex' : 'none';
+  document.getElementById('nav-info').innerHTML = `Step <b>${step}</b> of 5`;
+  next.textContent = step === 3 ? 'Run PayeeCheck →' : 'Continue →';
+}
+
+// ─── Product reveal ───────────────────────────────────────
+function showProduct() {
+  closeDemo();
+  const ps = document.getElementById('product-section');
+  ps.classList.add('vis');
+  setTimeout(() => ps.scrollIntoView({ behavior: 'smooth' }), 120);
+}
+
+function restartDemo() {
+  step = 1;
+  xp = 0;
+  keystrokeTimes = [];
+  lastKeyTime = null;
+  pastedName = false; pastedVPA = false;
+  suspiciousVPA = false; selectedVPA = '';
+  document.getElementById('payee-name').value = '';
+  document.getElementById('vpa-input').value = '';
+  document.getElementById('amt').value = '250000';
+  document.getElementById('xp-label').textContent = '0';
+  document.querySelectorAll('.vpa-card').forEach(c=>c.className='vpa-card');
+  document.getElementById('name-sigs').innerHTML = '<div class="sig-row" style="opacity:.35"><span class="sig-k">status</span><span class="sig-v muted">Waiting for input…</span></div>';
+  document.getElementById('vpa-sigs').innerHTML = '<div class="sig-row" style="opacity:.35"><span class="sig-k">status</span><span class="sig-v muted">Select or enter a UPI ID…</span></div>';
+  document.getElementById('scan-pipeline').innerHTML = '<div class="pipe-dot" style="background:var(--fg-3)"></div><span style="color:var(--fg-3)">Initialising pipeline…</span>';
+  document.getElementById('timer-val').textContent = '0.0';
+  document.getElementById('scan-sub').textContent = '7 signals · sequential pipeline';
+  renderModules();
+  onAmtInput();
+  populateDeviceSigs();
+
+  // Reset all steps
+  ['s1','s2','s3','s4','s5'].forEach((id,i) => {
+    const el = document.getElementById(id);
+    el.className = 'step ' + (i===0 ? 'active' : 'inactive-right');
+  });
+  document.getElementById('o-nav').style.display = 'flex';
+  renderProgress();
+  updateNav();
+}
+
+// ─── Utils ────────────────────────────────────────────────
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ─── Ticker feeds ────────────────────────────────────────
+const LEFT_SIGNALS = [
+  { cls:'danger', icon:'🕳️', text:'mule_flagged · 3 reports' },
+  { cls:'block',  icon:'🛑', text:'risk_score · 87 · BLOCK' },
+  { cls:'danger', icon:'🎭', text:'lookalike_vpa · DETECTED' },
+  { cls:'warn',   icon:'⚡', text:'vpa_age_days · 11 · NEW' },
+  { cls:'pass',   icon:'✓',  text:'sanctions · CLEAR' },
+  { cls:'warn',   icon:'📱', text:'paste_trust · 0.08 · LOW' },
+  { cls:'danger', icon:'🕸️', text:'fraud_ring · 3-entity' },
+  { cls:'pass',   icon:'✓',  text:'name_match · 96.2%' },
+  { cls:'warn',   icon:'⚠️', text:'amount_ratio · 4.5×' },
+  { cls:'neutral',icon:'📊', text:'pipeline · 2.2ms' },
+];
+const RIGHT_SIGNALS = [
+  { cls:'pass',   icon:'✓',  text:'name_match · EXACT · 97%' },
+  { cls:'danger', icon:'🚫', text:'sanctions · PEP MATCH' },
+  { cls:'warn',   icon:'⚡', text:'velocity · 43 senders/7d' },
+  { cls:'pass',   icon:'✓',  text:'mule_db · CLEAN' },
+  { cls:'danger', icon:'🎭', text:'brand_token · HDFC spoof' },
+  { cls:'warn',   icon:'📱', text:'input · CLIPBOARD_PASTE' },
+  { cls:'pass',   icon:'✓',  text:'vpa_age · 847 days' },
+  { cls:'danger', icon:'🕸️', text:'gat_ring · ring_score 0.91' },
+  { cls:'warn',   icon:'⚠️', text:'first_time_payee · true' },
+  { cls:'neutral',icon:'🔤', text:'l5_siamese · 0.38 · WARN' },
+];
+
+function buildTicker(containerId, signals) {
+  const wrap = document.getElementById(containerId);
+  if (!wrap) return;
+  // Duplicate for seamless loop
+  const all = [...signals, ...signals];
+  const inner = document.createElement('div');
+  inner.className = 'ticker-inner';
+  inner.innerHTML = all.map(s => `
+    <div class="tc ${escapeHtml(s.cls)}">
+      <div class="tc-dot ${escapeHtml(s.cls)}"></div>
+      <span>${escapeHtml(s.icon)}</span>
+      <span>${escapeHtml(s.text)}</span>
+    </div>
+  `).join('');
+  wrap.appendChild(inner);
+}
+
+buildTicker('ticker-left',  LEFT_SIGNALS);
+buildTicker('ticker-right', RIGHT_SIGNALS);
+
+// ─── Code tab switcher ────────────────────────────────────
+function showTab(lang) {
+  ['curl','python','node'].forEach(l => {
+    document.getElementById('code-' + l).style.display = l === lang ? 'block' : 'none';
+  });
+  document.querySelectorAll('.ctab').forEach((t, i) => {
+    const langs = ['curl','python','node'];
+    t.classList.toggle('active', langs[i] === lang);
+    t.setAttribute('aria-selected', langs[i] === lang);
+  });
+}
+
+// ─── Init ─────────────────────────────────────────────────
+onAmtInput();
+populateDeviceSigs();
+</script>
+</body>
+</html>
