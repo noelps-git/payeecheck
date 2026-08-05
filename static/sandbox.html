@@ -775,6 +775,288 @@ textarea.field-input {
 
 /* Utility */
 .hidden { display: none !important; }
+
+/* ── Mode toggle ── */
+.mode-toggle {
+  display: flex;
+  gap: 4px;
+  padding: 10px 18px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.mode-btn {
+  flex: 1;
+  padding: 5px 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  font-family: var(--sans);
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg-3);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mode-btn.active {
+  background: var(--surface-2);
+  color: var(--fg);
+  border-color: var(--border-mid);
+}
+
+/* ── AI action buttons ── */
+.ai-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.btn-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: var(--radius);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--sans);
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.15s;
+}
+.btn-explain {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border-color: rgba(249,115,22,0.25);
+}
+.btn-explain:hover { background: rgba(249,115,22,0.18); }
+.btn-str {
+  background: var(--block-dim);
+  color: var(--block);
+  border-color: rgba(239,68,68,0.25);
+}
+.btn-str:hover { background: rgba(239,68,68,0.18); }
+.btn-triage {
+  background: var(--warn-dim);
+  color: var(--warn);
+  border-color: rgba(245,158,11,0.25);
+}
+.btn-triage:hover { background: rgba(245,158,11,0.18); }
+
+/* ── AI output cards ── */
+.ai-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  margin-top: 12px;
+}
+.ai-card-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+  margin-bottom: 10px;
+}
+.ai-card-text {
+  font-size: 13.5px;
+  color: var(--fg-2);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+.ai-card-warning {
+  margin-top: 10px;
+  padding: 7px 10px;
+  background: var(--warn-dim);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: var(--radius);
+  font-size: 11px;
+  color: var(--warn);
+  font-weight: 500;
+}
+.tools-used {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.tool-chip {
+  font-size: 10.5px;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--fg-3);
+  font-family: var(--mono);
+}
+
+/* ── Chat view ── */
+#chat-view { display: none; flex-direction: column; height: 100%; }
+#chat-view.visible { display: flex; }
+
+.chat-intro {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+}
+.chat-intro h2 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--fg);
+  margin-bottom: 4px;
+}
+.chat-intro p {
+  font-size: 12.5px;
+  color: var(--fg-3);
+  line-height: 1.5;
+}
+.chat-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+.chat-example-btn {
+  padding: 5px 11px;
+  font-size: 11.5px;
+  font-family: var(--sans);
+  background: var(--surface-2);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius);
+  color: var(--fg-2);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+.chat-example-btn:hover { color: var(--fg); background: var(--surface-3); }
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 12px;
+}
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 4px; }
+
+.chat-msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 88%;
+}
+.chat-msg.user { align-self: flex-end; align-items: flex-end; }
+.chat-msg.agent { align-self: flex-start; }
+
+.chat-bubble {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.chat-msg.user  .chat-bubble { background: var(--accent-dim); border: 1px solid rgba(249,115,22,0.2); color: var(--fg); }
+.chat-msg.agent .chat-bubble { background: var(--surface-2); border: 1px solid var(--border); color: var(--fg-2); }
+
+.chat-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.chat-input-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-shrink: 0;
+}
+.chat-input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius);
+  padding: 9px 12px;
+  font-size: 13px;
+  font-family: var(--sans);
+  color: var(--fg);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.chat-input:focus { border-color: rgba(249,115,22,0.4); }
+.chat-input::placeholder { color: var(--fg-3); }
+.btn-send {
+  padding: 9px 16px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.btn-send:hover { background: #ea6c0a; }
+.btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Triage view ── */
+#triage-view { display: none; }
+#triage-view.visible { display: block; }
+
+.triage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.triage-header h2 {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.triage-alert {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.triage-alert-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.triage-rank {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--warn);
+  background: var(--warn-dim);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+.triage-vpa {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--fg-2);
+  flex: 1;
+}
+.triage-urgency {
+  font-size: 11px;
+  color: var(--fg-3);
+}
+.triage-note {
+  font-size: 12.5px;
+  color: var(--fg-2);
+  line-height: 1.6;
+  padding: 8px 10px;
+  background: var(--surface-2);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
 </style>
 </head>
 <body>
@@ -862,13 +1144,23 @@ textarea.field-input {
       Welcome back — pick a scenario
     </div>
 
-    <div class="sb-section-label">13 Scenarios</div>
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="mode-scenarios" onclick="setMode('scenarios')">Scenarios</button>
+      <button class="mode-btn" id="mode-analyst" onclick="setMode('analyst')">AI Analyst</button>
+    </div>
 
-    <div class="sb-scenarios" id="sb-scenarios">
-      <!-- populated by JS -->
+    <div id="scenarios-panel">
+      <div class="sb-section-label">13 Scenarios</div>
+      <div class="sb-scenarios" id="sb-scenarios">
+        <!-- populated by JS -->
+      </div>
     </div>
 
     <div class="sb-footer">
+      <button class="btn-ai btn-triage" id="triage-btn" onclick="runTriage()" style="width:100%;justify-content:center;display:none;">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Triage WARN queue
+      </button>
       <button class="btn-message" onclick="openModal()">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
           <path d="M14 10.667C14 11.0206 13.8595 11.3594 13.6095 11.6095C13.3594 11.8595 13.0207 12 12.6667 12H4.66667L2 14.667V3.333C2 2.98 2.14048 2.64124 2.39052 2.39119C2.64057 2.14115 2.97971 2 3.33333 2H12.6667C13.0203 2 13.359 2.14115 13.6091 2.39119C13.8591 2.64124 14 2.98 14 3.333V10.667Z"
@@ -950,6 +1242,31 @@ textarea.field-input {
 
       </div>
 
+      <!-- AI actions -->
+      <div class="ai-actions" id="ai-actions" style="display:none;">
+        <button class="btn-ai btn-explain" onclick="explainVerdict()">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v5M8 5h.01" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          Explain this
+        </button>
+        <button class="btn-ai btn-str" id="str-btn" style="display:none;" onclick="draftSTR()">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 2h10v12H3z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Draft STR
+        </button>
+      </div>
+
+      <!-- AI explanation output -->
+      <div class="ai-card" id="explain-card" style="display:none;">
+        <div class="ai-card-label">AI Explanation</div>
+        <div class="ai-card-text" id="explain-text"></div>
+      </div>
+
+      <!-- STR Draft output -->
+      <div class="ai-card" id="str-card" style="display:none;">
+        <div class="ai-card-label">STR Draft — FIU-IND Format</div>
+        <div class="ai-card-text" id="str-text"></div>
+        <div class="ai-card-warning">⚠ This is a draft. Human review and approval required before submission to FIU-IND.</div>
+      </div>
+
       <div class="sandbox-note">
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
           <circle cx="8" cy="8" r="6.5" stroke="#52525b" stroke-width="1.2"/>
@@ -959,6 +1276,34 @@ textarea.field-input {
         Deterministic sandbox — all responses are pre-computed. No live API key required.
       </div>
 
+    </div>
+
+    <!-- Chat view (AI Analyst mode) -->
+    <div id="chat-view">
+      <div class="chat-intro">
+        <h2>Fraud Analyst</h2>
+        <p>Ask about any UPI payee, VPA, or transaction. The agent runs PayeeCheck's signal pipeline and explains what it found.</p>
+        <div class="chat-examples">
+          <button class="chat-example-btn" onclick="askChat('Is paytm.verify@axl suspicious? The account name is Vikram Nair.')">Is paytm.verify@axl legit?</button>
+          <button class="chat-example-btn" onclick="askChat('Check amazon.pay@apl — entered name is Amazon Pay')">Verify amazon.pay@apl</button>
+          <button class="chat-example-btn" onclick="askChat('The payee VPA is hdfc.support@paytrn and the name shown is HDFC Support. Is this real?')">hdfc.support@paytrn real?</button>
+          <button class="chat-example-btn" onclick="askChat('Analyse Global Trade Finance Ltd against sanctions lists')">Sanctions check</button>
+        </div>
+      </div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-input-row">
+        <input class="chat-input" id="chat-input" placeholder="Ask about any VPA or payee…" onkeydown="if(event.key==='Enter')sendChat()" />
+        <button class="btn-send" id="chat-send" onclick="sendChat()">Ask</button>
+      </div>
+    </div>
+
+    <!-- Triage view -->
+    <div id="triage-view">
+      <div class="triage-header">
+        <h2>WARN Alert Queue</h2>
+        <span id="triage-count" style="font-size:12px;color:var(--fg-3);"></span>
+      </div>
+      <div id="triage-list"></div>
     </div>
 
   </main>
@@ -1164,7 +1509,224 @@ async function selectScenario(scenarioId) {
   }
 }
 
+// ── Mode toggle ──────────────────────────────────────────────────────
+let currentMode = 'scenarios'
+
+function setMode(mode) {
+  currentMode = mode
+  document.getElementById('mode-scenarios').classList.toggle('active', mode === 'scenarios')
+  document.getElementById('mode-analyst').classList.toggle('active', mode === 'analyst')
+  document.getElementById('scenarios-panel').style.display = mode === 'scenarios' ? 'block' : 'none'
+  document.getElementById('chat-view').classList.toggle('visible', mode === 'analyst')
+  document.getElementById('triage-view').classList.remove('visible')
+  if (mode === 'analyst') {
+    document.getElementById('welcome').style.display = 'none'
+    document.getElementById('result').classList.remove('visible')
+    document.getElementById('triage-btn').style.display = 'flex'
+    document.getElementById('chat-input').focus()
+  } else {
+    document.getElementById('triage-btn').style.display = 'none'
+  }
+}
+
+// ── AI Explain ───────────────────────────────────────────────────────
+let _lastResult = null
+
+async function explainVerdict() {
+  if (!_lastResult) return
+  const rv  = _lastResult.risk_verdict
+  const ev  = _lastResult.payee_check.evidence
+  const card = document.getElementById('explain-card')
+  const text = document.getElementById('explain-text')
+
+  card.style.display = 'block'
+  text.innerHTML = '<span class="spinner"></span> Explaining…'
+
+  try {
+    const res = await fetch('/agent/explain', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        scenario_id:  _lastResult.scenario_id,
+        verdict:      rv.verdict,
+        risk_score:   rv.risk_score,
+        payee_vpa:    ev.payee_vpa,
+        entered_name: ev.entered_name,
+        actual_name:  ev.actual_name,
+        signals:      ev.signals_fired,
+        description:  _lastResult.scenario_description
+      })
+    })
+    const data = await res.json()
+    text.textContent = data.explanation
+  } catch {
+    text.textContent = 'Could not load explanation — is the server running with GROQ_API_KEY set?'
+  }
+}
+
+// ── STR Draft ────────────────────────────────────────────────────────
+async function draftSTR() {
+  if (!_lastResult) return
+  const rv  = _lastResult.risk_verdict
+  const ev  = _lastResult.payee_check.evidence
+  const card = document.getElementById('str-card')
+  const text = document.getElementById('str-text')
+
+  card.style.display = 'block'
+  text.innerHTML = '<span class="spinner"></span> Drafting STR…'
+
+  try {
+    const res = await fetch('/agent/str-draft', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        check_id:     _lastResult.payee_check.id,
+        scenario_id:  _lastResult.scenario_id,
+        payee_vpa:    ev.payee_vpa,
+        entered_name: ev.entered_name,
+        actual_name:  ev.actual_name,
+        risk_score:   rv.risk_score,
+        signals:      ev.signals_fired,
+        description:  _lastResult.scenario_description
+      })
+    })
+    const data = await res.json()
+    text.textContent = data.draft
+  } catch (e) {
+    text.textContent = 'STR draft failed — check GROQ_API_KEY is set.'
+  }
+}
+
+// ── Chat (Fraud Analyst Agent) ───────────────────────────────────────
+function askChat(q) {
+  document.getElementById('chat-input').value = q
+  sendChat()
+}
+
+async function sendChat() {
+  const input  = document.getElementById('chat-input')
+  const query  = input.value.trim()
+  if (!query) return
+
+  const msgs   = document.getElementById('chat-messages')
+  const sendBtn = document.getElementById('chat-send')
+
+  // User bubble
+  msgs.innerHTML += `<div class="chat-msg user"><div class="chat-bubble">${escHtml(query)}</div></div>`
+  input.value = ''
+  sendBtn.disabled = true
+  msgs.scrollTop = msgs.scrollHeight
+
+  // Thinking bubble
+  const thinkId = 'think-' + Date.now()
+  msgs.innerHTML += `<div class="chat-msg agent" id="${thinkId}"><div class="chat-bubble"><span class="spinner"></span> Analyzing…</div></div>`
+  msgs.scrollTop = msgs.scrollHeight
+
+  try {
+    const res  = await fetch('/agent/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query })
+    })
+    const data = await res.json()
+
+    const chips = (data.tools_used || []).map(t =>
+      `<span class="tool-chip">✓ ${t.tool}</span>`
+    ).join('')
+
+    document.getElementById(thinkId).outerHTML = `
+      <div class="chat-msg agent">
+        ${chips ? `<div class="chat-tools">${chips}</div>` : ''}
+        <div class="chat-bubble">${escHtml(data.response || 'No response.')}</div>
+      </div>`
+  } catch {
+    document.getElementById(thinkId).outerHTML =
+      `<div class="chat-msg agent"><div class="chat-bubble">Error — is GROQ_API_KEY set on the server?</div></div>`
+  }
+
+  sendBtn.disabled = false
+  msgs.scrollTop = msgs.scrollHeight
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>')
+}
+
+// ── Alert Triage ─────────────────────────────────────────────────────
+async function runTriage() {
+  // Collect all WARN scenarios as alerts
+  const warns = SCENARIOS.filter(s => s.verdict === 'warn')
+  document.getElementById('triage-view').classList.add('visible')
+  document.getElementById('chat-view').classList.remove('visible')
+  document.getElementById('welcome').style.display = 'none'
+  document.getElementById('result').classList.remove('visible')
+
+  const list  = document.getElementById('triage-list')
+  const count = document.getElementById('triage-count')
+  list.innerHTML = '<div style="color:var(--fg-3);font-size:13px;padding:8px 0"><span class="spinner"></span> Scoring urgency and drafting investigation notes…</div>'
+  count.textContent = ''
+
+  // Fetch scenario data for all warns
+  const alertData = warns.map(s => ({
+    scenario_id: s.id,
+    verdict:     s.verdict,
+    payee_vpa:   'vpa@sandbox',
+    risk_score:  s.score,
+    amount:      50000,
+    signals:     [],
+    description: ''
+  }))
+
+  // Get actual signal data by fetching each scenario
+  await Promise.all(warns.map(async (s, i) => {
+    try {
+      const r = await fetch('/sandbox/v1/payee-checks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenario_id: s.id })
+      })
+      const d = await r.json()
+      alertData[i].payee_vpa   = d.payee_check.evidence.payee_vpa
+      alertData[i].signals     = d.payee_check.evidence.signals_fired
+      alertData[i].description = d.scenario_description
+    } catch {}
+  }))
+
+  try {
+    const res  = await fetch('/agent/triage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ alerts: alertData })
+    })
+    const data = await res.json()
+
+    count.textContent = `${data.total_alerts} alerts · top ${data.triaged_alerts.length} shown`
+    list.innerHTML = data.triaged_alerts.map(a => `
+      <div class="triage-alert">
+        <div class="triage-alert-header">
+          <span class="triage-rank">#${a.urgency_rank}</span>
+          <span class="triage-vpa">${a.payee_vpa}</span>
+          <span class="triage-urgency">urgency ${a.urgency_score}</span>
+        </div>
+        <div class="triage-note">${escHtml(a.investigation_note)}</div>
+      </div>
+    `).join('')
+  } catch {
+    list.innerHTML = '<div style="color:var(--block);font-size:13px;">Triage failed — check GROQ_API_KEY.</div>'
+  }
+}
+
 function renderResult(data) {
+  _lastResult = data
+  document.getElementById('explain-card').style.display = 'none'
+  document.getElementById('str-card').style.display = 'none'
+  document.getElementById('ai-actions').style.display = 'flex'
+  // Show STR button only for BLOCK + score >= 85
+  const strBtn = document.getElementById('str-btn')
+  const _aiScore = data.risk_verdict.risk_score
+  const _aiVerdict = data.risk_verdict.verdict
+  strBtn.style.display = (_aiVerdict === 'block' && _aiScore >= 85) ? 'inline-flex' : 'none'
+
   const rv       = data.risk_verdict
   const evidence = data.payee_check.evidence
   const verdict  = rv.verdict
