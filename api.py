@@ -16,6 +16,7 @@ Example request:
     POST http://localhost:8000/match/4
     {"entered": "SBI", "actual": "State Bank of India"}
 """
+from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -25,11 +26,22 @@ from typing import Literal, Optional
 import hmac
 import os
 
+from api_v1.storage import init_db
+from api_v1.gate import router as gate_router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+
 app = FastAPI(
     title="PayeeCheck — Name Matching Intelligence API",
     description="L1 to L6 name matching, hosted locally. "
                  "See /docs for interactive testing.",
     version="1.0",
+    lifespan=lifespan,
 )
 
 # Browser origins allowed to call this API. Defaults to local development
@@ -65,6 +77,9 @@ def require_api_key(x_api_key: Optional[str] = Header(default=None)) -> None:
 
 
 _STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+
+# ── Gate — visitor identification + query flow ────────────────────────
+app.include_router(gate_router)
 
 # ── Sandbox — deterministic demo environment ──────────────────────────
 from sandbox.router import router as sandbox_router
@@ -131,14 +146,9 @@ def get_matcher(level: int):
     return match
 
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
 def serve_ui():
-    """
-    Serves the PayeeCheck phone-UI prototype directly — visiting
-    http://localhost:8000/ shows the live playground, calling this
-    same server's /score endpoint via relative paths. No separate
-    HTML file to open.
-    """
+    """Serves the PayeeCheck B2B dashboard."""
     index_path = os.path.join(_STATIC_DIR, "index.html")
     if not os.path.exists(index_path):
         raise HTTPException(
@@ -147,6 +157,18 @@ def serve_ui():
                    "payeecheck/ folder."
         )
     return FileResponse(index_path, media_type="text/html")
+
+
+@app.get("/sandbox", include_in_schema=False)
+def serve_sandbox():
+    """Serves the gated fraud intelligence sandbox UI."""
+    sandbox_path = os.path.join(_STATIC_DIR, "sandbox.html")
+    if not os.path.exists(sandbox_path):
+        raise HTTPException(
+            status_code=404,
+            detail="sandbox.html not found in static/."
+        )
+    return FileResponse(sandbox_path, media_type="text/html")
 
 
 @app.get("/health")

@@ -1,12 +1,14 @@
+# Lightweight deploy — no torch, no torch-geometric
+# GAT falls back to ring_score=0.0 via gnn/gat_scorer.py guard
+# L4/L5 embeddings fall back to L3 TF-IDF
+# Runs on any 512MB free tier (Railway, Render, Fly.io)
 fastapi>=0.100
 uvicorn>=0.23
 rapidfuzz>=3.0
 metaphone>=0.6
 scikit-learn>=1.3
-sentence-transformers>=2.5
-torch>=2.0
-torch-geometric>=2.8
-networkx>=3.0
-pydantic>=2.0
 pandas>=2.0
 numpy>=1.24
+pydantic>=2.0
+httpx>=0.24
+python-dotenv>=1.0
