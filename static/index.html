@@ -830,66 +830,110 @@ const AGENTS = [
   {id:'triage',name:'Alert Triage Agent',status:'Active',statusCls:'agen-active',
    desc:'Activates on WARN verdicts only — never on BLOCK (already decisive) or PASS. Reads the full 3-layer attribution record, queries the entity graph, and produces an escalate/dismiss recommendation citing specific signals and numerical values.',
    governance:'Every recommendation is logged with a request_id. Human analyst retains full override authority. Agent cannot modify any verdict or attribution record.',
-   fn: async (a,out) => stream(out,[
-     `Alert Triage Agent · ${new Date().toLocaleTimeString()}`,
-     `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-     `Alert: ${a.id} · ${a.name}`,
-     `Verdict: ${a.verdict.toUpperCase()} · Score: ${a.score}/100`,
-     ``,
-     `Signals reviewed:`,
-     ...a.signals.map(s=>`  [${s.sev}] ${s.name} — fleet rate ${s.prev}%`),
-     ``,
-     a.verdict==='block'
-       ? `RECOMMENDATION: Escalate for compliance review.\n\nPrimary signal "${a.signals[0].name}" has a fleet prevalence of ${a.signals[0].prev}% — this is ${a.signals[0].prev < 2 ? 'rare and highly indicative of fraud' : 'moderately common'}. Signal combination warrants no further investigation before blocking.`
-       : `RECOMMENDATION: Hold for analyst review.\n\nPrimary signal "${a.signals[0].name}" warrants friction but not an outright block. Suggest confirming with payer before proceeding. Low-friction confirmation screen already shown.`,
-     ``,
-     `⚠  Advisory only. Human analyst retains final authority.`,
-     `Logged: ${a.id}_triage_${Date.now()}`,
-   ])},
+   fn: async (a,out) => {
+     out.textContent='Calling Alert Triage Agent…';
+     out.classList.add('on');
+     try {
+       const res = await fetch('/agent/triage',{
+         method:'POST',headers:{'Content-Type':'application/json'},
+         body:JSON.stringify({alerts:[{
+           scenario_id:a.id,verdict:a.verdict,payee_vpa:a.vpa,
+           risk_score:a.score,amount:50000,
+           signals:a.signals.map(s=>s.name),description:a.desc
+         }]})
+       });
+       const data = await res.json();
+       const top = data.triaged_alerts[0];
+       const text = [
+         `Alert Triage Agent · ${new Date().toLocaleTimeString()}`,
+         `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+         `Alert: ${a.id} · ${a.name}`,
+         `Verdict: ${a.verdict.toUpperCase()} · Score: ${a.score}/100`,
+         `Urgency Score: ${top.urgency_score} (Rank #${top.urgency_rank} of ${data.total_alerts})`,
+         ``,
+         top.investigation_note,
+         ``,
+         `⚠  Advisory only. Human analyst retains final authority.`,
+         `Logged: ${a.id}_triage_${Date.now()}`
+       ].join('\n');
+       await streamStr(out, text);
+     } catch(e) { await streamStr(out,`Error: ${e.message}`); }
+   }},
   {id:'entity',name:'Entity Resolution Agent',status:'Active',statusCls:'agen-active',
    desc:'Narrates what the fraud graph shows about a flagged account — hops to confirmed mule accounts, shared attributes, and propagated risk weights. Never infers a connection not present in the graph.',
    governance:'Read-only. Agent cannot modify the entity graph or create new connections.',
-   fn: async (a,out) => stream(out,[
-     `Entity Resolution Agent · ${new Date().toLocaleTimeString()}`,
-     `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-     `Target: ${a.vpa}`,
-     `Graph connections: ${a.connections}`,
-     ``,
-     a.connections>0
-       ? (a.ringId
-         ? `Ring membership confirmed: ${a.ringId}\n  → Account is the ring coordinator\n  → ${Math.min(a.connections,5)} satellites share device fingerprint\n  → GAT propagated risk: 0.956 (edge-feature attention)\n  → Shared attribute type: device fingerprint hash`
-         : `${a.connections} connections found\n  → No confirmed ring membership\n  → Connection type: shared attributes\n  → Propagated risk: 0.48 (2nd-degree, decay 0.5 per hop)`)
-       : `No graph connections found.\nEntity graph traversal returned 0 connected nodes.\nThis account has no known associations in the shared-attribute graph.`,
-     ``,
-     `Note: Only verified graph edges reported. No inferred connections.`,
-     `Logged: ${a.id}_entity_${Date.now()}`,
-   ])},
+   fn: async (a,out) => {
+     out.textContent='Calling Entity Resolution Agent…';
+     out.classList.add('on');
+     try {
+       const query = `Analyze fraud risk for VPA ${a.vpa}. Payee name: ${a.name}. Graph connections: ${a.connections}${a.ringId?', ring: '+a.ringId:''}. ${a.desc}. Check fraud ring membership and entity resolution.`;
+       const res = await fetch('/agent/analyze',{
+         method:'POST',headers:{'Content-Type':'application/json'},
+         body:JSON.stringify({query})
+       });
+       const data = await res.json();
+       const toolsStr = data.tools_used&&data.tools_used.length
+         ? '\n\nSignals called:\n'+data.tools_used.map(t=>`  · ${t.tool}`).join('\n')
+         : '';
+       const text = [
+         `Entity Resolution Agent · ${new Date().toLocaleTimeString()}`,
+         `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+         `Target: ${a.vpa}`,
+         `Graph connections: ${a.connections}`,
+         ``,
+         data.response,
+         toolsStr,
+         ``,
+         `Note: Only verified graph edges reported. No inferred connections.`,
+         `Logged: ${a.id}_entity_${Date.now()}`
+       ].join('\n');
+       await streamStr(out, text);
+     } catch(e) { await streamStr(out,`Error: ${e.message}`); }
+   }},
   {id:'str-draft',name:'STR/SAR Draft Agent',status:'Active',statusCls:'agen-active',
    desc:'Drafts Suspicious Transaction Report narratives for FIU-IND in the required who/what/when/where/why format. Every sentence traces to a real attribution.py signal. A deterministic grounding checker validates each claim before it reaches a human reviewer.',
    governance:'BLOCK verdicts only. Draft always reviewed by human compliance officer before filing with FIU-IND. Grounding checker is non-LLM code — not another AI validating AI output.',
-   fn: async (a,out) => stream(out,[
-     `STR/SAR Draft Agent · ${new Date().toLocaleTimeString()}`,
-     `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-     `DRAFT — SUSPICIOUS TRANSACTION REPORT`,
-     `FIU-IND · PMLA Section 12`,
-     ``,
-     `WHO:   ${a.name} (${a.vpa})`,
-     `WHAT:  Payment blocked — risk score ${a.score}/100`,
-     `WHEN:  ${new Date().toLocaleDateString()} · ${a.age} ago`,
-     `WHERE: UPI transaction via PayeeCheck API`,
-     `WHY:   ${a.signals.map(s=>s.name).join('; ')}`,
-     ``,
-     `Evidence (attribution.py Layer 2 signals):`,
-     ...a.signals.map(s=>`  [${s.sev}] ${s.name}\n           ${s.detail}`),
-     ``,
-     `─── Grounding Check ────────────────────`,
-     `✓ All factual claims trace to attribution record`,
-     `✓ 0/0 sentences flagged by grounding checker`,
-     `✓ No hallucinated details detected`,
-     ``,
-     `⚠  DRAFT ONLY — compliance officer must review and file.`,
-     `Logged: ${a.id}_str_${Date.now()}`,
-   ])},
+   fn: async (a,out) => {
+     if(a.score < 85){
+       out.classList.add('on');
+       await streamStr(out,[
+         `STR/SAR Draft Agent · ${new Date().toLocaleTimeString()}`,
+         `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+         ``,
+         `STR draft not triggered — risk score ${a.score}/100 is below the`,
+         `threshold of 85. The STR Draft Agent only activates on BLOCK`,
+         `verdicts with risk score ≥ 85.`
+       ].join('\n'));
+       return;
+     }
+     out.textContent='Calling STR/SAR Draft Agent…';
+     out.classList.add('on');
+     try {
+       const res = await fetch('/agent/str-draft',{
+         method:'POST',headers:{'Content-Type':'application/json'},
+         body:JSON.stringify({
+           check_id:a.id,scenario_id:a.id,payee_vpa:a.vpa,
+           entered_name:a.name,actual_name:a.name,
+           risk_score:a.score,
+           signals:a.signals.map(s=>s.name),
+           description:a.desc
+         })
+       });
+       const data = await res.json();
+       const text = [
+         `STR/SAR Draft Agent · ${new Date().toLocaleTimeString()}`,
+         `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
+         `DRAFT — SUSPICIOUS TRANSACTION REPORT`,
+         `FIU-IND · PMLA Section 12`,
+         `Model: ${data.model}`,
+         ``,
+         data.draft,
+         ``,
+         `⚠  ${data.draft_status}`
+       ].join('\n');
+       await streamStr(out, text);
+     } catch(e) { await streamStr(out,`Error: ${e.message}`); }
+   }},
   {id:'pattern',name:'Pattern Monitor Agent',status:'Scheduled',statusCls:'agen-sched',
    desc:'Scans rolling window of stored PayeeCheck records for emerging fraud campaigns — clusters of accounts individually below threshold but collectively forming a detectable pattern. Runs on aggregated data, not per-transaction.',
    governance:'Scheduled — not per case. Outputs a daily digest. Cannot trigger blocks or modify any record directly.',
@@ -1200,6 +1244,15 @@ async function stream(el, lines) {
       el.scrollTop = el.scrollHeight;
       await sleep(ch==='\n'?20:8);
     }
+  }
+}
+async function streamStr(el, text) {
+  el.textContent='';
+  el.classList.add('on');
+  for(const ch of text) {
+    el.textContent += ch;
+    el.scrollTop = el.scrollHeight;
+    await sleep(ch==='\n'?15:5);
   }
 }
 async function runAgent(aid, alertId, btn) {
