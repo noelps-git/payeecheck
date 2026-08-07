@@ -207,6 +207,29 @@ python gnn/gat_mule_detector.py --epochs 100
 
 ---
 
+## Configuration
+
+All configuration is via environment variables — no config files needed.
+
+| Variable | Default | Description |
+|---|---|---|
+| `PAYEECHECK_API_KEY` | *(unset — open)* | When set, all scoring/matching endpoints require `X-API-Key: <value>` header. Comparison is timing-safe (`hmac.compare_digest`). Sandbox and health endpoints stay public regardless. |
+| `PAYEECHECK_ALLOWED_ORIGINS` | `http://localhost:8000,http://127.0.0.1:8000` | Comma-separated CORS whitelist. Set to your deployed domain(s) in production. `*` is honoured only if you explicitly pass it. |
+| `PAYEECHECK_HOST` | `127.0.0.1` | Server bind address. Set to `0.0.0.0` to expose on the network. |
+| `PAYEECHECK_PORT` | `8000` | Server port. |
+| `PAYEECHECK_RELOAD` | *(off)* | Set to `1` or `true` to enable uvicorn hot-reload (development only). |
+
+Example — lock down for internal deployment:
+
+```bash
+PAYEECHECK_API_KEY=my-secret-key \
+PAYEECHECK_ALLOWED_ORIGINS=https://dashboard.yourbank.com \
+PAYEECHECK_HOST=0.0.0.0 \
+python run.py
+```
+
+---
+
 ## Repo structure
 
 ```
@@ -338,9 +361,12 @@ Designed to meet [RBI Draft Model Risk Management Guidelines (2023)](https://www
 | NPCI promoter banks, UPI-live banks list | ✅ Real — verified public data |
 | Bank abbreviation aliases (SBI, PNB, BOB…) | ✅ Real |
 | Known merchant VPA patterns (Amazon Pay, Paytm…) | ✅ Real — public knowledge |
-| FastAPI server, endpoints, idempotency, auth | ✅ Real — fully tested |
+| FastAPI server, endpoints, input validation, auth | ✅ Real — field-level constraints (min/max length) on all inputs; optional API key auth via `PAYEECHECK_API_KEY` |
+| CORS restriction | ✅ Real — locked to localhost by default; `*` is not the default |
 | GAT architecture (`GATConv(edge_dim=…)`) | ✅ Real PyTorch Geometric — trained end-to-end |
+| GAT graceful degradation | ✅ Real — a GAT inference failure logs the error and omits the signal rather than crashing `/score` |
 | Three-layer attribution record | ✅ Real — every assertion has a numerical value + threshold |
+| Sanctions fallback | ✅ Real — corrupt or missing `sanctions_data.json` falls back to bundled seed lists at import time; never a hard crash |
 | Synthetic benchmark dataset | ⚠️ Rule-generated — measures pipeline correctness, not real-world accuracy |
 | L5 Siamese training pairs | ⚠️ Illustrative seed (~15 pairs) — extend with real KYC data |
 | Sanctions/PEP seed lists | ⚠️ Illustrative — production requires OFAC/UN/domestic sync |
@@ -352,11 +378,19 @@ Designed to meet [RBI Draft Model Risk Management Guidelines (2023)](https://www
 
 All benchmark numbers (Precision 1.00, Recall 82.6%, AUPRC ~0.996) are from rule-generated synthetic data on 1,000 transactions. They measure whether the pipeline correctly recovers patterns **deliberately encoded in the generator** — not real-world accuracy on live bank data. This mirrors how SCAFDS (Uddin, 2026) frames its own synthetic Track B evaluation.
 
-Two real bugs were found and fixed during this build:
+Real bugs found and fixed during this build:
+
+**Benchmark methodology (initial build):**
 - **Dataset inconsistency:** `mule_flagged` set independently from `mule_flag_count` — silently capped recall at 47%. Fixed: `mule_flagged = mule_flag_count > 0`. Recall jumped to 82.6%.
 - **Vacuous GAT ablation:** Non-overlapping fraud/clean feature ranges made the ablation meaningless. Fixed by overlapping ranges — produced a real 6.7pp edge-feature contribution.
 
-Both are documented in full in `CHANGELOG.pdf`.
+**Reliability / correctness (post-merge hardening):**
+- **GAT scorer silent failure:** A `_WEIGHTS` name typo caused the GAT model to fail to load on every start without any error. Inference always fell back to the zero-signal default. Fixed: corrected the variable name; failures now log explicitly and the signal degrades gracefully.
+- **Indexing bug in `transaction_graph.py`:** `probs[i][0]` was used in a context where `i` was an edge index, not a row index — potential out-of-bounds on larger graphs. Fixed: corrected indexing; GAT inference failure now logged rather than swallowed.
+- **Silent data loss in `calibrate_weights.py`:** Rows that failed coercion were silently skipped via a bare `except: pass`. Fixed: logged and counted; bare `except` narrowed to `(ValueError, TypeError)`.
+- **Sanctions screening import crash:** A corrupt or missing `sanctions_data.json` raised an unhandled exception at module import time, taking down the whole API. Fixed: falls back to bundled seed lists with a warning log.
+
+All are documented in full in `CHANGELOG.pdf`.
 
 ---
 
@@ -374,15 +408,20 @@ Both are documented in full in `CHANGELOG.pdf`.
 
 Full Swagger UI at `/docs` when running locally.
 
+Auth column shows requirement when `PAYEECHECK_API_KEY` is set (unset = all open).
+
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| `POST` | `/v1/payee-checks` | API key | Full 7-signal risk check |
-| `GET` | `/v1/payee-checks/{id}` | API key | Retrieve a prior check result |
-| `GET` | `/v1/reconciliation?date=YYYY-MM-DD` | API key | Daily audit export |
-| `POST` | `/v1/admin/banks` | API key | Issue a bank API key |
-| `POST` | `/sandbox/v1/payee-checks` | None | Deterministic demo — 13 scenarios |
-| `POST` | `/score` | None | Raw risk scorer — local testing |
-| `POST` | `/match/{level}` | None | Name matching at a specific level (1–6) |
+| `GET` | `/health` | None | Liveness check |
+| `POST` | `/score` | API key | Full 7-signal risk check — returns verdict, risk_score, attribution |
+| `POST` | `/match/{level}` | API key | Name matching at a specific level (1–6) |
+| `POST` | `/compare` | API key | Run all levels and return a side-by-side comparison |
+| `POST` | `/resolve` | API key | Graph entity resolution across the KYC name corpus |
+| `GET` | `/rings` | API key | Return detected fraud rings (`min_size` query param, default 2) |
+| `POST` | `/attribution` | API key | Build a three-layer attribution record for a given input |
+| `GET` | `/sandbox/v1/scenarios` | None | List all 13 scenario IDs and their descriptions |
+| `POST` | `/sandbox/v1/payee-checks` | None | Run a scenario by `scenario_id` — deterministic, no DB writes |
+| `GET` | `/sandbox/v1/payee-checks/{scenario_id}` | None | Fetch a scenario response by ID |
 
 ---
 
