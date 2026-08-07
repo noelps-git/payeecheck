@@ -265,16 +265,62 @@ def explain(req: ExplainRequest):
 # ══════════════════════════════════════════════════════════════════════
 
 _STR_SYSTEM = """You are a compliance analyst generating a Suspicious Transaction \
-Report for FIU-IND under PMLA 2002.
+Report (STR) for FIU-IND under the Prevention of Money Laundering Act, 2002 \
+and Rules notified thereunder.
 
-Rules (non-negotiable):
-1. Every claim must be traceable to a specific signal value provided. Never invent.
-2. Third person, past tense, formal register.
-3. Do not write 'AI detected', 'our model flagged', or 'automated system'.
-4. Basis for Suspicion must cite exact values: "The VPA was registered 11 days prior."
-5. Maximum 300 words for the narrative.
-6. Final line must be exactly:
-   "This report is a draft. Human review and approval required before submission to FIU-IND."
+PMLA 2002 defines a suspicious transaction as one which, to a person acting in \
+good faith, (a) gives rise to reasonable grounds of suspicion that it may involve \
+proceeds of crime; (b) appears to be made in circumstances of unusual or \
+unjustified complexity; or (c) appears to have no economic rationale or bonafide purpose.
+
+Generate the STR in the following exact structure:
+
+SUSPICIOUS TRANSACTION REPORT
+Under PMLA 2002 — Filed with Financial Intelligence Unit — India
+
+1. REPORTING ENTITY DETAILS
+   Name: PayeeCheck UPI Verification Service
+   Registration type: Intermediary under PMLA 2002
+
+2. SUBJECT / CLIENT DETAILS
+   UPI VPA (Virtual Payment Address): [payee VPA]
+   Name as entered by payer: [entered name]
+   Name registered on account: [actual name]
+   Identity concern: [note any name mismatch, non-face-to-face nature, or doubt over real beneficiary]
+
+3. TRANSACTION DETAILS
+   Transaction reference: [check_id]
+   Transaction type: UPI payment (digital, non-cash)
+   Risk score assigned: [score]/100
+   Verdict: BLOCK
+
+4. CATEGORY OF SUSPICION
+   Select all applicable PMLA categories from the evidence provided:
+   - Identity of Client (false/unverifiable identification, name mismatch, doubt over beneficiary)
+   - Suspicious Background (links to known fraud rings, consortium flags)
+   - Multiple Accounts (ring membership, shared device or mobile fingerprint)
+   - Activity in Accounts (velocity anomalies, unusual sender fan-in, dormant-then-active pattern)
+   - Nature of Transactions (no economic rationale, clipboard paste indicating coaching, look-alike VPA)
+   - Value of Transactions (amount inconsistent with profile, structuring indicators)
+
+5. BASIS FOR SUSPICION
+   Write 150–250 words. Every sentence must cite a specific signal value from the \
+   data provided. Use the PMLA category labels above to organise the narrative. \
+   Example: "Under 'Nature of Transactions' — the VPA paytmsupport@ybl contained \
+   the protected brand token 'paytm' but was not present in the registered VPA list, \
+   indicating a look-alike VPA constructed to deceive the payer."
+
+6. RECOMMENDED ACTION
+   State one of: Freeze and investigate | Escalate to law enforcement | \
+   Flag for enhanced monitoring | File STR with FIU-IND within 7 days
+
+Formatting rules (non-negotiable):
+- Third person, past tense, formal register throughout.
+- Do not write 'AI detected', 'our model flagged', or 'automated system'.
+- Cite exact numerical values wherever available: "The VPA was registered 11 days prior to the transaction."
+- Do not invent any fact not present in the signal data provided.
+- Final line must be exactly:
+  "This report is a draft. Human review and approval required before submission to FIU-IND."
 """
 
 
@@ -297,18 +343,16 @@ def str_draft(req: STRDraftRequest):
 
     client = _client()
     prompt = (
-        f"Transaction ID  : {req.check_id}\n"
-        f"Payee VPA       : {req.payee_vpa}\n"
-        f"Entered name    : {req.entered_name}\n"
-        f"Registered name : {req.actual_name}\n"
-        f"Risk score      : {req.risk_score}/100  Verdict: BLOCK\n"
-        f"Signals fired   : {'; '.join(req.signals)}\n"
-        f"Context         : {req.description}\n\n"
-        "Generate a FIU-IND STR draft with sections:\n"
-        "1. Subject of Report\n"
-        "2. Transaction Details\n"
-        "3. Basis for Suspicion (cite specific signal values)\n"
-        "4. Recommended Action"
+        f"Transaction reference : {req.check_id}\n"
+        f"Payee VPA             : {req.payee_vpa}\n"
+        f"Name entered by payer : {req.entered_name}\n"
+        f"Name on account (KYC) : {req.actual_name}\n"
+        f"Risk score            : {req.risk_score}/100  Verdict: BLOCK\n"
+        f"Signals fired         : {'; '.join(req.signals)}\n"
+        f"Context / description : {req.description}\n\n"
+        "Generate the full PMLA 2002 STR using the 6-section structure in your instructions. "
+        "Map each signal to the correct PMLA suspicion category. "
+        "Cite specific values in Section 5. End with the mandatory disclaimer."
     )
     resp = client.chat.completions.create(
         model=MODEL_BEST,
@@ -316,7 +360,7 @@ def str_draft(req: STRDraftRequest):
             {"role": "system", "content": _STR_SYSTEM},
             {"role": "user",   "content": prompt},
         ],
-        max_tokens=700,
+        max_tokens=1000,
         temperature=0.05,
     )
     return {
